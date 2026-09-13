@@ -13,7 +13,7 @@ import { SelectField } from "@/components/shared/select-field";
 import { useUrCampus } from "@/providers/urcampus-provider";
 import type { Campus, Student, Chapter } from "@/types";
 
-function DuplicatePage({ chapter }: { chapter?: Chapter }) {
+function DuplicatePage({ chapter }: { chapter?: Chapter | undefined }) {
   return (
     <AppLayout mode="student">
       <div className="mx-auto max-w-xl border-t-4 border-clay bg-card p-7 text-center shadow-soft sm:p-10">
@@ -50,7 +50,10 @@ export function RegisterPage({ params }: { params: Promise<{ chapterId: string }
   const [form, setForm] = useState({ ...profile, chapterId });
 
   if (!chapter) return null;
-  if (duplicate) return <DuplicatePage chapter={chapters.find((c) => c.id === duplicate.chapterId)} />;
+  if (duplicate) {
+    const duplicateChapter = chapters.find((c) => c.id === duplicate.chapterId);
+    return <DuplicatePage chapter={duplicateChapter} />;
+  }
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
