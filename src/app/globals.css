@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.25rem;
+    --background: 38 70% 96%;
+    --foreground: 141 21% 27%;
+    --card: 106 26% 98%;
+    --card-foreground: 141 21% 27%;
+    --popover: 106 26% 98%;
+    --popover-foreground: 141 21% 27%;
+    --primary: 141 37% 42%;
+    --primary-foreground: 108 27% 97%;
+    --secondary: 104 44% 87%;
+    --secondary-foreground: 141 32% 31%;
+    --muted: 102 42% 92%;
+    --muted-foreground: 102 21% 50%;
+    --accent: 86 55% 86%;
+    --accent-foreground: 102 32% 30%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 99 35% 82%;
+    --input: 97 36% 78%;
+    --ring: 141 37% 54%;
+    --clay: 40 55% 54%;
+    --clay-foreground: 108 27% 97%;
+    --gold: 76 55% 70%;
+  }
+
+  .dark {
+    --background: 264 65% 13%;
+    --foreground: 248 22% 98%;
+    --card: 266 40% 21%;
+    --card-foreground: 248 22% 98%;
+    --popover: 266 40% 21%;
+    --popover-foreground: 248 22% 98%;
+    --primary: 256 20% 93%;
+    --primary-foreground: 266 40% 21%;
+    --secondary: 260 30% 28%;
+    --secondary-foreground: 248 22% 98%;
+    --muted: 260 30% 28%;
+    --muted-foreground: 257 18% 70%;
+    --accent: 260 30% 28%;
+    --accent-foreground: 248 22% 98%;
+    --destructive: 0 63% 70%;
+    --destructive-foreground: 248 22% 98%;
+    --border: 0 0% 100% / 10%;
+    --input: 0 0% 100% / 15%;
+    --ring: 264 18% 55%;
+    --clay: 40 55% 54%;
+    --clay-foreground: 108 27% 97%;
+    --gold: 76 55% 70%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: 0;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    letter-spacing: 0;
+  }
+}
+
+@layer utilities {
+  .shadow-soft {
+    box-shadow: 0 12px 36px color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: hsl(var(--clay));
+  }
+
+  .bg-hero-overlay {
+    background: linear-gradient(
+      90deg,
+      oklch(0.2 0.035 118 / 0.92) 0%,
+      oklch(0.24 0.03 110 / 0.62) 52%,
+      oklch(0.24 0.03 110 / 0.08) 100%
+    );
+  }
+}
+
+@layer components {
+  .status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    border: 1px solid;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .status-active {
+    border-color: color-mix(in srgb, hsl(var(--primary)) 40%, transparent);
+    background: color-mix(in srgb, hsl(var(--primary)) 10%, hsl(var(--card)));
+    color: hsl(var(--primary));
+  }
+
+  .status-coming-soon {
+    border-color: color-mix(in srgb, hsl(var(--gold)) 65%, transparent);
+    background: color-mix(in srgb, hsl(var(--gold)) 14%, hsl(var(--card)));
+    color: oklch(0.43 0.09 68);
+  }
+
+  .status-draft {
+    border-color: hsl(var(--border));
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+  }
+}
