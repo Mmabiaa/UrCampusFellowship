@@ -18,7 +18,7 @@ export function CampusPage() {
         <PageIntro
           eyebrow="One quick choice"
           title="Which campus are you on?"
-          description="We'll show fellowships that meet close to you. You can change this anytime."
+          description="We&apos;ll show fellowships that meet close to you. You can change this anytime."
         />
         <div className="grid gap-4 sm:grid-cols-2">
           {(["Main Campus", "Essikado"] as Campus[]).map((name) => (

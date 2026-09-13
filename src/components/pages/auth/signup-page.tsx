@@ -22,7 +22,7 @@ export function SignupPage() {
   return (
     <AuthLayout
       title="Start with your student email"
-      description="We'll send a short code to make sure it's really you."
+      description="We&apos;ll send a short code to make sure it&apos;s really you."
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         <Field label="University email">

@@ -21,7 +21,7 @@ function DuplicatePage({ chapter }: { chapter?: Chapter }) {
           <CircleAlert />
         </div>
         <p className="eyebrow mt-6">One community at a time</p>
-        <h1 className="mt-3 font-display text-4xl">You're already registered</h1>
+        <h1 className="mt-3 font-display text-4xl">You&apos;re already registered</h1>
         <p className="mt-4 leading-7 text-muted-foreground">
           Your student email is already connected to{" "}
           <strong className="text-foreground">{chapter?.name ?? "another chapter"}</strong>. Leave

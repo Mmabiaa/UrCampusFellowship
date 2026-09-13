@@ -34,7 +34,7 @@ export function NewDenominationPage() {
         <PageIntro
           eyebrow="Add to the directory"
           title="Create denomination"
-          description="Start with the fellowship's official name and a short description students will understand."
+          description="Start with the fellowship&apos;s official name and a short description students will understand."
         />
         <form onSubmit={handleSubmit} className="space-y-5 border border-border bg-card p-6">
           <Field label="Denomination name">
@@ -42,7 +42,7 @@ export function NewDenominationPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Baptist Students' Union"
+              placeholder="e.g. Baptist Students&apos; Union"
             />
           </Field>
           <Field label="Description">

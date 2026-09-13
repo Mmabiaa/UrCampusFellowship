@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-09-13
 
+### Fixed
+- ESLint errors: Replaced all unescaped apostrophes with `&apos;` entity across 9 component files
+- Build compatibility: Added pnpm configuration to allow `unrs-resolver` build scripts
+- Removed unused `useState` import from signup page
+
 ### Added
 - Complete Next.js 15 implementation with App Router
 - Student authentication and onboarding flow

@@ -54,7 +54,7 @@ export function ChapterPage({ params }: { params: Promise<{ chapterId: string }>
               </p>
               <Button
                 className="mt-6"
-                onClick={() => toast.success("We'll let you know when this chapter is ready")}
+                onClick={() => toast.success("We&apos;ll let you know when this chapter is ready")}
               >
                 Notify me
               </Button>
@@ -80,19 +80,19 @@ export function ChapterPage({ params }: { params: Promise<{ chapterId: string }>
           )}
         </div>
         <aside className="h-fit border border-border bg-card p-6 lg:sticky lg:top-24">
-          <p className="eyebrow">{coming ? "Stay close" : "You're welcome here"}</p>
+          <p className="eyebrow">{coming ? "Stay close" : "You&apos;re welcome here"}</p>
           <h2 className="mt-3 font-display text-2xl">
             {coming ? "Hear when it opens" : "Ready to join?"}
           </h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             {coming
-              ? "One tap is all it takes. We'll remember your interest."
+              ? "One tap is all it takes. We&apos;ll remember your interest."
               : "Share a few details with the chapter, then join their WhatsApp group."}
           </p>
           {coming ? (
             <Button
               className="mt-6 w-full"
-              onClick={() => toast.success("You're on the notification list")}
+              onClick={() => toast.success("You&apos;re on the notification list")}
             >
               <Bell /> Notify me
             </Button>
