@@ -35,7 +35,7 @@ export function LandingPage() {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="bg-gold text-accent-foreground hover:bg-gold/90">
                   <Link href="/signup">
-                    I'm a student <ArrowRight />
+                    I&apos;m a student <ArrowRight />
                   </Link>
                 </Button>
                 <Button
@@ -66,7 +66,7 @@ export function LandingPage() {
               [
                 MessageCircle,
                 "Join the conversation",
-                "Register once, then open the chapter's WhatsApp group right away.",
+                "Register once, then open the chapter&apos;s WhatsApp group right away.",
               ],
             ].map(([Icon, title, text], i) => (
               <article

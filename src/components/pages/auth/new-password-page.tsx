@@ -26,7 +26,7 @@ export function NewPasswordPage() {
   return (
     <AuthLayout
       title="Choose a new password"
-      description="Use at least eight characters you don't use elsewhere."
+      description="Use at least eight characters you don&apos;t use elsewhere."
       back="/login"
     >
       <form onSubmit={handleSubmit} className="space-y-5">

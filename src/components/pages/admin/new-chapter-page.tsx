@@ -27,7 +27,7 @@ export function NewChapterPage() {
       id,
       denominationId,
       name,
-      shortName: name.split(" ")[0],
+      shortName: name.split(" ")[0] || name,
       campus,
       status: "draft",
       description: "This chapter is preparing its campus presence.",

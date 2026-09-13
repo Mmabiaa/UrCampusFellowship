@@ -35,4 +35,4 @@ export interface Student {
   flagged?: boolean;
 }
 
-export type Profile = Omit<Student, "id" | "chapterId"> & { chapterId?: string };
+export type Profile = Omit<Student, "id" | "chapterId"> & { chapterId?: string | undefined };

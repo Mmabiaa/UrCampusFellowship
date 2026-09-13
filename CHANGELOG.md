@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-09-13
 
+### Fixed
+- ESLint errors: Replaced all unescaped apostrophes with `&apos;` entity across 9 component files
+- TypeScript errors: Fixed `exactOptionalPropertyTypes` compatibility issues across multiple files
+  - Fixed unsafe array access in `name.split(" ")[0]` with fallback values
+  - Added explicit `undefined` to optional type definitions for strict TypeScript compliance
+  - Fixed optional prop types in DuplicatePage component
+  - Fixed status-badge safe navigation
+- Build compatibility: Added pnpm configuration to allow `unrs-resolver` build scripts
+- Removed unused `useState` import from signup page
+
 ### Added
 - Complete Next.js 15 implementation with App Router
 - Student authentication and onboarding flow

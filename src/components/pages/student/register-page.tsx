@@ -13,7 +13,7 @@ import { SelectField } from "@/components/shared/select-field";
 import { useUrCampus } from "@/providers/urcampus-provider";
 import type { Campus, Student, Chapter } from "@/types";
 
-function DuplicatePage({ chapter }: { chapter?: Chapter }) {
+function DuplicatePage({ chapter }: { chapter?: Chapter | undefined }) {
   return (
     <AppLayout mode="student">
       <div className="mx-auto max-w-xl border-t-4 border-clay bg-card p-7 text-center shadow-soft sm:p-10">
@@ -21,7 +21,7 @@ function DuplicatePage({ chapter }: { chapter?: Chapter }) {
           <CircleAlert />
         </div>
         <p className="eyebrow mt-6">One community at a time</p>
-        <h1 className="mt-3 font-display text-4xl">You're already registered</h1>
+        <h1 className="mt-3 font-display text-4xl">You&apos;re already registered</h1>
         <p className="mt-4 leading-7 text-muted-foreground">
           Your student email is already connected to{" "}
           <strong className="text-foreground">{chapter?.name ?? "another chapter"}</strong>. Leave
@@ -50,7 +50,10 @@ export function RegisterPage({ params }: { params: Promise<{ chapterId: string }
   const [form, setForm] = useState({ ...profile, chapterId });
 
   if (!chapter) return null;
-  if (duplicate) return <DuplicatePage chapter={chapters.find((c) => c.id === duplicate.chapterId)} />;
+  if (duplicate) {
+    const duplicateChapter = chapters.find((c) => c.id === duplicate.chapterId);
+    return <DuplicatePage chapter={duplicateChapter} />;
+  }
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
