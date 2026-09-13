@@ -37,7 +37,7 @@ export function ProfilePage() {
     <AppLayout mode="student">
       <PageIntro
         eyebrow="Student profile"
-        title={`Hello, ${profile.name.split(" ")[0]}`}
+        title={`Hello, ${profile.name.split(" ")[0] || profile.name}`}
         description="Keep your details current and stay connected to your fellowship."
         action={
           <Button variant="outline" onClick={() => setEditing(!editing)}>

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - ESLint errors: Replaced all unescaped apostrophes with `&apos;` entity across 9 component files
+- TypeScript errors: Fixed unsafe array access in `name.split(" ")[0]` with fallback values
 - Build compatibility: Added pnpm configuration to allow `unrs-resolver` build scripts
 - Removed unused `useState` import from signup page
 
