@@ -8,8 +8,9 @@ export default function AboutPage() {
         <p className="eyebrow">About us</p>
         <h1>Building community on campus.</h1>
         <p className="intro">
-          UrCampusFellowship helps students discover Christian fellowships,
-          connect with their campus community, and grow in faith together.
+          UrCampusFellowship helps students discover fellowships and
+          denominations, connect with their campus community, and grow in
+          faith together.
         </p>
 
         <div style={{ marginTop: "64px" }}>
@@ -24,16 +25,18 @@ export default function AboutPage() {
         <div style={{ marginTop: "64px" }}>
           <h2>For students</h2>
           <p className="intro">
-            Find fellowships that match your denomination, meet times, and
-            community style. Discover your spiritual home on campus.
+            Find fellowships that match your denomination and campus, see
+            meeting details up front, and join instantly — no waiting on
+            approval.
           </p>
         </div>
 
         <div style={{ marginTop: "64px" }}>
           <h2>For leaders</h2>
           <p className="intro">
-            Manage your chapter, track attendance, and reach students looking
-            for community. Simple tools for meaningful ministry.
+            Manage your chapter, keep your roster up to date, and reach
+            students looking for community. Simple tools for meaningful
+            ministry.
           </p>
         </div>
 
