@@ -20,7 +20,7 @@ export function HomePage() {
             </p>
             <div className="landing-actions">
               <Link className="landing-cta" href="/student">
-                Explore fellowships <span aria-hidden="true">↗</span>
+                Explore fellowships <span aria-hidden="true" className="text-black">↗</span>
               </Link>
               <Link className="landing-secondary" href="/heads">
                 I lead a chapter
