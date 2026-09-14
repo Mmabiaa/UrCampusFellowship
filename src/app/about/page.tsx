@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/common/site-header"
+import Image from "next/image"
 import Link from "next/link"
 
 export default function AboutPage() {
@@ -12,6 +13,18 @@ export default function AboutPage() {
           denominations, connect with their campus community, and grow in
           faith together.
         </p>
+
+        <figure className="about-photo">
+          <Image
+            src="https://i.pinimg.com/1200x/77/bb/ea/77bbea41d23660c2c51f4acab0495999.jpg"
+            alt="Students gathered together outdoors on campus, talking and laughing"
+            width={1200}
+            height={720}
+            className="about-photo-img"
+            priority
+          />
+          <figcaption>Students finding their people, one gathering at a time.</figcaption>
+        </figure>
 
         <div style={{ marginTop: "64px" }}>
           <h2>Our mission</h2>
@@ -39,6 +52,17 @@ export default function AboutPage() {
             ministry.
           </p>
         </div>
+
+        <figure className="about-photo about-photo-wide">
+          <Image
+            src="https://i.pinimg.com/736x/82/a2/c8/82a2c8291c1718acbb3964df7c12ac28.jpg"
+            alt="A small group sitting in a circle, deep in conversation"
+            width={1200}
+            height={640}
+            className="about-photo-img"
+          />
+          <figcaption>Real conversations, not just check-in sheets.</figcaption>
+        </figure>
 
         <div style={{ marginTop: "80px", paddingTop: "40px", borderTop: "1px solid var(--border)" }}>
           <Link className="button button-primary" href="/student">
