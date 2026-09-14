@@ -4,7 +4,7 @@ import type { FormEvent } from "react"
 import { useState } from "react"
 import { DashboardShell } from "@/components/common/dashboard-shell"
 
-export default function CreateDenominationPage() {
+export default function CreateChapterPage() {
   const [name, setName] = useState("")
   const [saved, setSaved] = useState(false)
 
@@ -15,22 +15,22 @@ export default function CreateDenominationPage() {
 
   return (
     <DashboardShell role="admin">
-      <p className="eyebrow">Create denomination</p>
-      <h1>Add a denomination.</h1>
+      <p className="eyebrow">Create chapter</p>
+      <h1>Register a chapter.</h1>
       <form onSubmit={handleSubmit}>
         <label>
-          Denomination name
+          Chapter name
           <input
-            placeholder="Enter denomination"
+            placeholder="Enter chapter name"
             value={name}
             onChange={(event) => setName(event.target.value)}
             required
           />
         </label>
         <button className="button button-primary" type="submit">
-          Create denomination
+          Create chapter
         </button>
-        {saved && <p role="status">Denomination ready to be added.</p>}
+        {saved && <p role="status">Chapter ready to be added.</p>}
       </form>
     </DashboardShell>
   )
