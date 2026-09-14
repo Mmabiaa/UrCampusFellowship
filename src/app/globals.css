@@ -270,50 +270,6 @@ textarea { width:100%; min-height:120px; resize:vertical; background:var(--cream
   .dash-side { min-height:auto; padding:16px var(--mobile-gutter); position:relative; }
   .side-label { display:none; }
   .dash-side > .signout { display:none; }
-
-  .dash-nav {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    left: var(--mobile-gutter);
-    right: var(--mobile-gutter);
-    flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
-    background: var(--cream);
-    border: 1px solid var(--ink);
-    border-radius: 12px;
-    box-shadow: 4px 4px 0 var(--ink);
-    padding: 10px;
-    z-index: 1000;
-  }
-  .dash-nav.nav-open {
-    display: flex;
-    animation: menu-pop .16s ease both;
-  }
-  .dash-nav a {
-    color: var(--ink);
-    border-radius: 8px;
-    padding: 11px 12px;
-    font-size: 14px;
-    white-space: normal;
-    transform: none;
-  }
-  .dash-nav a.active,
-  .dash-nav a:hover {
-    background: var(--sage);
-    color: var(--ink);
-    transform: none;
-  }
-  .dash-nav .signout-mobile {
-    display: block;
-    margin-top: 4px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border);
-    color: var(--destructive);
-    font-size: 14px;
-  }
-
   .dash-main { padding:36px var(--mobile-gutter); }
   .dash-header h1 { font-size:clamp(34px, 10vw, 42px); }
   .dash-user { align-self:flex-start; }
@@ -417,8 +373,9 @@ textarea { width:100%; min-height:120px; resize:vertical; background:var(--cream
 
   .hamburger { display: flex; }
 
-  /* Compact dropdown instead of a full-height sidebar */
-  .landing-header .header-nav {
+  /* Compact dropdown — shared, pixel-for-pixel, by the site header AND the dashboard sidebar */
+  .landing-header .header-nav,
+  .dash-side .dash-nav {
     display: none;
     position: absolute;
     top: calc(100% + 8px);
@@ -434,25 +391,41 @@ textarea { width:100%; min-height:120px; resize:vertical; background:var(--cream
     padding: 10px;
     z-index: 1000;
   }
-  .landing-header .header-nav.nav-open {
+  .landing-header .header-nav.nav-open,
+  .dash-side .dash-nav.nav-open {
     display: flex;
     animation: menu-pop .16s ease both;
   }
-  .landing-header .header-nav a {
+  .landing-header .header-nav a,
+  .dash-side .dash-nav a {
     width: auto;
     border-bottom: 0;
     border-radius: 8px;
     padding: 11px 12px;
     font-size: 14px;
+    color: var(--ink);
+    text-decoration: none;
     transition: background .15s ease;
   }
-  .landing-header .header-nav a:hover { background: var(--sage); }
+  .landing-header .header-nav a:hover,
+  .dash-side .dash-nav a:hover,
+  .dash-side .dash-nav a.active {
+    background: var(--sage);
+  }
   .landing-header .header-pill {
     background: var(--moss);
     color: var(--cream);
     border-radius: 8px;
     padding: 11px 12px;
     text-align: center;
+  }
+  .dash-side .dash-nav .signout-mobile {
+    display: block;
+    margin-top: 4px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    color: var(--destructive);
+    font-size: 14px;
   }
 }
 

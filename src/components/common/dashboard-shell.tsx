@@ -86,7 +86,6 @@ export function DashboardShell({ role, children }: DashboardShellProps) {
     }
   }, [menuOpen])
 
-  // Close the dropdown whenever the route changes (link tap navigated away)
   useEffect(() => {
     setMenuOpen(false)
   }, [pathname])
@@ -131,7 +130,6 @@ export function DashboardShell({ role, children }: DashboardShellProps) {
             )
           })}
 
-          {/* Only visible on mobile, inside the dropdown */}
           <Link className="signout-mobile" href="/" onClick={() => setMenuOpen(false)}>
             Sign out
           </Link>
