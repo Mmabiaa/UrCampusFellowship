@@ -306,7 +306,7 @@ textarea { width:100%; min-height:120px; resize:vertical; background:var(--cream
 .landing-header nav a { color: var(--ink); font-size: 14px; text-decoration: none; }
 .landing-header .header-pill { background: #e4e4e4; border-radius: 999px; padding: 13px 22px; }
 .landing-home { max-width: 1280px; padding: 0 42px; }
-.landing-hero { min-height: 590px; display: flex; flex-direction: column; align-items: center; padding: 78px 0 0; text-align: center; }
+.landing-hero { min-height: 590px; display: flex; flex-direction: column; align-items: center; padding: 40px 0 0; text-align: center; }
 .landing-copy { max-width: 900px; }
 .landing-kicker { color: var(--muted-foreground); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 20px; }
 .landing-hero h1 { color: var(--ink); font-family: Arial, Helvetica, sans-serif; font-size: clamp(44px, 7vw, 82px); font-weight: 800; letter-spacing: -.07em; line-height: .94; text-transform: uppercase; margin-bottom: 28px; }
@@ -330,10 +330,9 @@ textarea { width:100%; min-height:120px; resize:vertical; background:var(--cream
 @media (max-width: 760px) {
   .landing-header { padding: 20px 22px; }
   .landing-header nav { gap: 10px; }
-  .landing-header nav a:first-child { display: none; }
   .landing-header .header-pill { padding: 10px 15px; }
   .landing-home { padding: 0 22px; }
-  .landing-hero { min-height: auto; padding-top: 54px; }
+  .landing-hero { min-height: auto; padding-top: 20px; }
   .landing-hero h1 { font-size: clamp(42px, 12vw, 66px); }
   .landing-lede { font-size: 15px; }
   .landing-actions { align-items: stretch; flex-direction: column; gap: 20px; width: 100%; }
@@ -351,4 +350,63 @@ textarea { width:100%; min-height:120px; resize:vertical; background:var(--cream
   .invite-form { grid-template-columns:1fr; gap:14px; margin-top:28px; padding:18px; }
   .preference-card { align-items:flex-start; }
   .preference-card input { width:20px; flex:0 0 auto; }
+}
+
+/* Hamburger Menu Styles */
+.hamburger { display: none; background: none; border: 0; flex-direction: column; justify-content: center; gap: 5px; width: 40px; height: 40px; padding: 8px; cursor: pointer; flex: 0 0 auto; }
+.hamburger span { display: block; width: 24px; height: 2px; background: var(--ink); transition: transform .25s ease, opacity .2s ease; }
+.hamburger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.is-open span:nth-child(2) { opacity: 0; }
+.hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.header-nav { display: flex; align-items: center; gap: 32px; }
+
+@media (max-width: 760px) {
+  /* Keep the logo and hamburger on one row instead of the generic stacked mobile header */
+  .landing-header { align-items: center; flex-wrap: nowrap; position: relative; }
+  .landing-header .brand { flex: 0 1 auto; }
+
+  .hamburger { display: flex; }
+
+  /* Compact dropdown instead of a full-height sidebar */
+  .landing-header .header-nav {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: var(--mobile-gutter);
+    width: min(220px, 72vw);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    background: var(--cream);
+    border: 1px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 4px 4px 0 var(--ink);
+    padding: 10px;
+    z-index: 1000;
+  }
+  .landing-header .header-nav.nav-open {
+    display: flex;
+    animation: menu-pop .16s ease both;
+  }
+  .landing-header .header-nav a {
+    width: auto;
+    border-bottom: 0;
+    border-radius: 8px;
+    padding: 11px 12px;
+    font-size: 14px;
+    transition: background .15s ease;
+  }
+  .landing-header .header-nav a:hover { background: var(--sage); }
+  .landing-header .header-pill {
+    background: var(--moss);
+    color: var(--cream);
+    border-radius: 8px;
+    padding: 11px 12px;
+    text-align: center;
+  }
+}
+
+@keyframes menu-pop {
+  from { opacity: 0; transform: translateY(-6px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
