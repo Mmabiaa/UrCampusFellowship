@@ -70,13 +70,13 @@ export default function ForLeadersPage() {
                         marginBottom: "32px",
                     }}>
                         <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>What chapter heads tell us</h3>
-                        <p style={{ color: "var(--secondary-foreground)", fontSize: "15px", lineHeight: "1.65", margin: 0 }}>
+                        <p style={{ color: "black", fontSize: "15px", lineHeight: "1.65", margin: 0 }}>
                             "Before UrCampusFellowship, we relied on word-of-mouth and Facebook posts. Now
                             students can discover us directly, and we spend less time coordinating who's in
                             and who's out. It just works."
                         </p>
                         <p style={{
-                            color: "var(--secondary-foreground)",
+                            color: "black",
                             fontSize: "13px",
                             marginTop: "16px",
                             marginBottom: 0,
