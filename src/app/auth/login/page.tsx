@@ -1,16 +1,11 @@
 import Link from "next/link"
-import { SiteHeader } from "@/components/common/site-header"
+import { Brand } from "@/components/common/site-header"
 
 export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-left">
-        <Link className="brand" href="/">
-          <span className="brand-mark">U</span>
-          <span>
-            UrCampus<span className="brand-light">Fellowship</span>
-          </span>
-        </Link>
+        <Brand />
         <div className="auth-quote">
           <p>&ldquo;Welcome back home.&rdquo;</p>
           <span>Continue your journey</span>
