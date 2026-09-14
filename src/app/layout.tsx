@@ -3,25 +3,25 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'UrCampusFellowship | Find your people on campus',
+  title: 'UrCampusFellowship | Find your denomination on campus',
   description: 'Discover and join a faith community on your university campus in Ghana.',
-  generator: 'v0.app',
+  generator: 'Mmabiaa',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: 'https://i.pinimg.com/736x/59/a5/0a/59a50aa4fcda0cc8409b793810442756.jpg',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: 'https://i.pinimg.com/736x/59/a5/0a/59a50aa4fcda0cc8409b793810442756.jpg',
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: 'https://i.pinimg.com/736x/59/a5/0a/59a50aa4fcda0cc8409b793810442756.jpg',
+        type: 'image/jpg',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: 'https://i.pinimg.com/736x/59/a5/0a/59a50aa4fcda0cc8409b793810442756.jpg',
   },
 }
 

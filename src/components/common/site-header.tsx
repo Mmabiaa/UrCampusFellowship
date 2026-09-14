@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 
@@ -32,7 +33,13 @@ export function SiteHeader() {
     <header ref={headerRef} className="site-header landing-header">
       <Link className="brand" href="/" aria-label="UrCampusFellowship home">
         <span className="brand-mark" aria-hidden="true">
-          U
+          <Image
+            src="/logo.png"
+            alt=""
+            width={30}
+            height={30}
+            className="brand-mark-img"
+          />
         </span>
         <span>
           UrCampus<span className="brand-light">Fellowship</span>
