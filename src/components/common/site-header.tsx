@@ -34,7 +34,7 @@ export function SiteHeader() {
       <Link className="brand" href="/" aria-label="UrCampusFellowship home">
         <span className="brand-mark" aria-hidden="true">
           <Image
-            src="/logo.png"
+            src="https://i.pinimg.com/736x/59/a5/0a/59a50aa4fcda0cc8409b793810442756.jpg"
             alt=""
             width={30}
             height={30}
