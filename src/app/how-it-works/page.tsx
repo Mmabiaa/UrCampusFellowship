@@ -46,7 +46,7 @@ export default function HowItWorksPage() {
             Set up your chapter, manage your roster, and help students find
             your community. Our dashboard makes ministry management simple.
           </p>
-          <Link className="button button-secondary" href="/heads">
+          <Link className="button button-secondary" href="/for-leaders">
             Learn more for leaders
           </Link>
         </div>
