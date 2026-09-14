@@ -91,13 +91,13 @@ export function HeadOverview() {
 
         <div className="member-list">
           {recentMembers.map((member) => (
-            <span key={member[1]}>
-              <i aria-hidden="true">{member[0]}</i>
+            <span key={member.id}>
+              <i aria-hidden="true">{member.initials}</i>
               <div>
-                <strong>{member[1]}</strong>
-                <small>{member[2]}</small>
+                <strong>{member.name}</strong>
+                <small>{member.displayInfo}</small>
               </div>
-              <small>2 days ago</small>
+              <small>{member.joinedDate}</small>
               <Link href="/heads/roster" className="button-text">
                 View
               </Link>

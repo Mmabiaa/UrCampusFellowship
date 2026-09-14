@@ -51,18 +51,45 @@ export function StudentPage() {
       />
 
       <div className="chapter-grid">
-        {visibleChapters.map((chapter) => (
-          <Link
-            className="chapter-card"
-            href={`/student/chapter?name=${encodeURIComponent(chapter.name)}`}
-            key={chapter.name}
-          >
-            <span className="chapter-initial">{chapter.name[0]}</span>
-            <h3>{chapter.name}</h3>
-            <p>{chapter.denomination}</p>
-            <span className="card-arrow">View chapter →</span>
-          </Link>
-        ))}
+        {visibleChapters.length === 0 ? (
+          <div style={{
+            gridColumn: '1 / -1',
+            padding: '48px 24px',
+            textAlign: 'center',
+            background: 'var(--cream)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+          }}>
+            <p style={{
+              fontSize: '16px',
+              color: 'var(--muted-foreground)',
+              margin: '0 0 8px',
+              lineHeight: '1.6'
+            }}>
+              {query ? `No fellowships found matching "${query}"` : 'No fellowships available on this campus yet.'}
+            </p>
+            <p style={{
+              fontSize: '13px',
+              color: 'var(--muted-foreground)',
+              margin: 0
+            }}>
+              {query ? 'Try adjusting your search.' : 'Check back soon or explore other campus options.'}
+            </p>
+          </div>
+        ) : (
+          visibleChapters.map((chapter) => (
+            <Link
+              className="chapter-card"
+              href={`/student/chapter?name=${encodeURIComponent(chapter.name)}`}
+              key={chapter.name}
+            >
+              <span className="chapter-initial">{chapter.name[0]}</span>
+              <h3>{chapter.name}</h3>
+              <p>{chapter.denomination}</p>
+              <span className="card-arrow">View chapter →</span>
+            </Link>
+          ))
+        )}
       </div>
     </PageShell>
   )

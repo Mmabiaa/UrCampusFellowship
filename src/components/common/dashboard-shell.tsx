@@ -90,6 +90,19 @@ export function DashboardShell({ role, children }: DashboardShellProps) {
     setMenuOpen(false)
   }, [pathname])
 
+  // Lock page scroll behind the open mobile dropdown, same as a modal would
+  useEffect(() => {
+    if (menuOpen) {
+      const previousOverflow = document.body.style.overflow
+      document.body.classList.add('nav-open')
+      document.body.style.overflow = "hidden"
+      return () => {
+        document.body.classList.remove('nav-open')
+        document.body.style.overflow = previousOverflow
+      }
+    }
+  }, [menuOpen])
+
   return (
     <div className="dashboard">
       <aside ref={sideRef} className="dash-side">
