@@ -1,5 +1,5 @@
-import { AdminOverviewPage } from "@/components/pages/admin/overview-page";
+import { AdminOverview } from "@/components/admin/admin-overview"
 
-export default function Admin() {
-  return <AdminOverviewPage />;
+export default function AdminRoute() {
+  return <AdminOverview />
 }
