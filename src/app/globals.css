@@ -1345,6 +1345,61 @@ textarea {
   margin: 0;
 }
 
+.simple-list {
+  border-top: 1px solid var(--border);
+}
+
+.simple-list-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.simple-list-row:hover {
+  background: var(--sage);
+  padding-left: 16px;
+  padding-right: 16px;
+  margin-left: -16px;
+  margin-right: -16px;
+  border-radius: 8px;
+}
+
+.simple-list-row strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.simple-list-row>div {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-action-btn {
+  display: none;
+}
+
+@media (min-width: 761px) {
+  .member-action-btn {
+    display: inline-flex;
+  }
+  .roster-list .tap-indicator {
+    display: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .roster-list .member-action-btn {
+    display: none;
+  }
+  .roster-list .tap-indicator {
+    display: block !important;
+  }
+}
+
 @media (max-width: 760px) {
   :root {
     --mobile-gutter: clamp(16px, 5vw, 24px);
