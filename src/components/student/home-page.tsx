@@ -15,8 +15,8 @@ export function HomePage() {
               Grow together.
             </h1>
             <p className="landing-lede">
-              Discover Christian fellowships on your campus, meet your community,
-              and take your next step in faith with UrCampusFellowship.
+              Discover fellowships and denominations on your campus, meet your community, 
+              and take the next step in your faith journey with UrCampusFellowship.
             </p>
             <div className="landing-actions">
               <Link className="landing-cta" href="/student">
