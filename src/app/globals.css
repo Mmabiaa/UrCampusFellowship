@@ -1662,8 +1662,14 @@ textarea {
   }
 
   .dashboard {
-    display: block;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   .dash-side {
@@ -1675,6 +1681,7 @@ textarea {
     overflow: visible;
     z-index: 900;
     background: var(--ink);
+    flex-shrink: 0;
   }
 
   .side-label {
@@ -1688,6 +1695,8 @@ textarea {
   .dash-main {
     padding: 36px var(--mobile-gutter);
     overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
   }
 
   .dash-nav {
