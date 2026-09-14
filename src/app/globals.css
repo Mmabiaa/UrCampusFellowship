@@ -330,7 +330,6 @@ textarea { width:100%; min-height:120px; resize:vertical; background:var(--cream
 @media (max-width: 760px) {
   .landing-header { padding: 20px 22px; }
   .landing-header nav { gap: 10px; }
-  .landing-header nav a:first-child { display: none; }
   .landing-header .header-pill { padding: 10px 15px; }
   .landing-home { padding: 0 22px; }
   .landing-hero { min-height: auto; padding-top: 20px; }
