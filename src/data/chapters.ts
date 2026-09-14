@@ -64,12 +64,74 @@ export const chapters: Chapter[] = [
 
 export const campuses = ["Main Campus", "Essikado"] as const
 
-export const rosterMembers = [
-  ["KA", "Kwame Asante", "Computer Science · Level 300"],
-  ["AM", "Akosua Mensah", "Business Administration · Level 200"],
-  ["EN", "Esi Nkrumah", "Civil Engineering · Level 100"],
-  ["YO", "Yaw Ofori", "Accounting · Level 400"],
-] as const
+export type MemberDetails = {
+  id: string
+  initials: string
+  name: string
+  program: string
+  level: string
+  phone: string
+  email: string
+  campus: string
+  hall: string
+  joinedDate: string
+  displayInfo: string
+}
+
+export const rosterMembers: MemberDetails[] = [
+  {
+    id: "1",
+    initials: "KA",
+    name: "Kwame Asante",
+    program: "Computer Science",
+    level: "300",
+    phone: "0241234567",
+    email: "kwame.asante@student.edu.gh",
+    campus: "Main Campus",
+    hall: "Unity Hall",
+    joinedDate: "2 days ago",
+    displayInfo: "Computer Science · Level 300",
+  },
+  {
+    id: "2",
+    initials: "AM",
+    name: "Akosua Mensah",
+    program: "Business Administration",
+    level: "200",
+    phone: "0557654321",
+    email: "akosua.mensah@student.edu.gh",
+    campus: "Main Campus",
+    hall: "Casely-Hayford Hall",
+    joinedDate: "5 days ago",
+    displayInfo: "Business Administration · Level 200",
+  },
+  {
+    id: "3",
+    initials: "EN",
+    name: "Esi Nkrumah",
+    program: "Civil Engineering",
+    level: "100",
+    phone: "0209876543",
+    email: "esi.nkrumah@student.edu.gh",
+    campus: "Main Campus",
+    hall: "Africa Hall",
+    joinedDate: "1 week ago",
+    displayInfo: "Civil Engineering · Level 100",
+  },
+  {
+    id: "4",
+    initials: "YO",
+    name: "Yaw Ofori",
+    program: "Accounting",
+    level: "400",
+    phone: "0264445555",
+    email: "yaw.ofori@student.edu.gh",
+    campus: "Main Campus",
+    hall: "Republic Hall",
+    joinedDate: "2 weeks ago",
+    displayInfo: "Accounting · Level 400",
+  },
+]
 
 export const denominationRows = [
   ["Campus Christian Fellowship", "Main Campus · 4 chapters"],
