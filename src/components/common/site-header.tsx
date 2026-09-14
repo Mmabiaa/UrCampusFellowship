@@ -4,6 +4,25 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 
+export function Brand({ href = "/" }: { href?: string }) {
+  return (
+    <Link className="brand" href={href} aria-label="UrCampusFellowship home">
+      <span className="brand-mark" aria-hidden="true">
+        <Image
+          src="https://i.pinimg.com/736x/59/a5/0a/59a50aa4fcda0cc8409b793810442756.jpg"
+          alt=""
+          width={30}
+          height={30}
+          className="brand-mark-img"
+        />
+      </span>
+      <span>
+        UrCampus<span className="brand-light">Fellowship</span>
+      </span>
+    </Link>
+  )
+}
+
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
@@ -31,20 +50,7 @@ export function SiteHeader() {
 
   return (
     <header ref={headerRef} className="site-header landing-header">
-      <Link className="brand" href="/" aria-label="UrCampusFellowship home">
-        <span className="brand-mark" aria-hidden="true">
-          <Image
-            src="https://i.pinimg.com/736x/59/a5/0a/59a50aa4fcda0cc8409b793810442756.jpg"
-            alt=""
-            width={30}
-            height={30}
-            className="brand-mark-img"
-          />
-        </span>
-        <span>
-          UrCampus<span className="brand-light">Fellowship</span>
-        </span>
-      </Link>
+      <Brand />
       <button
         className={`hamburger ${menuOpen ? "is-open" : ""}`}
         onClick={() => setMenuOpen((open) => !open)}
