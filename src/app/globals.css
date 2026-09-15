@@ -2315,7 +2315,7 @@ textarea {
   }
 
   .landing-header .header-pill {
-    background: var(--moss);
+    background: rgb(157, 157, 147);
     color: var(--cream);
     border-radius: 8px;
     padding: 11px 12px;
