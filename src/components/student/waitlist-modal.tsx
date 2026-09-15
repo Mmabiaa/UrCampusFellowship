@@ -106,7 +106,7 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
                                 ✓
                             </div>
                             <DialogHeader>
-                                <DialogTitle>You're on the list!</DialogTitle>
+                                <DialogTitle className="text-center">You're on the list!</DialogTitle>
                                 <DialogDescription className="mt-3">
                                     Thanks for joining! We'll email you as soon as we launch. Get ready to discover your campus fellowship community.
                                 </DialogDescription>
