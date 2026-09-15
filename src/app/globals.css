@@ -1981,11 +1981,11 @@ textarea {
   display: inline-flex;
   gap: 12px;
   align-items: center;
-  background: #f2e3ba;
+  background: var(--moss);
   border: 1px solid var(--ink);
   box-shadow: 3px 3px 0 var(--ink);
   border-radius: 10px;
-  color: var(--ink);
+  color: beige;
   padding: 11px 18px;
   font-weight: 700;
   font-size: 14px;
