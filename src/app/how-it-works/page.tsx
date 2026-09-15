@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/common/site-header"
+import { SiteFooter } from "@/components/common/site-footer"
 import Link from "next/link"
 
 export default function HowItWorksPage() {
@@ -51,6 +52,7 @@ export default function HowItWorksPage() {
           </Link>
         </div>
       </div>
+      <SiteFooter />
     </PageShell>
   )
 }

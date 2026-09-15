@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/common/site-header"
+import { SiteFooter } from "@/components/common/site-footer"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -70,6 +71,7 @@ export default function AboutPage() {
           </Link>
         </div>
       </div>
+      <SiteFooter />
     </PageShell>
   )
 }
