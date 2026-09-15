@@ -1,7 +1,13 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import { SiteHeader } from "@/components/common/site-header"
+import { WaitlistModal } from "@/components/student/waitlist-modal"
 
 export function HomePage() {
+  const [showWaitlist, setShowWaitlist] = useState(false)
+
   return (
     <>
       <SiteHeader />
@@ -19,9 +25,12 @@ export function HomePage() {
               and take the next step in your faith journey with UrCampusFellowship.
             </p>
             <div className="landing-actions">
-              <Link className="landing-cta" href="/student">
-                Explore fellowships <span aria-hidden="true" className="text-black">↗</span>
-              </Link>
+              <button 
+                className="landing-cta" 
+                onClick={() => setShowWaitlist(true)}
+              >
+                Join the waitlist <span aria-hidden="true" className="text-black">↗</span>
+              </button>
               <Link className="landing-secondary" href="/for-leaders">
                 I lead a chapter
               </Link>
@@ -45,6 +54,7 @@ export function HomePage() {
           <span>Belong</span>
         </div>
       </main>
+      <WaitlistModal open={showWaitlist} onOpenChange={setShowWaitlist} />
     </>
   )
 }
