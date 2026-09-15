@@ -19,11 +19,7 @@ const dashboardNavigation = {
     overviewHref: "/admin",
     links: [
       { href: "/admin/denominations", label: "Denominations" },
-      {
-        href: "/admin/denominations/new",
-        label: "Create denomination",
-      },
-      { href: "/admin/chapter/new", label: "Create chapter" },
+      { href: "/admin/chapter", label: "Chapters" },
     ],
   },
 } as const
