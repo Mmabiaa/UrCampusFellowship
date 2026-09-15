@@ -42,7 +42,7 @@ export default function ForLeadersPage() {
                     <p style={{ color: "var(--muted-foreground)", lineHeight: "1.65" }}>
                         When a student registers with your fellowship, they get immediate access to your
                         WhatsApp group — no waiting on approval. They fill out their details (name, phone,
-                        program, hall, level) so you know who's joining your community.
+                        program, hall, level) so you know who&apos;s joining your community.
                     </p>
                 </div>
 
@@ -50,16 +50,16 @@ export default function ForLeadersPage() {
                     <span className="step-number">03</span>
                     <h3>Manage your roster</h3>
                     <p style={{ color: "var(--muted-foreground)", lineHeight: "1.65" }}>
-                        View all registered members, search by name or program, and manage your community.
-                        You can flag members for follow-up or remove them if needed — giving them freedom
-                        to register elsewhere.
+                        View all registered members and manage your community. You can flag members for
+                        follow-up or remove them if needed — freeing them to register elsewhere. You only
+                        ever see your own chapter&apos;s members, never another chapter&apos;s.
                     </p>
                 </div>
 
                 <div style={{ marginTop: "80px", paddingTop: "40px", borderTop: "1px solid var(--border)" }}>
                     <h2 style={{ fontSize: "30px", marginBottom: "20px" }}>Built for campus ministry</h2>
                     <p className="intro" style={{ marginBottom: "32px" }}>
-                        We know you're already managing WhatsApp groups, planning meetings, and building
+                        We know you&apos;re already managing WhatsApp groups, planning meetings, and building
                         community. This platform handles the discovery and registration side, so students
                         can find you and you can focus on discipleship.
                     </p>
@@ -70,19 +70,12 @@ export default function ForLeadersPage() {
                         borderRadius: "12px",
                         marginBottom: "32px",
                     }}>
-                        <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>What chapter heads tell us</h3>
+                        <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Why we built this</h3>
                         <p style={{ color: "black", fontSize: "15px", lineHeight: "1.65", margin: 0 }}>
-                            "Before UrCampusFellowship, we relied on word-of-mouth and Facebook posts. Now
-                            students can discover us directly, and we spend less time coordinating who's in
-                            and who's out. It just works."
-                        </p>
-                        <p style={{
-                            color: "black",
-                            fontSize: "13px",
-                            marginTop: "16px",
-                            marginBottom: 0,
-                        }}>
-                            — Ama T., Campus Christian Fellowship
+                            Most chapters still recruit by walking around campus with a notebook, collecting
+                            names and numbers by hand, then adding people to WhatsApp one at a time. Meeting
+                            details live in flyers and word of mouth. We think finding your fellowship should
+                            be easier than that — for students and for the people leading them.
                         </p>
                     </div>
 
