@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/common/site-header"
+import { SiteFooter } from "@/components/common/site-footer"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -95,6 +96,7 @@ export default function ForLeadersPage() {
                     </div>
                 </div>
             </div>
+            <SiteFooter />
         </PageShell>
     )
 }
