@@ -6,7 +6,6 @@ export default function HowItWorksPage() {
   return (
     <PageShell>
       <div className="narrow">
-        <p className="eyebrow">How it works</p>
         <h1>Three simple steps.</h1>
         <p className="intro">
           Whether you&apos;re seeking community or leading one, getting started

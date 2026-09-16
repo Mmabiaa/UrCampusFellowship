@@ -79,7 +79,6 @@ function RegisterContent() {
           ← Back to chapter
         </Link>
 
-        <p className="eyebrow">Register</p>
         <h1>Join {chapter.name}</h1>
         <p className="intro">
           Fill in your details below. Once submitted, you'll get instant access to the

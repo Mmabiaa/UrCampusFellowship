@@ -7,7 +7,6 @@ export default function ForLeadersPage() {
     return (
         <PageShell>
             <div className="narrow">
-                <p className="eyebrow">For chapter leaders</p>
                 <h1>Simple tools for meaningful ministry.</h1>
                 <p className="intro">
                     Manage your chapter, connect with students looking for a community,
@@ -86,7 +85,7 @@ export default function ForLeadersPage() {
                             Chapter head login
                         </Link>
                         <Link className="button button-outline" href="/student">
-                            Browse as a student
+                            Explore Fellowships
                         </Link>
                     </div>
                 </div>

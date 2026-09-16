@@ -7,7 +7,6 @@ export default function AboutPage() {
   return (
     <PageShell>
       <div className="narrow">
-        <p className="eyebrow">About us</p>
         <h1>Building community on campus.</h1>
         <p className="intro">
           UrCampusFellowship helps students discover fellowships and
