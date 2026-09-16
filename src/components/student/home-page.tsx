@@ -29,7 +29,7 @@ export function HomePage() {
                 className="landing-cta" 
                 onClick={() => setShowWaitlist(true)}
               >
-                Join the waitlist
+                Get early access
               </button>
               <Link className="landing-secondary" href="/for-leaders">
                 I lead a chapter
