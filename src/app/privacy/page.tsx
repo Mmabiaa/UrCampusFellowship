@@ -8,7 +8,7 @@ export default function PrivacyPage() {
         <p className="eyebrow">Legal</p>
         <h1>Privacy Policy</h1>
         <p className="intro">
-          Last updated: September 15, 2026
+          Last updated: September 16, 2026
         </p>
 
         <div style={{ marginTop: "48px" }}>
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
           <ul style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "24px", paddingLeft: "24px" }}>
             <li style={{ marginBottom: "8px" }}>Email address (used to sign in and to identify your account)</li>
             <li style={{ marginBottom: "8px" }}>Full name</li>
-            <li style={{ marginBottom: "8px" }}>Phone number (contact only — not used to sign in)</li>
+            <li style={{ marginBottom: "8px" }}>Phone number (contact only, not used to sign in)</li>
             <li style={{ marginBottom: "8px" }}>Campus</li>
             <li style={{ marginBottom: "8px" }}>Academic program</li>
             <li style={{ marginBottom: "8px" }}>Hall/hostel</li>
@@ -79,10 +79,13 @@ export default function PrivacyPage() {
             With Chapter Heads
           </h3>
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "24px" }}>
-            When you register with a fellowship, your profile information (name, email, phone, program,
-            hall, level) is shared with that chapter&apos;s head. This enables them to manage their
-            community and follow up with members. Chapter heads can only see members of their own
-            chapter — never members of another chapter, even within the same denomination.
+            When you register with a fellowship, your profile information, including your name, email,
+            phone number, program, hall, and level, is shared with that chapter’s head. This helps them manage
+            their community and stay in touch with members.
+
+            Chapter heads can only see members registered with their own chapter. They cannot access members
+            from another chapter, even if both chapters belong to the same denomination.
+
           </p>
 
           <h3 style={{ fontSize: "18px", marginBottom: "12px", marginTop: "24px" }}>
@@ -97,10 +100,11 @@ export default function PrivacyPage() {
             Third-Party Services
           </h3>
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "32px" }}>
-            We use third-party services for authentication and data storage (Supabase) and email delivery
-            (Google SMTP). We may in future use an SMS provider to deliver sign-in codes. WhatsApp links
-            direct you to external WhatsApp groups, which are governed by WhatsApp&apos;s own privacy
-            policy — we do not create, manage, or monitor those groups.
+            We use third party services for authentication and data storage, including Supabase,
+            and for email delivery through Google SMTP. We may also use an SMS provider in the future to deliver sign in codes.
+
+            WhatsApp links take you to external WhatsApp groups. These groups are governed by WhatsApp’s
+            own privacy policy. We do not create, manage, or monitor these groups.
           </p>
 
           <h2 style={{ fontSize: "24px", marginBottom: "16px" }}>5. Data Security</h2>

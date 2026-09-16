@@ -10,8 +10,8 @@ export default function ForLeadersPage() {
                 <p className="eyebrow">For chapter leaders</p>
                 <h1>Simple tools for meaningful ministry.</h1>
                 <p className="intro">
-                    Manage your chapter, reach students looking for community, and keep your roster
-                    up to date — all in one place.
+                    Manage your chapter, connect with students looking for a community,
+                    and keep your roster up to date, all in one place.
                 </p>
 
                 <figure className="about-photo" style={{ marginTop: "48px" }}>
@@ -41,8 +41,8 @@ export default function ForLeadersPage() {
                     <h3>Students join instantly</h3>
                     <p style={{ color: "var(--muted-foreground)", lineHeight: "1.65" }}>
                         When a student registers with your fellowship, they get immediate access to your
-                        WhatsApp group — no waiting on approval. They fill out their details (name, phone,
-                        program, hall, level) so you know who&apos;s joining your community.
+                        WhatsApp group without waiting for approval. They provide their details, including
+                        their name, phone number, program, hall, and level, so you always know who is joining your community.
                     </p>
                 </div>
 
@@ -50,9 +50,11 @@ export default function ForLeadersPage() {
                     <span className="step-number">03</span>
                     <h3>Manage your roster</h3>
                     <p style={{ color: "var(--muted-foreground)", lineHeight: "1.65" }}>
-                        View all registered members and manage your community. You can flag members for
-                        follow-up or remove them if needed — freeing them to register elsewhere. You only
-                        ever see your own chapter&apos;s members, never another chapter&apos;s.
+                        View all your registered members and manage your community with ease.
+                        You can flag members for follow up or remove them when needed, giving
+                        them the freedom to register with another fellowship. You will only see
+                        members from your own chapter, never another chapter’s.
+
                     </p>
                 </div>
 
@@ -70,12 +72,12 @@ export default function ForLeadersPage() {
                         borderRadius: "12px",
                         marginBottom: "32px",
                     }}>
-                        <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Why we built this</h3>
+                        <h1 style={{ fontSize: "30px", marginBottom: "12px" }}>Why we built this</h1>
                         <p style={{ color: "black", fontSize: "15px", lineHeight: "1.65", margin: 0 }}>
                             Most chapters still recruit by walking around campus with a notebook, collecting
-                            names and numbers by hand, then adding people to WhatsApp one at a time. Meeting
-                            details live in flyers and word of mouth. We think finding your fellowship should
-                            be easier than that — for students and for the people leading them.
+                            names and phone numbers by hand, and adding people to WhatsApp one at a time.
+                            Meeting details are often shared through flyers and word of mouth. We believe
+                            finding the right fellowship should be much easier for students and the people leading them.
                         </p>
                     </div>
 

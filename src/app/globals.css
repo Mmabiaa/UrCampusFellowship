@@ -279,10 +279,10 @@ textarea:focus {
   gap: 10px;
   background: none;
   border: 0;
-  color: var(--ink);
+  color: #4d5744;
   font-weight: 700;
   letter-spacing: -.03em;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .brand-mark {
@@ -1458,7 +1458,7 @@ textarea {
 
   .brand {
     gap: 7px;
-    font-size: 13px;
+    font-size: 20px;
     min-width: 0;
     flex: 1 1 auto;
   }
@@ -1913,8 +1913,9 @@ textarea {
 }
 
 .landing-header nav a {
-  color: var(--ink);
-  font-size: 14px;
+  color: var(--moss);
+  font-size: 16px;
+  font-weight:500;
   text-decoration: none;
 }
 
@@ -2306,6 +2307,9 @@ textarea {
     color: var(--ink);
     text-decoration: none;
     transition: background .15s ease;
+  }
+  .landing-header .header-nav a {
+    text-align: center;
   }
 
   .landing-header .header-nav a:hover,

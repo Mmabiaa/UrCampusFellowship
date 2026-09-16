@@ -26,10 +26,10 @@ export default function HowItWorksPage() {
           <span className="step-number">02</span>
           <h3>Connect</h3>
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.65" }}>
-            See meeting details, location, and leadership for any fellowship
-            that catches your eye. When you&apos;re ready, register in a
-            minute and get instant access to the fellowship&apos;s WhatsApp
-            group — no waiting, no approval process.
+            See the meeting details, location, and leadership of any fellowship that catches your eye.
+            When you are ready, register in just a minute and get instant access to the fellowship’s 
+            WhatsApp group without waiting for approval.
+
           </p>
         </div>
 
@@ -39,19 +39,33 @@ export default function HowItWorksPage() {
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.65" }}>
             Join a community, grow in faith, and build lasting friendships.
           </p>
-        </div>
+        </div> <br />
 
-        <div style={{ marginTop: "80px", paddingTop: "40px", borderTop: "1px solid var(--border)" }}>
-          <h2 style={{ fontSize: "30px", marginBottom: "20px" }}>For chapter leaders</h2>
-          <p className="intro" style={{ marginBottom: "24px" }}>
-            Set up your chapter, manage your roster, and help students find
-            your community. Our dashboard makes ministry management simple.
-          </p>
-          <Link className="button button-secondary" href="/for-leaders">
-            Learn more for leaders
-          </Link>
+        <div style={{
+            background: "var(--sage)",
+            padding: "24px",
+            borderRadius: "12px",
+            marginBottom: "32px",
+            display: "inline-block",
+            maxWidth: "100%",
+        }}>
+            <h1 style={{ fontSize: "30px", marginBottom: "12px" }}>For chapter leaders</h1>
+            <p className="intro" style={{
+                color: "black",
+                fontSize: "15px",
+                lineHeight: "1.65",
+                margin: 0,
+                maxWidth: "360px",
+            }}>
+                Set up your chapter, manage your roster, and help students find
+                your community. Our dashboard makes ministry management simple.
+            </p>
         </div>
       </div>
+
+      <Link className="button button-primary" href="/for-leaders">
+            Learn more for leaders
+          </Link>
       <SiteFooter />
     </PageShell>
   )
