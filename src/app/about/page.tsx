@@ -7,7 +7,6 @@ export default function AboutPage() {
   return (
     <PageShell>
       <div className="narrow">
-        <p className="eyebrow">About us</p>
         <h1>Building community on campus.</h1>
         <p className="intro">
           UrCampusFellowship helps students discover fellowships and
@@ -63,6 +62,12 @@ export default function AboutPage() {
           />
           <figcaption>Real conversations, not just check-in sheets.</figcaption>
         </figure>
+
+        <div style={{ marginTop: "40px", paddingTop: "24px", borderTop: "1px solid var(--border)" }}>
+          <Link className="button button-primary" href="/student">
+            Explore fellowships
+          </Link>
+        </div>
       </div>
       <SiteFooter />
     </PageShell>

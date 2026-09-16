@@ -24,7 +24,6 @@ export function StudentPage() {
 
   return (
     <PageShell>
-      <p className="eyebrow">Your campus</p>
       <h1>Find your fellowship.</h1>
       <p className="intro">Communities meeting around {campus}.</p>
 

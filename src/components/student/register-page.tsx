@@ -79,7 +79,6 @@ function RegisterContent() {
           ← Back to chapter
         </Link>
 
-        <p className="eyebrow">Register</p>
         <h1>Join {chapter.name}</h1>
         <p className="intro">
           Fill in your details below. Once submitted, you'll get instant access to the
@@ -164,7 +163,7 @@ function RegisterContent() {
 
           <button
             type="submit"
-            className="button button-primary full"
+            className="button button-primary"
             disabled={!isFormValid || isSubmitting}
             style={{
               marginTop: "24px",
@@ -173,7 +172,6 @@ function RegisterContent() {
             }}
           >
             {isSubmitting ? "Submitting..." : "Complete registration"}
-            <span aria-hidden="true">→</span>
           </button>
         </form>
 
