@@ -42,7 +42,7 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="max-w-[460px] p-0">
+            <DialogContent className="max-w-[460px] p-0 w-[calc(100%-2rem)] sm:w-full">
                 {/* Custom close button */}
                 <button
                     type="button"
@@ -70,8 +70,8 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
                     {!showSuccess ? (
                         <>
                             <DialogHeader>
-                                <DialogTitle>Join the Waitlist</DialogTitle>
-                                <DialogDescription>
+                                <DialogTitle className="text-center">Join the Waitlist</DialogTitle>
+                                <DialogDescription className="text-center">
                                     Be the first to know when we launch. We'll send you an email with early access to explore fellowships on your campus.
                                 </DialogDescription>
                             </DialogHeader>
@@ -107,7 +107,7 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
                             </div>
                             <DialogHeader>
                                 <DialogTitle className="text-center">You're on the list!</DialogTitle>
-                                <DialogDescription className="mt-3">
+                                <DialogDescription className="text-center mt-3">
                                     Thanks for joining! We'll email you as soon as we launch. Get ready to discover your campus fellowship community.
                                 </DialogDescription>
                             </DialogHeader>
