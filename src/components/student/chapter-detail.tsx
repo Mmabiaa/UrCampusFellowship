@@ -72,10 +72,9 @@ function ChapterDetailContent() {
 
             <Link
               href={`/student/register?chapter=${encodeURIComponent(chapter.name)}`}
-              className="button button-primary full"
+              className="button button-primary"
             >
               Register to join
-              <span aria-hidden="true">→</span>
             </Link>
 
             <p className="small-note" style={{ marginTop: "16px" }}>

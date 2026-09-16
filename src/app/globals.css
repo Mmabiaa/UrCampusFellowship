@@ -789,7 +789,7 @@ select:focus {
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: var(--clay);
+  background: var(--sage);
   color: var(--cream);
   display: grid;
   place-items: center;
@@ -835,7 +835,7 @@ select:focus {
 }
 
 .notify-box p {
-  color: var(--secondary-foreground);
+  color: var(--moss);
   line-height: 1.6;
 }
 

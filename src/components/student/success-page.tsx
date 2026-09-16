@@ -1,5 +1,6 @@
 "use client"
-
+import { PageShell } from "@/components/common/site-header"
+import { SiteFooter } from "@/components/common/site-footer"
 import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
@@ -12,7 +13,7 @@ function SuccessContent() {
   const chapter = chapters.find((c) => c.name === chapterName)
 
   // Mock WhatsApp link - in production, this would come from the chapter data
-  const whatsappLink = "https://chat.whatsapp.com/mock-invite-link"
+  const whatsappLink = "https://chat.whatsapp.com"
 
   if (!chapter) {
     return (
@@ -29,20 +30,8 @@ function SuccessContent() {
   }
 
   return (
+    <PageShell>
     <div className="success-screen">
-      <button
-        className="brand"
-        onClick={() => window.location.href = "/"}
-        type="button"
-      >
-        <div className="brand-mark" aria-hidden="true">
-          U
-        </div>
-        <span>
-          UrCampus<span className="brand-light">Fellowship</span>
-        </span>
-      </button>
-
       <div className="success-card">
         <div className="success-mark" aria-label="Success">
           ✓
@@ -54,17 +43,16 @@ function SuccessContent() {
         <p>
           You're all set. Tap the button below to join the fellowship's WhatsApp group and
           start connecting with your new community.
-        </p>
+        </p><br />
 
         <a
           href={whatsappLink}
-          className="button button-primary full"
+          className="button button-primary"
           target="_blank"
           rel="noopener noreferrer"
           style={{ marginTop: "8px" }}
         >
           Open WhatsApp group
-          <span aria-hidden="true">→</span>
         </a>
 
         <div style={{ marginTop: "40px", paddingTop: "32px", borderTop: "1px solid var(--border)" }}>
@@ -78,8 +66,8 @@ function SuccessContent() {
             Back to fellowships →
           </Link>
         </div>
-      </div>
-    </div>
+      </div><SiteFooter />
+    </div></PageShell>
   )
 }
 

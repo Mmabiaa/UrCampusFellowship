@@ -164,7 +164,7 @@ function RegisterContent() {
 
           <button
             type="submit"
-            className="button button-primary full"
+            className="button button-primary"
             disabled={!isFormValid || isSubmitting}
             style={{
               marginTop: "24px",
@@ -173,7 +173,6 @@ function RegisterContent() {
             }}
           >
             {isSubmitting ? "Submitting..." : "Complete registration"}
-            <span aria-hidden="true">→</span>
           </button>
         </form>
 

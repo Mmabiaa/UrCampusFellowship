@@ -63,6 +63,12 @@ export default function AboutPage() {
           />
           <figcaption>Real conversations, not just check-in sheets.</figcaption>
         </figure>
+
+        <div style={{ marginTop: "40px", paddingTop: "24px", borderTop: "1px solid var(--border)" }}>
+          <Link className="button button-primary" href="/student">
+            Explore fellowships
+          </Link>
+        </div>
       </div>
       <SiteFooter />
     </PageShell>
