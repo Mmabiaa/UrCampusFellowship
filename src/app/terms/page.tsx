@@ -8,7 +8,7 @@ export default function TermsPage() {
         <p className="eyebrow">Legal</p>
         <h1>Terms of Service</h1>
         <p className="intro">
-          Last updated: September 15, 2026
+          Last updated: September 16, 2026
         </p>
 
         <div style={{ marginTop: "48px" }}>
@@ -21,11 +21,12 @@ export default function TermsPage() {
 
           <h2 style={{ fontSize: "24px", marginBottom: "16px" }}>2. Description of Service</h2>
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "32px" }}>
-            UrCampusFellowship is a platform designed to help students discover and connect with campus
-            fellowships and denominations. The Platform lists meeting times, locations, and community
-            details, handles registration, and passes registered students the WhatsApp group invite link
-            provided by their chapter. The Platform is a directory and registration tool — it is not
-            affiliated with, and does not speak for, any denomination or fellowship listed on it.
+            UrCampusFellowship is a platform that helps students discover and connect with campus fellowships and denominations.
+            Students can find meeting times, locations, and community details, register with a fellowship,
+            and receive the WhatsApp group invite link provided by that chapter.
+
+            The platform serves as a directory and registration tool. It is not affiliated with any denomination
+            or fellowship listed on the platform and does not represent or speak on behalf of them.
           </p>
 
           <h2 style={{ fontSize: "24px", marginBottom: "16px" }}>3. User Registration</h2>
@@ -57,11 +58,12 @@ export default function TermsPage() {
 
           <h2 style={{ fontSize: "24px", marginBottom: "16px" }}>5. Chapter Membership</h2>
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "32px" }}>
-            Students may only be registered with one fellowship at a time. You may leave your fellowship
-            yourself at any time, which frees you to register with another. Chapter heads may also flag
-            or remove members from their own roster. Removing a member from a roster does not remove them
-            from the chapter&apos;s WhatsApp group — that is managed separately by the chapter head
-            within WhatsApp.
+            Students can only be registered with one fellowship at a time. You can leave your fellowship whenever
+            you choose, which allows you to register with another fellowship.
+
+            Chapter heads can also flag or remove members from their own roster.
+            Removing a member from the roster does not remove them from the chapter’s WhatsApp group.
+            WhatsApp group membership is managed separately by the chapter head within WhatsApp.
           </p>
 
           <h2 style={{ fontSize: "24px", marginBottom: "16px" }}>6. WhatsApp Groups</h2>

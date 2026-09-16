@@ -39,9 +39,8 @@ export default function AboutPage() {
         <div style={{ marginTop: "64px" }}>
           <h2>For students</h2>
           <p className="intro">
-            Find fellowships that match your denomination and campus, see
-            meeting details up front, and join instantly — no waiting on
-            approval.
+            Find fellowships that match your denomination and campus, 
+            view meeting details upfront, and join instantly without waiting for approval.
           </p>
         </div>
 
