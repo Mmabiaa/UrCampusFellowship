@@ -63,6 +63,7 @@ export const ChapterSetupSchema = z.object({
     location: z.string().optional(),
     description: z.string().optional(),
     whatsapp_link: z.string().url('Enter a valid WhatsApp invite link').optional(),
+    logo_url: z.string().url('Logo must be a valid URL').optional(),
 })
 
 export const MemberActionSchema = z.object({
@@ -74,6 +75,11 @@ export const MemberActionSchema = z.object({
 export const DenominationSchema = z.object({
     name: z.string().min(3, 'Denomination name must be at least 3 characters'),
     description: z.string().optional(),
+    logo_url: z.string().url('Logo must be a valid URL').optional(),
+})
+
+export const CampusLogoSchema = z.object({
+    logo_url: z.string().url('Logo must be a valid URL'),
 })
 
 export const RejectChapterSchema = z.object({

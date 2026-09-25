@@ -1,53 +1,44 @@
 import { createServiceClient } from '@/lib/supabase/service'
+import { getSession, getUserRole, apiError, apiOk } from '@/lib/api-helpers'
 import { RejectChapterSchema } from '@/lib/validations'
-import { apiError, apiOk } from '@/lib/api-helpers'
 
-export async function POST(
-    request: Request,
-    context: any
-) {
+export async function POST(request: Request, context: any) {
     try {
+        const session = await getSession()
+        if (!session) return apiError('Unauthorized', 401)
+
+        const role = await getUserRole(session.user.id)
+        if (role !== 'admin') return apiError('Forbidden: Admin only', 403)
+
         const json = await request.json()
         const parsed = RejectChapterSchema.safeParse(json)
+        if (!parsed.success) return apiError(parsed.error.issues[0].message, 422)
 
-        if (!parsed.success) {
-            return apiError(parsed.error.issues[0].message, 422)
-        }
-
+        const { id } = await context.params
         const { reason } = parsed.data
         const supabase = createServiceClient() as any
 
-        // Assuming same validation logic as approve (omitted for brevity, could refactor to helper)
-        const { data: chapter, error: fetchError } = await (supabase as any)
+        const { data: chapter, error: fetchError } = await supabase
             .from('chapters')
             .select('id, status, head_user_id')
-            .eq('id', (await context.params).id)
+            .eq('id', id)
             .single()
 
-        if (fetchError || !chapter) {
-            return apiError('Chapter not found', 404)
-        }
+        if (fetchError || !chapter) return apiError('Chapter not found', 404)
 
         if (chapter.status !== 'pending_approval') {
-            return apiError('Chapter is not in pending_approval state.', 400)
+            return apiError(`Cannot reject a chapter with status '${chapter.status}'. Only 'pending_approval' chapters can be rejected.`, 400)
         }
 
-        const { error: updateError } = await (supabase as any)
+        const { error: updateError } = await supabase
             .from('chapters')
-            .update({
-                status: 'rejected',
-                rejection_reason: reason
-            })
-            .eq('id', (await context.params).id)
+            .update({ status: 'rejected', rejection_reason: reason })
+            .eq('id', id)
 
-        if (updateError) {
-            return apiError('Failed to reject chapter', 500)
-        }
-
-        // Optional: email the head with the rejection reason here
+        if (updateError) return apiError('Failed to reject chapter', 500)
 
         return apiOk({ message: 'Chapter rejected successfully' })
-    } catch (error) {
+    } catch {
         return apiError('Internal server error', 500)
     }
 }
