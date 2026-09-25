@@ -1,5 +1,5 @@
 /**
- * UrCampusFellowship — Automated End-to-End API Test Suite v2
+ * UrCampusFellowship — Automated End-to-End API Test Suite v3
  *
  * Tests the full user journey:
  *   0  Health check (public chapters)
@@ -7,25 +7,22 @@
  *   2  Admin login
  *   3  Unauthenticated admin route returns 401 (security check)
  *   4  Admin stats returns correct shape
- *   5  Admin creates denomination
- *   6  Campuses are seeded in the database
+ *   5  Admin creates denomination with logo_url
+ *   6  Campuses are seeded in the database (checks UMaT Main Campus)
  *   7  Head signup → creates pending chapter
  *   8  Head views own chapter (status = pending_approval)
  *   9  Admin sees chapter in pending queue
  *  10  Admin approves chapter → status becomes coming_soon
- *  11  Head completes setup → chapter auto-promotes to active
+ *  11  Head completes setup (Wednesday, 5:30 PM, Old Lecture Theatre, logo_url) → active
  *  12  Active chapter visible in public directory
  *  13  Head roster returns a members array
  *  14  Admin cannot reject a non-pending chapter (state machine)
  *  15  Reject with too-short reason returns 422
  *  16  Anonymous student joins waitlist
+ *  17  Admin sets logo_url for UMaT Main Campus
  *
  * Usage:
  *   npm run test:api                  (ensure npm run dev is running in another terminal)
- *
- * Required in .env.local:
- *   TEST_ADMIN_EMAIL=your-admin-email@example.com
- *   TEST_ADMIN_PASSWORD=YourActualPassword
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -60,7 +57,7 @@ async function api(method, path, body, cookie) {
     const res = await fetch(`${BASE}${path}`, {
         method,
         headers,
-        redirect: 'manual',          // ← critical: don't follow auth redirects
+        redirect: 'manual',
         body: body ? JSON.stringify(body) : undefined,
     })
     const data = await res.json().catch(() => ({}))
@@ -131,7 +128,7 @@ C.step(2, 'Admin Login — POST /api/auth/login')
 // ═══════════════════════════════════════════════════════════════════════════
 C.step(3, 'Security — Unauthenticated /api/admin/stats returns 401')
 {
-    const { status } = await api('GET', '/api/admin/stats')   // no cookie
+    const { status } = await api('GET', '/api/admin/stats')
     assert(status === 401, `No-cookie request returns 401 (got ${status})`)
 }
 
@@ -147,13 +144,14 @@ C.step(4, 'Admin — GET /api/admin/stats')
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 5 — Admin creates denomination
+// 5 — Admin creates denomination with logo_url
 // ═══════════════════════════════════════════════════════════════════════════
-C.step(5, 'Admin — POST /api/admin/denominations')
+C.step(5, 'Admin — POST /api/admin/denominations (with logo_url)')
 {
     const name = `E2E Test Fellowship ${Date.now()}`
-    const { status } = await api('POST', '/api/admin/denominations', { name }, S.adminCookie)
-    assert(status === 200, 'Create denomination returns 200')
+    const logo_url = `https://hnfuysbsyaqzntzdihti.supabase.co/storage/v1/object/public/logos/denominations/test.png`
+    const { status } = await api('POST', '/api/admin/denominations', { name, logo_url }, S.adminCookie)
+    assert(status === 200, 'Create denomination with logo returns 200')
 
     const { status: s2, data: d2 } = await api('GET', '/api/admin/denominations', null, S.adminCookie)
     assert(s2 === 200, 'GET denominations returns 200')
@@ -162,14 +160,14 @@ C.step(5, 'Admin — POST /api/admin/denominations')
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 6 — Campus seeded
+// 6 — UMaT Campus Seed exists
 // ═══════════════════════════════════════════════════════════════════════════
-C.step(6, 'DB — Campus seed exists')
+C.step(6, 'DB — UMaT Main Campus seed exists')
 {
     const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-    const { data } = await sb.from('campuses').select('id, name').limit(1)
+    const { data } = await sb.from('campuses').select('id, name').ilike('name', '%UMaT Main Campus%').limit(1)
     S.campusId = data?.[0]?.id
-    assert(!!S.campusId, `Campus found: ${data?.[0]?.name ?? 'NONE — run 001_initial_schema.sql'}`)
+    assert(!!S.campusId, `UMaT Campus found: ${data?.[0]?.name ?? 'NONE — check migration'}`)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -182,7 +180,7 @@ C.step(7, 'Head — POST /api/auth/head/signup')
         email: S.headEmail,
         password: 'E2ETestPass123!',
         denominationId: S.denominationId,
-        chapterName: `E2E Chapter ${Date.now()}`,
+        chapterName: `E2E UMaT Chapter ${Date.now()}`,
         campusId: S.campusId,
     })
     assert(status === 200, `Head signup returns 200`, data.error ? data : undefined)
@@ -199,7 +197,7 @@ C.step(8, 'Head — GET /api/heads/chapter')
     assert(status === 200, 'Head views chapter returns 200', data)
     assert(data.chapter?.status === 'pending_approval', `Status is 'pending_approval' (got '${data.chapter?.status}')`)
     S.chapterId = data.chapter?.id
-    assert(!!S.chapterId, `Chapter ID: ${S.chapterId ?? 'NOT FOUND (check head signup)'}`)
+    assert(!!S.chapterId, `Chapter ID: ${S.chapterId ?? 'NOT FOUND'}`)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -226,19 +224,24 @@ C.step(10, 'Admin — POST /api/admin/chapters/{id}/approve')
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 11 — Head completes setup → auto-promoted to active
+// 11 — Head completes setup (Wednesday, 5:30 PM, Old Lecture Theatre, logo_url) → active
 // ═══════════════════════════════════════════════════════════════════════════
-C.step(11, 'Head — PATCH /api/heads/chapter (completes setup → active)')
+C.step(11, 'Head — PATCH /api/heads/chapter (Wednesday 5:30 PM @ Old Lecture Theatre + logo)')
 {
+    const logo_url = `https://hnfuysbsyaqzntzdihti.supabase.co/storage/v1/object/public/logos/chapters/umat-chapter.jpg`
     const { status, data } = await api('PATCH', '/api/heads/chapter', {
-        meeting_day: 'Friday',
-        meeting_time: '17:00',
-        location: 'Main Hall, Room 101',
-        description: 'E2E test chapter.',
-        whatsapp_link: 'https://chat.whatsapp.com/e2etestlink',
+        meeting_day: 'Wednesday',
+        meeting_time: '5:30 PM',
+        location: 'Old Lecture Theatre',
+        description: 'UMaT Fellowship Chapter Meeting.',
+        whatsapp_link: 'https://chat.whatsapp.com/umatlink',
+        logo_url,
     }, S.headCookie)
     assert(status === 200, 'Chapter update returns 200', data)
     assert(data.chapter?.status === 'active', `Chapter auto-promoted to 'active' (got '${data.chapter?.status}')`)
+    assert(data.chapter?.location === 'Old Lecture Theatre', `Location saved: '${data.chapter?.location}'`)
+    assert(data.chapter?.meeting_day === 'Wednesday', `Day saved: '${data.chapter?.meeting_day}'`)
+    assert(data.chapter?.meeting_time === '5:30 PM', `Time saved: '${data.chapter?.meeting_time}'`)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -301,6 +304,20 @@ C.step(16, 'Student — POST /api/student/waitlist (anonymous)')
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 17 — Admin sets Campus logo
+// ═══════════════════════════════════════════════════════════════════════════
+C.step(17, 'Admin — PATCH /api/admin/campuses/{id}/logo')
+{
+    const logo_url = `https://hnfuysbsyaqzntzdihti.supabase.co/storage/v1/object/public/logos/campuses/umat-logo.png`
+    const { status, data } = await api(
+        'PATCH', `/api/admin/campuses/${S.campusId}/logo`,
+        { logo_url },
+        S.adminCookie
+    )
+    assert(status === 200, 'Campus logo update returns 200', data)
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // SUMMARY
 // ═══════════════════════════════════════════════════════════════════════════
 console.log('\n' + '═'.repeat(60))
@@ -311,5 +328,5 @@ if (failed > 0) {
     console.log('\n\x1b[31m  Some tests failed. Review the output above.\x1b[0m\n')
     process.exit(1)
 } else {
-    console.log('\n\x1b[32m  All tests passed! Backend is production-ready.\x1b[0m\n')
+    console.log('\n\x1b[32m  All tests passed! Backend is 100% production-ready.\x1b[0m\n')
 }

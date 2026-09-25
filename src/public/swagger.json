@@ -3,7 +3,7 @@
     "info": {
         "title": "UrCampusFellowship API",
         "version": "1.0.0",
-        "description": "Complete API documentation covering Student, Head, and Admin specific routes."
+        "description": "Complete API documentation covering Student, Head, Admin, Public, and Upload routes."
     },
     "servers": [
         {
@@ -38,12 +38,18 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
                                 "properties": {
                                     "email": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "head@example.com"
                                     },
                                     "password": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Password123!"
                                     }
                                 }
                             }
@@ -53,6 +59,9 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "422": {
+                        "description": "Validation Error"
                     }
                 }
             }
@@ -87,6 +96,14 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "denominationId",
+                                    "chapterName",
+                                    "campusId"
+                                ],
                                 "properties": {
                                     "name": {
                                         "type": "string"
@@ -98,13 +115,15 @@
                                         "type": "string"
                                     },
                                     "denominationId": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "uuid"
                                     },
                                     "chapterName": {
                                         "type": "string"
                                     },
                                     "campusId": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "uuid"
                                     }
                                 }
                             }
@@ -130,6 +149,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "email"
+                                ],
                                 "properties": {
                                     "email": {
                                         "type": "string"
@@ -158,6 +180,10 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "email",
+                                    "token"
+                                ],
                                 "properties": {
                                     "email": {
                                         "type": "string"
@@ -189,6 +215,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "email"
+                                ],
                                 "properties": {
                                     "email": {
                                         "type": "string"
@@ -216,7 +245,8 @@
                         "in": "query",
                         "name": "campusId",
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "uuid"
                         },
                         "required": false
                     }
@@ -245,9 +275,19 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "chapterId",
+                                    "name",
+                                    "phone",
+                                    "program",
+                                    "hall",
+                                    "level",
+                                    "campusId"
+                                ],
                                 "properties": {
                                     "chapterId": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "uuid"
                                     },
                                     "name": {
                                         "type": "string"
@@ -262,10 +302,18 @@
                                         "type": "string"
                                     },
                                     "level": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "enum": [
+                                            "100",
+                                            "200",
+                                            "300",
+                                            "400",
+                                            "postgrad"
+                                        ]
                                     },
                                     "campusId": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "uuid"
                                     }
                                 }
                             }
@@ -291,9 +339,14 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "chapterId",
+                                    "email"
+                                ],
                                 "properties": {
                                     "chapterId": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "uuid"
                                     },
                                     "email": {
                                         "type": "string"
@@ -346,7 +399,7 @@
                 }
             },
             "patch": {
-                "summary": "Update chapter details (triggers active state)",
+                "summary": "Update chapter details (triggers active state when day, time, location, whatsapp_link are provided)",
                 "tags": [
                     "Head"
                 ],
@@ -363,19 +416,27 @@
                                 "type": "object",
                                 "properties": {
                                     "meeting_day": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Wednesday"
                                     },
                                     "meeting_time": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "5:30 PM"
                                     },
                                     "location": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Old Lecture Theatre"
                                     },
                                     "description": {
                                         "type": "string"
                                     },
                                     "whatsapp_link": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "https://chat.whatsapp.com/sample"
+                                    },
+                                    "logo_url": {
+                                        "type": "string",
+                                        "example": "https://hnfuysbsyaqzntzdihti.supabase.co/storage/v1/object/public/logos/chapters/sample.jpg"
                                     }
                                 }
                             }
@@ -442,7 +503,8 @@
                         "name": "memberId",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
                 ],
@@ -452,6 +514,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "action"
+                                ],
                                 "properties": {
                                     "action": {
                                         "type": "string",
@@ -543,7 +608,8 @@
                         "name": "id",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
                 ],
@@ -571,7 +637,8 @@
                         "name": "id",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
                 ],
@@ -581,6 +648,9 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "reason"
+                                ],
                                 "properties": {
                                     "reason": {
                                         "type": "string"
@@ -630,11 +700,17 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "name"
+                                ],
                                 "properties": {
                                     "name": {
                                         "type": "string"
                                     },
                                     "description": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
                                         "type": "string"
                                     }
                                 }
@@ -645,6 +721,96 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/campuses/{id}/logo": {
+            "patch": {
+                "summary": "Set or update campus logo URL",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "logo_url"
+                                ],
+                                "properties": {
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/uploads/logo": {
+            "post": {
+                "summary": "Upload a logo image file to Supabase Storage",
+                "tags": [
+                    "Uploads"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "Image file (JPG, PNG, WEBP, SVG) up to 2MB"
+                                    },
+                                    "folder": {
+                                        "type": "string",
+                                        "example": "chapters",
+                                        "description": "Target folder: chapters, denominations, or campuses"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Returns { url: string }"
                     }
                 }
             }
