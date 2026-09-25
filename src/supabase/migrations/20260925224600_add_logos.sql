@@ -32,21 +32,28 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('logos', 'logos', true)
 ON CONFLICT (id) DO NOTHING;
 
--- ── 5. Storage RLS — anyone can read logos (they are public) ─────────────
-CREATE POLICY IF NOT EXISTS "logos_public_read" ON storage.objects
+-- ── 5–7. Storage RLS policies (DROP IF EXISTS then CREATE is the safe pattern)
+DROP POLICY IF EXISTS "logos_public_read"          ON storage.objects;
+DROP POLICY IF EXISTS "logos_authenticated_upload" ON storage.objects;
+DROP POLICY IF EXISTS "logos_owner_update"         ON storage.objects;
+DROP POLICY IF EXISTS "logos_owner_delete"         ON storage.objects;
+
+-- Anyone (anon or authenticated) can read public logos
+CREATE POLICY "logos_public_read" ON storage.objects
   FOR SELECT TO anon, authenticated
   USING (bucket_id = 'logos');
 
--- ── 6. Storage RLS — authenticated users can upload logos ────────────────
-CREATE POLICY IF NOT EXISTS "logos_authenticated_upload" ON storage.objects
+-- Authenticated users can upload logos
+CREATE POLICY "logos_authenticated_upload" ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'logos');
 
--- ── 7. Storage RLS — owners can update/delete their own uploads ──────────
-CREATE POLICY IF NOT EXISTS "logos_owner_update" ON storage.objects
+-- Owners can update their own uploads
+CREATE POLICY "logos_owner_update" ON storage.objects
   FOR UPDATE TO authenticated
   USING (bucket_id = 'logos' AND owner = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "logos_owner_delete" ON storage.objects
+-- Owners can delete their own uploads
+CREATE POLICY "logos_owner_delete" ON storage.objects
   FOR DELETE TO authenticated
   USING (bucket_id = 'logos' AND owner = auth.uid());
