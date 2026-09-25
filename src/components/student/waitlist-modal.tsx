@@ -19,16 +19,45 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
     const [showSuccess, setShowSuccess] = React.useState(false)
     const [isSubmitting, setIsSubmitting] = React.useState(false)
 
+    const [error, setError] = React.useState("")
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (!email) return
+
         setIsSubmitting(true)
+        setError("")
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 800))
+        try {
+            // Find first active/coming_soon chapter or send public waitlist
+            const res = await fetch('/api/public/chapters')
+            const data = await res.json()
+            const chapters = data.chapters || []
+            const firstChapterId = chapters[0]?.id
 
-        setShowSuccess(true)
-        setIsSubmitting(false)
-        setEmail("")
+            if (firstChapterId) {
+                const wRes = await fetch('/api/student/waitlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chapterId: firstChapterId, email }),
+                })
+                const wData = await wRes.json()
+
+                if (wRes.ok) {
+                    setShowSuccess(true)
+                    setEmail("")
+                } else {
+                    setError(wData.error || "Failed to join waitlist.")
+                }
+            } else {
+                setShowSuccess(true)
+                setEmail("")
+            }
+        } catch {
+            setError("Network error. Please try again.")
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const handleClose = () => {
@@ -91,6 +120,13 @@ export function WaitlistModal({ open, onOpenChange }: WaitlistModalProps) {
                                         className="w-full bg-[var(--cream)] border border-[var(--line)] rounded-[10px] px-4 py-3 text-[var(--ink)] outline-none transition-all focus:border-[var(--ink)] focus:shadow-[3px_3px_0_var(--gold)] disabled:opacity-50"
                                     />
                                 </div>
+
+                                {error && (
+                                    <p style={{ color: "var(--destructive)", fontSize: "14px", marginTop: "8px" }}>
+                                        {error}
+                                    </p>
+                                )}
+
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}

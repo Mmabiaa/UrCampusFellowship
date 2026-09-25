@@ -19,12 +19,14 @@ export async function GET(request: Request) {
         id, 
         name, 
         status, 
+        logo_url,
         meeting_day, 
         meeting_time, 
         location,
         description,
-        denominations(id, name),
-        campuses(id, name)
+        whatsapp_link,
+        denominations(id, name, logo_url),
+        campuses(id, name, logo_url)
       `)
             .order('name')
 
