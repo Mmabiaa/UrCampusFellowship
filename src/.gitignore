@@ -20,6 +20,7 @@ node_modules
 out/
 build/
 .DS_Store
+/scripts
 
 # Temporary & Test scripts
 fix_ts.js
