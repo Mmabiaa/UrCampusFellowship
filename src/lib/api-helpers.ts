@@ -8,9 +8,11 @@ import type { UserRole } from '@/lib/supabase/types'
 export async function getSession() {
     const supabase = await createServerSupabaseClient()
     const {
-        data: { session },
-    } = await supabase.auth.getSession()
-    return session
+        data: { user },
+        error,
+    } = await supabase.auth.getUser()
+    if (error || !user) return null
+    return { user }
 }
 
 /**

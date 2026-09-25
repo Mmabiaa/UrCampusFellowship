@@ -318,6 +318,22 @@ C.step(17, 'Admin — PATCH /api/admin/campuses/{id}/logo')
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 18 — Cleanup E2E test artifacts
+// ═══════════════════════════════════════════════════════════════════════════
+C.step(18, 'Cleanup — Remove E2E test chapter & test denomination')
+{
+    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+    if (S.chapterId) {
+        await sb.from('chapters').delete().eq('id', S.chapterId)
+        log(C.pass, `Cleaned test chapter (${S.chapterId})`)
+    }
+    if (S.denominationId) {
+        await sb.from('denominations').delete().eq('id', S.denominationId)
+        log(C.pass, `Cleaned test denomination (${S.denominationId})`)
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // SUMMARY
 // ═══════════════════════════════════════════════════════════════════════════
 console.log('\n' + '═'.repeat(60))

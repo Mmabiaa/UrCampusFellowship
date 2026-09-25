@@ -110,6 +110,9 @@ export async function middleware(request: NextRequest) {
     // ── /heads/** and /api/heads/** — head or admin only ─────────────────────
     if (path.startsWith('/heads') || path.startsWith('/api/heads')) {
         const role = await fetchRole(user.id)
+        if (role === 'admin' && !isApiRoute) {
+            return NextResponse.redirect(new URL('/admin', request.url))
+        }
         if (!role || !['head', 'admin'].includes(role)) {
             if (isApiRoute) {
                 return Response.json({ error: 'Forbidden: Head access only' }, { status: 403 })

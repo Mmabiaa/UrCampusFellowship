@@ -1,200 +1,215 @@
 "use client"
 
-import { DashboardShell } from "@/components/common/dashboard-shell"
-import { chapters, denominationRows } from "@/data/chapters"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { DashboardShell } from "@/components/common/dashboard-shell"
+
+interface AdminStats {
+  totalChapters: number
+  activeChapters: number
+  pendingApprovals: number
+  totalMembers: number
+}
+
+interface PendingChapter {
+  id: string
+  name: string
+  created_at: string
+  campuses?: { name: string }
+  denominations?: { name: string }
+  heads?: { name: string; email: string }
+}
 
 export function AdminOverview() {
-  const activeChapters = chapters.filter(c => c.status === "active").length
-  const comingSoonChapters = chapters.filter(c => c.status === "coming soon").length
-  const draftChapters = chapters.filter(c => c.status === "draft").length
-  const mainCampusChapters = chapters.filter(c => c.campus === "Main Campus").length
-  const essikadoChapters = chapters.filter(c => c.campus === "Essikado").length
+  const [stats, setStats] = useState<AdminStats | null>(null)
+  const [pendingChapters, setPendingChapters] = useState<PendingChapter[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [actionMessage, setActionMessage] = useState("")
+
+  const loadAdminData = async () => {
+    try {
+      setIsLoading(true)
+      const [statsRes, pendingRes] = await Promise.all([
+        fetch('/api/admin/stats'),
+        fetch('/api/admin/chapters/pending')
+      ])
+
+      if (statsRes.ok) {
+        const sData = await statsRes.json()
+        setStats(sData)
+      }
+      if (pendingRes.ok) {
+        const pData = await pendingRes.json()
+        setPendingChapters(pData.pending || [])
+      }
+    } catch {
+      // network error
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadAdminData()
+  }, [])
+
+  const handleApprove = async (id: string, name: string) => {
+    try {
+      const res = await fetch(`/api/admin/chapters/${id}/approve`, { method: 'POST' })
+      if (res.ok) {
+        setActionMessage(`Chapter "${name}" approved successfully!`)
+        loadAdminData()
+        setTimeout(() => setActionMessage(""), 4000)
+      } else {
+        alert("Failed to approve chapter.")
+      }
+    } catch {
+      alert("Network error.")
+    }
+  }
+
+  const handleReject = async (id: string, name: string) => {
+    const reason = prompt(`Enter rejection reason for "${name}":`)
+    if (!reason || reason.trim().length < 5) {
+      alert("Rejection reason must be at least 5 characters.")
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/admin/chapters/${id}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      })
+
+      if (res.ok) {
+        setActionMessage(`Chapter "${name}" rejected.`)
+        loadAdminData()
+        setTimeout(() => setActionMessage(""), 4000)
+      } else {
+        alert("Failed to reject chapter.")
+      }
+    } catch {
+      alert("Network error.")
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <DashboardShell role="admin">
+        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
+          Loading admin dashboard...
+        </div>
+      </DashboardShell>
+    )
+  }
 
   return (
     <DashboardShell role="admin">
       <div className="dash-header">
         <div>
           <p className="eyebrow">Platform administration</p>
-          <h1>A clear view of community.</h1>
+          <h1>System Overview</h1>
           <p className="intro">
-            Structural overview of denominations and chapters. Manage the platform
-            without seeing individual student data.
+            Overview of campus fellowship chapters, pending registrations, and platform activity.
           </p>
         </div>
       </div>
 
+      {actionMessage && (
+        <p style={{ padding: "12px 16px", background: "var(--sage)", color: "var(--moss)", borderRadius: "8px", fontWeight: "bold", marginBottom: "20px" }}>
+          ✓ {actionMessage}
+        </p>
+      )}
+
       <div className="stat-grid">
         <div>
-          <small>Total chapters</small>
-          <strong>{chapters.length}</strong>
+          <small>Total Chapters</small>
+          <strong>{stats?.totalChapters ?? 0}</strong>
           <span>Across all campuses</span>
         </div>
         <div>
-          <small>Active</small>
-          <strong className="green-text">{activeChapters}</strong>
+          <small>Active Chapters</small>
+          <strong className="green-text">{stats?.activeChapters ?? 0}</strong>
           <span>Visible to students</span>
         </div>
         <div>
-          <small>Coming soon</small>
-          <strong style={{ color: "var(--moss)" }}>{comingSoonChapters}</strong>
-          <span>Head assigned, setup pending</span>
+          <small>Pending Approvals</small>
+          <strong className="gold-text">{stats?.pendingApprovals ?? pendingChapters.length}</strong>
+          <span>Require admin review</span>
         </div>
         <div>
-          <small>Draft</small>
-          <strong style={{ color: "var(--muted-foreground)" }}>{draftChapters}</strong>
-          <span>Not yet assigned</span>
+          <small>Registered Students</small>
+          <strong>{stats?.totalMembers ?? 0}</strong>
+          <span>Total platform members</span>
         </div>
       </div>
 
+      {/* Pending Approvals Section */}
       <div style={{ marginTop: "48px" }}>
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center",
-          marginBottom: "20px",
-        }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2 style={{ fontSize: "22px", fontFamily: "Georgia, serif", margin: 0 }}>
-            Campus distribution
+            Pending Chapter Approvals ({pendingChapters.length})
           </h2>
         </div>
-        
-        <div style={{
-          background: "var(--cream)",
-          border: "1px solid var(--border)",
-          borderRadius: "10px",
-          padding: "20px",
-        }}>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "24px",
-          }}>
-            <div>
-              <h3 style={{ fontSize: "16px", marginBottom: "8px" }}>Main Campus</h3>
-              <p style={{ 
-                fontSize: "32px", 
-                fontFamily: "Georgia, serif",
-                fontWeight: 700,
-                margin: "0 0 4px",
-                color: "var(--moss)",
-              }}>
-                {mainCampusChapters}
-              </p>
-              <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>
-                chapters
-              </p>
-            </div>
-            <div>
-              <h3 style={{ fontSize: "16px", marginBottom: "8px" }}>Essikado</h3>
-              <p style={{ 
-                fontSize: "32px", 
-                fontFamily: "Georgia, serif",
-                fontWeight: 700,
-                margin: "0 0 4px",
-                color: "var(--moss)",
-              }}>
-                {essikadoChapters}
-              </p>
-              <p style={{ fontSize: "13px", color: "var(--muted-foreground)", margin: 0 }}>
-                chapters
-              </p>
-            </div>
+
+        {pendingChapters.length === 0 ? (
+          <div style={{ background: "var(--cream)", padding: "24px", borderRadius: "10px", border: "1px solid var(--border)", color: "var(--muted-foreground)" }}>
+            No chapters currently pending approval.
           </div>
-        </div>
-      </div>
+        ) : (
+          <div className="simple-list">
+            {pendingChapters.map((chap) => (
+              <div key={chap.id} className="simple-list-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <strong style={{ display: "block", fontSize: "16px" }}>{chap.name}</strong>
+                  <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+                    {chap.denominations?.name || "Fellowship"} • {chap.campuses?.name || "Main Campus"}
+                  </span>
+                  <div style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "4px" }}>
+                    Leader: {chap.heads?.name || "N/A"} ({chap.heads?.email || "N/A"})
+                  </div>
+                </div>
 
-      <div style={{ marginTop: "48px" }}>
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center",
-          marginBottom: "20px",
-        }}>
-          <h2 style={{ fontSize: "22px", fontFamily: "Georgia, serif", margin: 0 }}>
-            Denominations
-          </h2>
-          <Link href="/admin/denominations" className="button button-outline" style={{
-            padding: "8px 16px",
-            fontSize: "13px",
-          }}>
-            Manage denominations
-          </Link>
-        </div>
-
-        <div className="simple-list">
-          {denominationRows.map(([name, info]) => (
-            <div key={name} className="simple-list-row">
-              <strong>{name}</strong>
-              <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
-                {info}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ marginTop: "48px" }}>
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center",
-          marginBottom: "20px",
-        }}>
-          <h2 style={{ fontSize: "22px", fontFamily: "Georgia, serif", margin: 0 }}>
-            Recent chapters
-          </h2>
-          <Link href="/admin/chapter" className="button button-outline" style={{
-            padding: "8px 16px",
-            fontSize: "13px",
-          }}>
-            View all chapters
-          </Link>
-        </div>
-
-        <div className="simple-list">
-          {chapters.slice(0, 5).map((chapter) => (
-            <div key={chapter.name} className="simple-list-row">
-              <div>
-                <strong>{chapter.name}</strong>
-                <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
-                  {chapter.denomination} · {chapter.campus}
-                </span>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button
+                    type="button"
+                    className="button button-primary"
+                    onClick={() => handleApprove(chap.id, chap.name)}
+                    style={{ padding: "6px 14px", fontSize: "13px" }}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    type="button"
+                    className="button button-outline"
+                    onClick={() => handleReject(chap.id, chap.name)}
+                    style={{ padding: "6px 14px", fontSize: "13px", borderColor: "var(--destructive)", color: "var(--destructive)" }}
+                  >
+                    Reject
+                  </button>
+                </div>
               </div>
-              <span style={{
-                fontSize: "12px",
-                padding: "4px 10px",
-                borderRadius: "6px",
-                background: chapter.status === "active" 
-                  ? "var(--sage)"
-                  : chapter.status === "coming soon"
-                  ? "color-mix(in srgb, var(--moss) 15%, var(--cream))"
-                  : "var(--cream)",
-                color: chapter.status === "active"
-                  ? "var(--moss)"
-                  : "var(--muted-foreground)",
-                fontWeight: 500,
-              }}>
-                {chapter.status}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div style={{
-        marginTop: "56px",
-        paddingTop: "32px",
-        borderTop: "1px solid var(--border)",
-      }}>
-        <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: "1.65" }}>
-          <strong style={{ color: "var(--ink)", display: "block", marginBottom: "8px" }}>
-            About platform administration
-          </strong>
-          As the System Admin, you manage the structural components of UrCampusFellowship:
-          denominations, chapter shells, and chapter head accounts. Individual student roster
-          data belongs to chapter heads and is not visible from this dashboard by default.
-        </p>
+      <div style={{ marginTop: "48px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <h2 style={{ fontSize: "22px", fontFamily: "Georgia, serif", margin: 0 }}>
+            Quick Links
+          </h2>
+        </div>
+
+        <div style={{ display: "flex", gap: "16px" }}>
+          <Link href="/admin/denominations" className="button button-outline">
+            Manage Denominations →
+          </Link>
+          <Link href="/admin/chapter" className="button button-outline">
+            Manage All Chapters →
+          </Link>
+        </div>
       </div>
     </DashboardShell>
   )
