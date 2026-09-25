@@ -12,19 +12,28 @@ export async function GET() {
         const supabase = createServiceClient() as any
 
         const [
-            { count: chapterCount },
-            { count: denomCount },
-            { count: pendingCount },
+            { count: totalChapters },
+            { count: activeChapters },
+            { count: pendingApprovals },
+            { count: comingSoonChapters },
+            { count: totalDenominations },
+            { count: totalMembers },
         ] = await Promise.all([
             supabase.from('chapters').select('*', { count: 'exact', head: true }),
-            supabase.from('denominations').select('*', { count: 'exact', head: true }),
+            supabase.from('chapters').select('*', { count: 'exact', head: true }).eq('status', 'active'),
             supabase.from('chapters').select('*', { count: 'exact', head: true }).eq('status', 'pending_approval'),
+            supabase.from('chapters').select('*', { count: 'exact', head: true }).eq('status', 'coming_soon'),
+            supabase.from('denominations').select('*', { count: 'exact', head: true }),
+            supabase.from('student_profiles').select('*', { count: 'exact', head: true }),
         ])
 
         return apiOk({
-            totalChapters: chapterCount ?? 0,
-            totalDenominations: denomCount ?? 0,
-            pendingApprovals: pendingCount ?? 0,
+            totalChapters: totalChapters ?? 0,
+            activeChapters: activeChapters ?? 0,
+            pendingApprovals: pendingApprovals ?? 0,
+            comingSoonChapters: comingSoonChapters ?? 0,
+            totalDenominations: totalDenominations ?? 0,
+            totalMembers: totalMembers ?? 0,
         })
     } catch {
         return apiError('Internal server error', 500)
