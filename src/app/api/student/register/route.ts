@@ -1,30 +1,29 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { getSession, apiError, apiOk } from '@/lib/api-helpers'
+import { apiError, apiOk } from '@/lib/api-helpers'
 import { StudentRegisterSchema } from '@/lib/validations'
 import { createServiceClient } from '@/lib/supabase/service'
 
 export async function POST(request: Request) {
     try {
-        const session = await getSession()
-        if (!session) return apiError('Unauthorized', 401)
-
         const json = await request.json()
+        
+        // Debug: log what we received
+        console.log('Received registration data:', json)
+        
         const parsed = StudentRegisterSchema.safeParse(json)
 
         if (!parsed.success) {
+            console.error('Validation failed:', parsed.error.issues)
             return apiError(parsed.error.issues[0].message, 422)
         }
 
-        // Must use service role to invoke a security definer RPC successfully without RLS issues 
-        // depending on how strict RLS is set up for memberships (even though auth is the user).
+        // Use service client to call the stored procedure
         const supabaseAdmin = createServiceClient() as any
 
-        // Call stored procedure
-        // Note: The types for RPC need manual defining usually, but relying on any since we hand crafted types.
+        // Call stored procedure (no auth required - student ID generated in function)
         const { data, error } = await (supabaseAdmin as any).rpc('register_student', {
-            p_student_id: session.user.id,
             p_chapter_id: parsed.data.chapterId,
             p_full_name: parsed.data.name,
+            p_email: parsed.data.email,
             p_phone: parsed.data.phone,
             p_program: parsed.data.program,
             p_hall: parsed.data.hall,

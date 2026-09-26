@@ -29,6 +29,7 @@ function RegisterContent() {
 
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     phone: "",
     campusId: "",
     program: "",
@@ -87,6 +88,7 @@ function RegisterContent() {
 
   const isFormValid =
     formData.name.trim() !== "" &&
+    formData.email.trim() !== "" &&
     formData.phone.trim() !== "" &&
     formData.campusId !== "" &&
     formData.level !== "" &&
@@ -111,6 +113,7 @@ function RegisterContent() {
         body: JSON.stringify({
           chapterId: chapter.id,
           name: formData.name,
+          email: formData.email,
           phone: formData.phone,
           program: formData.program,
           hall: formData.hall,
@@ -185,6 +188,18 @@ function RegisterContent() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="e.g. Boateng Prince"
+                required
+              />
+            </label>
+
+            <label>
+              Email address
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="e.g. prince.boateng@example.com"
                 required
               />
             </label>
