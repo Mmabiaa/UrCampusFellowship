@@ -1,30 +1,104 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { DashboardShell } from "@/components/common/dashboard-shell"
-import { rosterMembers, type MemberDetails } from "@/data/chapters"
+
+interface Member {
+  id: string
+  name: string
+  email: string
+  phone: string
+  program: string
+  level: string
+  hall: string
+  status: string
+  created_at: string
+  campuses?: { name: string }
+}
 
 export default function RosterPage() {
+  const [members, setMembers] = useState<Member[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedMember, setSelectedMember] = useState<MemberDetails | null>(null)
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null)
+  const [actionMessage, setActionMessage] = useState("")
 
-  const filteredMembers = rosterMembers.filter((member) =>
-    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.program.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.hall.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  useEffect(() => {
+    async function loadRoster() {
+      try {
+        setIsLoading(true)
+        const res = await fetch('/api/heads/roster')
+        if (res.ok) {
+          const data = await res.json()
+          setMembers(data.members || [])
+        }
+      } catch {
+        // network error
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-  const handleRemoveMember = (member: MemberDetails, e: React.MouseEvent) => {
+    loadRoster()
+  }, [])
+
+  const filteredMembers = members.filter((member) => {
+    const name = member.name || (member as any).full_name || ""
+    const program = member.program || ""
+    const hall = member.hall || ""
+    return (
+      name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      program.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      hall.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })
+
+  const handleRemoveMember = async (member: Member, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (confirm(`Are you sure you want to remove ${member.name} from your roster? They will be free to register with another fellowship.`)) {
-      alert(`${member.name} has been removed from the roster.`)
-      setSelectedMember(null)
+    if (
+      !confirm(
+        `Are you sure you want to remove ${member.name} from your roster? They will be free to register with another fellowship.`
+      )
+    ) {
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/heads/members/${member.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'remove' }),
+      })
+
+      if (res.ok) {
+        setMembers((prev) => prev.filter((m) => m.id !== member.id))
+        setSelectedMember(null)
+        setActionMessage(`${member.name} has been removed from the roster.`)
+        setTimeout(() => setActionMessage(""), 4000)
+      } else {
+        alert("Failed to remove member. Please try again.")
+      }
+    } catch {
+      alert("Network error.")
     }
   }
 
-  const handleFlagMember = (member: MemberDetails, e: React.MouseEvent) => {
+  const handleFlagMember = async (member: Member, e: React.MouseEvent) => {
     e.stopPropagation()
-    alert(`${member.name} has been flagged for follow-up.`)
+    try {
+      const res = await fetch(`/api/heads/members/${member.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'flag' }),
+      })
+
+      if (res.ok) {
+        setActionMessage(`${member.name} has been flagged for follow-up.`)
+        setTimeout(() => setActionMessage(""), 4000)
+      }
+    } catch {
+      alert("Network error.")
+    }
   }
 
   return (
@@ -34,16 +108,31 @@ export default function RosterPage() {
           <p className="eyebrow">Member roster</p>
           <h1>Your chapter community.</h1>
           <p className="intro">
-            Manage members who have registered with your fellowship. Students join instantly —
-            you can remove or flag them after the fact if needed.
+            Manage members who have registered with your fellowship.
           </p>
         </div>
       </div>
 
+      {actionMessage && (
+        <p
+          style={{
+            padding: "12px 16px",
+            background: "var(--sage)",
+            color: "var(--moss)",
+            borderRadius: "8px",
+            fontSize: "14px",
+            marginBottom: "16px",
+            fontWeight: "bold",
+          }}
+        >
+          ✓ {actionMessage}
+        </p>
+      )}
+
       <div className="roster-toolbar">
         <input
           type="search"
-          placeholder="Search members by name or program..."
+          placeholder="Search members by name, program, or hall..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           aria-label="Search members"
@@ -51,102 +140,117 @@ export default function RosterPage() {
         <span>{filteredMembers.length} members</span>
       </div>
 
-      <p style={{
-        fontSize: "13px",
-        color: "var(--muted-foreground)",
-        marginBottom: "16px",
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-      }}>
-        <span aria-hidden="true">👆</span> Tap any member to view their full details
+      <p
+        style={{
+          fontSize: "13px",
+          color: "var(--muted-foreground)",
+          marginBottom: "16px",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+        }}
+      >
+        <span aria-hidden="true">👆</span> Tap any member to view their full registration details
       </p>
 
-      <div className="roster-list">
-        {filteredMembers.length === 0 ? (
-          <p style={{ padding: "40px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
-            No members found matching "{searchQuery}"
-          </p>
-        ) : (
-          filteredMembers.map((member) => (
-            <span
-              key={member.id}
-              onClick={() => setSelectedMember(member)}
-              style={{
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                background: "var(--cream)",
-                borderRadius: "10px",
-                padding: "16px",
-                margin: "0 0 12px",
-                border: "1px solid var(--border)",
-                position: "relative",
-              }}
-              className="member-row"
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault()
-                  setSelectedMember(member)
-                }
-              }}
-            >
-              <i aria-hidden="true">{member.initials}</i>
-              <b>
-                {member.name}
-                <small>{member.displayInfo}</small>
-              </b>
-              <span
+      {isLoading ? (
+        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
+          Loading chapter roster...
+        </div>
+      ) : (
+        <div className="roster-list">
+          {filteredMembers.length === 0 ? (
+            <p style={{ padding: "40px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
+              {searchQuery
+                ? `No members found matching "${searchQuery}"`
+                : "No registered members in your fellowship yet."}
+            </p>
+          ) : (
+            filteredMembers.map((member) => (
+              <div
+                key={member.id}
+                onClick={() => setSelectedMember(member)}
                 style={{
-                  color: "var(--moss)",
-                  fontSize: "18px",
-                  display: "none",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  background: "var(--cream)",
+                  borderRadius: "10px",
+                  padding: "16px",
+                  margin: "0 0 12px",
+                  border: "1px solid var(--border)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "12px",
                 }}
-                className="tap-indicator"
-                aria-hidden="true"
+                className="member-row"
+                role="button"
+                tabIndex={0}
               >
-                →
-              </span>
-              <button
-                type="button"
-                className="button button-outline member-action-btn"
-                onClick={(e) => handleFlagMember(member, e)}
-                style={{ padding: "8px 14px", fontSize: "13px" }}
-              >
-                Flag
-              </button>
-              <button
-                type="button"
-                className="button button-outline member-action-btn"
-                onClick={(e) => handleRemoveMember(member, e)}
-                style={{
-                  padding: "8px 14px",
-                  fontSize: "13px",
-                  borderColor: "var(--destructive)",
-                  color: "var(--destructive)",
-                }}
-              >
-                Remove
-              </button>
-            </span>
-          ))
-        )}
-      </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <i
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      background: "var(--sage)",
+                      color: "var(--moss)",
+                      display: "grid",
+                      placeItems: "center",
+                      fontStyle: "normal",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {(member.name || (member as any).full_name || 'M')[0]?.toUpperCase()}
+                  </i>
+                  <div>
+                    <strong style={{ display: "block", fontSize: "15px" }}>{member.name || (member as any).full_name}</strong>
+                    <small style={{ color: "var(--muted-foreground)", fontSize: "13px" }}>
+                      {member.program} • Level {member.level}
+                    </small>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button
+                    type="button"
+                    className="button button-outline"
+                    onClick={(e) => handleFlagMember(member, e)}
+                    style={{ padding: "6px 12px", fontSize: "13px" }}
+                  >
+                    Flag
+                  </button>
+                  <button
+                    type="button"
+                    className="button button-outline"
+                    onClick={(e) => handleRemoveMember(member, e)}
+                    style={{
+                      padding: "6px 12px",
+                      fontSize: "13px",
+                      borderColor: "var(--destructive)",
+                      color: "var(--destructive)",
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Member Detail Modal */}
       {selectedMember && (
         <>
           <div className="modal-overlay" onClick={() => setSelectedMember(null)} />
-          <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="member-modal-name">
+          <div className="modal-card" role="dialog" aria-modal="true">
             <div className="modal-head">
               <div className="modal-head-info">
-                <div className="modal-avatar" aria-hidden="true">
-                  {selectedMember.initials}
-                </div>
+                <div className="modal-avatar">{selectedMember.name[0]}</div>
                 <div className="modal-head-text">
-                  <h2 id="member-modal-name">{selectedMember.name}</h2>
-                  <p>Joined {selectedMember.joinedDate}</p>
+                  <h2>{selectedMember.name}</h2>
+                  <p>Joined {new Date(selectedMember.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
               <button
@@ -162,15 +266,15 @@ export default function RosterPage() {
             <div className="modal-grid">
               <div className="modal-field">
                 <small>Email</small>
-                <strong className="modal-field-break">{selectedMember.email}</strong>
+                <strong className="modal-field-break">{selectedMember.email || "—"}</strong>
               </div>
               <div className="modal-field">
                 <small>Phone</small>
-                <strong>{selectedMember.phone}</strong>
+                <strong>{selectedMember.phone || "—"}</strong>
               </div>
               <div className="modal-field">
                 <small>Program</small>
-                <strong>{selectedMember.program}</strong>
+                <strong>{selectedMember.program || "—"}</strong>
               </div>
               <div className="modal-field">
                 <small>Level</small>
@@ -178,11 +282,11 @@ export default function RosterPage() {
               </div>
               <div className="modal-field">
                 <small>Campus</small>
-                <strong>{selectedMember.campus}</strong>
+                <strong>{selectedMember.campuses?.name || "Main Campus"}</strong>
               </div>
               <div className="modal-field">
                 <small>Hall/Hostel</small>
-                <strong>{selectedMember.hall}</strong>
+                <strong>{selectedMember.hall || "—"}</strong>
               </div>
             </div>
 
@@ -206,39 +310,13 @@ export default function RosterPage() {
         </>
       )}
 
-      <div style={{ marginTop: "48px", paddingTop: "32px", borderTop: "1px solid var(--border)" }}>
-        <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: "1.65" }}>
-          <strong style={{ color: "var(--ink)", display: "block", marginBottom: "8px" }}>
-            About roster management
-          </strong>
-          Students join your fellowship instantly without requiring approval. You can remove
-          members from your roster at any time, which frees them to register elsewhere. Flagging
-          a member keeps them on the roster but marks them for your follow-up.
-          <br /><br />
-          Note: Removing a member here does not remove them from your WhatsApp group — you'll
-          need to handle that separately in WhatsApp.
-        </p>
-      </div>
-
       <style jsx>{`
-        .member-row:hover {
-          border-color: var(--moss) !important;
-          box-shadow: 3px 3px 0 color-mix(in srgb, var(--moss) 20%, transparent) !important;
-          transform: translateY(-2px);
-        }
-        .member-row:active {
-          transform: translateY(0px);
-        }
-
         .modal-overlay {
           position: fixed;
           inset: 0;
           background: rgba(32, 35, 31, 0.5);
           z-index: 999;
-          animation: fadeIn 0.2s ease;
         }
-
-        /* Compact by design — sized to always fit in one screen, never scroll */
         .modal-card {
           position: fixed;
           top: 50%;
@@ -250,12 +328,8 @@ export default function RosterPage() {
           box-shadow: 5px 5px 0 var(--ink);
           padding: 22px;
           width: min(400px, calc(100vw - 32px));
-          max-height: calc(100vh - 32px);
-          overflow: hidden;
           z-index: 1000;
-          animation: slideUp 0.25s ease;
         }
-
         .modal-head {
           display: flex;
           justify-content: space-between;
@@ -267,82 +341,41 @@ export default function RosterPage() {
           display: flex;
           align-items: center;
           gap: 12px;
-          min-width: 0;
         }
         .modal-avatar {
           width: 42px;
           height: 42px;
-          flex: 0 0 auto;
           border-radius: 50%;
           background: var(--sage);
           color: var(--moss);
           display: grid;
           place-items: center;
-          font-family: Georgia, serif;
-          font-size: 18px;
           font-weight: 700;
-        }
-        .modal-head-text { min-width: 0; }
-        .modal-head-text h2 {
           font-size: 18px;
-          margin: 0;
-          font-family: Georgia, serif;
-          overflow-wrap: anywhere;
-          line-height: 1.2;
         }
-        .modal-head-text p {
-          color: var(--muted-foreground);
-          font-size: 11px;
-          margin: 3px 0 0;
-        }
-
         .modal-close {
           background: none;
           border: none;
-          color: var(--muted-foreground);
-          font-size: 20px;
+          font-size: 24px;
           cursor: pointer;
-          padding: 0;
-          width: 32px;
-          height: 32px;
-          flex: 0 0 auto;
-          border-radius: 50%;
-          display: grid;
-          place-items: center;
-          transition: background 0.15s ease, color 0.15s ease;
         }
-        .modal-close:hover {
-          background: var(--sage);
-          color: var(--ink);
-        }
-
-        /* Fixed 2-column x 3-row matrix, always — never collapses to 1 column */
         .modal-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px 16px;
+          gap: 12px;
           padding: 14px 0;
           border-top: 1px solid var(--border);
           border-bottom: 1px solid var(--border);
         }
         .modal-field small {
           color: var(--muted-foreground);
-          font-size: 9px;
+          font-size: 10px;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
           display: block;
-          margin-bottom: 4px;
         }
         .modal-field strong {
           font-size: 13px;
-          line-height: 1.3;
-          display: block;
         }
-        .modal-field-break {
-          word-break: break-word;
-          overflow-wrap: anywhere;
-        }
-
         .modal-actions {
           display: flex;
           gap: 10px;
@@ -350,19 +383,6 @@ export default function RosterPage() {
         }
         .modal-actions .button {
           flex: 1;
-          padding: 10px 12px;
-          font-size: 13px;
-        }
-        .modal-remove-btn {
-          border-color: var(--destructive);
-          color: var(--destructive);
-        }
-
-        @media (max-width: 380px) {
-          .modal-card { padding: 18px; }
-          .modal-head-text h2 { font-size: 16px; }
-          .modal-field strong { font-size: 12px; }
-          .modal-actions .button { font-size: 12px; padding: 9px 8px; }
         }
       `}</style>
     </DashboardShell>

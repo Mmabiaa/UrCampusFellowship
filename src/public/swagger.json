@@ -1,0 +1,819 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "UrCampusFellowship API",
+        "version": "1.0.0",
+        "description": "Complete API documentation covering Student, Head, Admin, Public, and Upload routes."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "Local Development Server"
+        },
+        {
+            "url": "https://urcampus-fellowship.vercel.app",
+            "description": "Staging Server"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "cookieAuth": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "sb-localhost-auth-token",
+                "description": "Supabase Auth Cookie (handled automatically by Next.js)"
+            }
+        }
+    },
+    "paths": {
+        "/api/auth/login": {
+            "post": {
+                "summary": "Login with Email & Password",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "head@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Password123!"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "summary": "Logout current user",
+                "tags": [
+                    "Auth"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/auth/head/signup": {
+            "post": {
+                "summary": "Signup as a Chapter Head",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "denominationId",
+                                    "chapterName",
+                                    "campusId"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "denominationId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "chapterName": {
+                                        "type": "string"
+                                    },
+                                    "campusId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/auth/otp/send": {
+            "post": {
+                "summary": "Send an OTP code for student login",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/auth/otp/verify": {
+            "post": {
+                "summary": "Verify an OTP code",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "email",
+                                    "token"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "token": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/auth/reset-password": {
+            "post": {
+                "summary": "Send a password reset email",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/public/chapters": {
+            "get": {
+                "summary": "Get directory of active & coming_soon chapters",
+                "tags": [
+                    "Public"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "campusId",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Active chapters"
+                    }
+                }
+            }
+        },
+        "/api/student/register": {
+            "post": {
+                "summary": "Register a student to an active chapter",
+                "tags": [
+                    "Student"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "chapterId",
+                                    "name",
+                                    "phone",
+                                    "program",
+                                    "hall",
+                                    "level",
+                                    "campusId"
+                                ],
+                                "properties": {
+                                    "chapterId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "program": {
+                                        "type": "string"
+                                    },
+                                    "hall": {
+                                        "type": "string"
+                                    },
+                                    "level": {
+                                        "type": "string",
+                                        "enum": [
+                                            "100",
+                                            "200",
+                                            "300",
+                                            "400",
+                                            "postgrad"
+                                        ]
+                                    },
+                                    "campusId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/student/waitlist": {
+            "post": {
+                "summary": "Join waitlist for a coming_soon chapter",
+                "tags": [
+                    "Student"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "chapterId",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "chapterId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/student/leave": {
+            "post": {
+                "summary": "Leave current chapter",
+                "tags": [
+                    "Student"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/heads/chapter": {
+            "get": {
+                "summary": "Get the head's owned chapter details",
+                "tags": [
+                    "Head"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update chapter details (triggers active state when day, time, location, whatsapp_link are provided)",
+                "tags": [
+                    "Head"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "meeting_day": {
+                                        "type": "string",
+                                        "example": "Wednesday"
+                                    },
+                                    "meeting_time": {
+                                        "type": "string",
+                                        "example": "5:30 PM"
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "example": "Old Lecture Theatre"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "whatsapp_link": {
+                                        "type": "string",
+                                        "example": "https://chat.whatsapp.com/sample"
+                                    },
+                                    "logo_url": {
+                                        "type": "string",
+                                        "example": "https://hnfuysbsyaqzntzdihti.supabase.co/storage/v1/object/public/logos/chapters/sample.jpg"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/heads/chapter/resubmit": {
+            "post": {
+                "summary": "Resubmit a rejected chapter",
+                "tags": [
+                    "Head"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/heads/roster": {
+            "get": {
+                "summary": "Get the chapter roster (member list)",
+                "tags": [
+                    "Head"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/heads/members/{memberId}": {
+            "patch": {
+                "summary": "Manage a specific member (flag/remove)",
+                "tags": [
+                    "Head"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "memberId",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "action"
+                                ],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "flag",
+                                            "remove"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/stats": {
+            "get": {
+                "summary": "Get platform statistics",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/chapters": {
+            "get": {
+                "summary": "List all global chapters",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/chapters/pending": {
+            "get": {
+                "summary": "Get queue of chapters pending approval",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/chapters/{id}/approve": {
+            "post": {
+                "summary": "Approve a chapter",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/chapters/{id}/reject": {
+            "post": {
+                "summary": "Reject a chapter",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "reason": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/denominations": {
+            "get": {
+                "summary": "List all denominations",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new denomination",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/campuses/{id}/logo": {
+            "patch": {
+                "summary": "Set or update campus logo URL",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "logo_url"
+                                ],
+                                "properties": {
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/uploads/logo": {
+            "post": {
+                "summary": "Upload a logo image file to Supabase Storage",
+                "tags": [
+                    "Uploads"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "Image file (JPG, PNG, WEBP, SVG) up to 2MB"
+                                    },
+                                    "folder": {
+                                        "type": "string",
+                                        "example": "chapters",
+                                        "description": "Target folder: chapters, denominations, or campuses"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Returns { url: string }"
+                    }
+                }
+            }
+        }
+    }
+}

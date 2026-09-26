@@ -1,118 +1,234 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { DashboardShell } from "@/components/common/dashboard-shell"
-import { chapters, type Chapter, campuses, denominationRows, invitations } from "@/data/chapters"
 
-type FormState = "none" | "create" | "invite"
-
-type CreateChapterForm = {
+interface Option {
+  id: string
   name: string
-  denominationId: string
-  campus: string
-  status: "draft" | "coming soon"
 }
 
-type InviteHeadForm = {
-  email: string
-  chapterId: string
+interface Chapter {
+  id: string
+  name: string
+  status: string
+  denomination_id?: string
+  campus_id?: string
+  meeting_day?: string
+  meeting_time?: string
+  location?: string
+  description?: string
+  logo_url?: string
+  whatsapp_link?: string
+  campuses?: { id?: string; name: string }
+  denominations?: { id?: string; name: string }
 }
 
 export default function AdminChapterPage() {
-  const [formState, setFormState] = useState<FormState>("none")
+  const [chapters, setChapters] = useState<Chapter[]>([])
+  const [denominations, setDenominations] = useState<Option[]>([])
+  const [campuses, setCampuses] = useState<Option[]>([])
+
+  const [isLoading, setIsLoading] = useState(true)
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [editingChapter, setEditingChapter] = useState<Chapter | null>(null)
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null)
-  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "coming soon" | "draft">("all")
-  const [filterCampus, setFilterCampus] = useState<"all" | typeof campuses[number]>("all")
-  const [searchQuery, setSearchQuery] = useState("")
-  
-  const [createForm, setCreateForm] = useState<CreateChapterForm>({
+
+  const [formData, setFormData] = useState({
     name: "",
-    denominationId: "",
-    campus: campuses[0],
+    denomination_id: "",
+    campus_id: "",
     status: "draft",
+    meeting_day: "",
+    meeting_time: "",
+    location: "",
+    description: "",
+    whatsapp_link: "",
+    logo_url: "",
   })
 
-  const [inviteForm, setInviteForm] = useState<InviteHeadForm>({
-    email: "",
-    chapterId: "",
-  })
+  const [isUploading, setIsUploading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
 
-  const filteredChapters = chapters.filter((chapter) => {
-    const matchesStatus = filterStatus === "all" || chapter.status === filterStatus
-    const matchesCampus = filterCampus === "all" || chapter.campus === filterCampus
-    const matchesSearch =
-      chapter.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chapter.denomination.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesStatus && matchesCampus && matchesSearch
-  })
+  const loadData = async () => {
+    try {
+      setIsLoading(true)
+      const [chapRes, denRes, camRes] = await Promise.all([
+        fetch('/api/admin/chapters'),
+        fetch('/api/public/denominations'),
+        fetch('/api/public/campuses')
+      ])
 
-  const handleCreateChapter = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!createForm.name.trim() || !createForm.denominationId) return
-
-    const statusLabel = createForm.status === "draft" ? "draft" : "coming soon"
-    alert(
-      `Chapter "${createForm.name}" created successfully with status "${statusLabel}".\n\n` +
-      `Campus: ${createForm.campus}\n` +
-      `Next step: Invite a chapter head to complete the setup and activate this chapter.`
-    )
-    
-    setCreateForm({ name: "", denominationId: "", campus: campuses[0], status: "draft" })
-    setFormState("none")
+      if (chapRes.ok) {
+        const cData = await chapRes.json()
+        setChapters(cData.chapters || [])
+      }
+      if (denRes.ok) {
+        const dData = await denRes.json()
+        setDenominations(dData.denominations || [])
+      }
+      if (camRes.ok) {
+        const caData = await camRes.json()
+        setCampuses(caData.campuses || [])
+      }
+    } catch {
+      setError("Failed to load chapter management data.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleInviteHead = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!inviteForm.email.trim() || !inviteForm.chapterId) return
+  useEffect(() => {
+    loadData()
+  }, [])
 
-    const chapter = chapters.find(c => c.name === inviteForm.chapterId)
-    alert(
-      `Invitation sent to ${inviteForm.email} for "${chapter?.name}".\n\n` +
-      `They will receive an email with login credentials and instructions to complete the chapter setup.`
-    )
-    
-    setInviteForm({ email: "", chapterId: "" })
-    setFormState("none")
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    setError("")
+
+    try {
+      const uploadData = new FormData()
+      uploadData.append('file', file)
+
+      const res = await fetch('/api/uploads/logo', {
+        method: 'POST',
+        body: uploadData,
+      })
+
+      const data = await res.json()
+      if (res.ok && data.url) {
+        setFormData((prev) => ({ ...prev, logo_url: data.url }))
+        setMessage("Logo image uploaded successfully!")
+      } else {
+        setError(data.error || "Failed to upload image.")
+      }
+    } catch {
+      setError("Network error uploading image.")
+    } finally {
+      setIsUploading(false)
+    }
   }
 
-  const resetForm = () => {
-    setFormState("none")
-    setCreateForm({ name: "", denominationId: "", campus: campuses[0], status: "draft" })
-    setInviteForm({ email: "", chapterId: "" })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.name.trim()) {
+      setError("Chapter name is required.")
+      return
+    }
+
+    setIsSaving(true)
+    setError("")
+    setMessage("")
+
+    const payload: Record<string, any> = { ...formData }
+    if (!payload.denomination_id) delete payload.denomination_id
+    if (!payload.campus_id) delete payload.campus_id
+
+    try {
+      const url = editingChapter ? `/api/admin/chapters/${editingChapter.id}` : '/api/admin/chapters'
+      const method = editingChapter ? 'PATCH' : 'POST'
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Failed to save chapter.")
+        setIsSaving(false)
+        return
+      }
+
+      setMessage(editingChapter ? "Chapter updated successfully!" : "Chapter shell created successfully!")
+      setShowCreateForm(false)
+      setEditingChapter(null)
+      setIsSaving(false)
+      loadData()
+
+      setTimeout(() => setMessage(""), 4000)
+    } catch {
+      setError("Network error.")
+      setIsSaving(false)
+    }
+  }
+
+  const openEditForm = (chap: Chapter) => {
+    setEditingChapter(chap)
+    setFormData({
+      name: chap.name,
+      denomination_id: chap.denomination_id || chap.denominations?.id || "",
+      campus_id: chap.campus_id || chap.campuses?.id || "",
+      status: chap.status,
+      meeting_day: chap.meeting_day || "",
+      meeting_time: chap.meeting_time || "",
+      location: chap.location || "",
+      description: chap.description || "",
+      whatsapp_link: chap.whatsapp_link || "",
+      logo_url: chap.logo_url || "",
+    })
+    setShowCreateForm(false)
+    setError("")
+    setMessage("")
   }
 
   return (
     <DashboardShell role="admin">
       <div className="dash-header">
         <div>
-          <p className="eyebrow">Chapter management</p>
-          <h1>Chapters & assignments.</h1>
+          <p className="eyebrow">Chapter Management</p>
+          <h1>Chapters & Logo Pictures</h1>
           <p className="intro">
-            Create chapter shells, assign chapter heads, and oversee the chapter lifecycle.
+            Create and edit chapters with custom picture logos and meeting details.
           </p>
         </div>
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-          <button
-            type="button"
-            className="button button-outline"
-            onClick={() => setFormState(formState === "invite" ? "none" : "invite")}
-            style={{ whiteSpace: "nowrap" }}
-          >
-            {formState === "invite" ? "Cancel" : "Invite chapter head"}
-          </button>
-          <button
-            type="button"
-            className="button button-primary"
-            onClick={() => setFormState(formState === "create" ? "none" : "create")}
-            style={{ whiteSpace: "nowrap" }}
-          >
-            {formState === "create" ? "Cancel" : "+ New chapter"}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="button button-primary"
+          onClick={() => {
+            setShowCreateForm(!showCreateForm)
+            setEditingChapter(null)
+            setFormData({
+              name: "",
+              denomination_id: denominations[0]?.id || "",
+              campus_id: campuses[0]?.id || "",
+              status: "draft",
+              meeting_day: "",
+              meeting_time: "",
+              location: "",
+              description: "",
+              whatsapp_link: "",
+              logo_url: "",
+            })
+            setError("")
+            setMessage("")
+          }}
+          style={{ whiteSpace: "nowrap" }}
+        >
+          {showCreateForm ? "Cancel" : "+ New Chapter"}
+        </button>
       </div>
 
-      {/* Create Chapter Form */}
-      {formState === "create" && (
+      {message && (
+        <p style={{ padding: "12px 16px", background: "var(--sage)", color: "var(--moss)", borderRadius: "8px", fontWeight: "bold", marginBottom: "20px" }}>
+          ✓ {message}
+        </p>
+      )}
+
+      {error && (
+        <p style={{ color: "var(--destructive)", fontWeight: "bold", marginBottom: "20px" }}>
+          {error}
+        </p>
+      )}
+
+      {(showCreateForm || editingChapter) && (
         <div style={{
           background: "var(--cream)",
           border: "1px solid var(--border)",
@@ -121,198 +237,176 @@ export default function AdminChapterPage() {
           marginBottom: "32px",
           animation: "fadeIn 0.2s ease",
         }}>
-          <h3 style={{ fontSize: "18px", marginBottom: "16px" }}>Create chapter shell</h3>
-          <form onSubmit={handleCreateChapter}>
+          <h3 style={{ fontSize: "18px", marginBottom: "16px" }}>
+            {editingChapter ? `Update Chapter: ${editingChapter.name}` : "Create Chapter Shell"}
+          </h3>
+
+          <form onSubmit={handleSubmit}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
               <div>
-                <label htmlFor="chapter-name" style={{
-                  display: "block",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  marginBottom: "6px",
-                  color: "var(--ink)",
-                }}>
-                  Chapter name *
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                  Chapter Name *
                 </label>
                 <input
-                  id="chapter-name"
                   type="text"
-                  value={createForm.name}
-                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                  placeholder="e.g. Campus Christian Fellowship"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. PENSA UMaT Chapter"
                   required
-                  autoFocus
                 />
               </div>
 
               <div>
-                <label htmlFor="denomination" style={{
-                  display: "block",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  marginBottom: "6px",
-                  color: "var(--ink)",
-                }}>
-                  Denomination *
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                  Status
                 </label>
                 <select
-                  id="denomination"
-                  value={createForm.denominationId}
-                  onChange={(e) => setCreateForm({ ...createForm, denominationId: e.target.value })}
-                  required
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 >
-                  <option value="">Select denomination</option>
-                  {denominationRows.map(([name], idx) => (
-                    <option key={idx} value={String(idx + 1)}>
-                      {name}
-                    </option>
-                  ))}
+                  <option value="draft">Draft</option>
+                  <option value="pending_approval">Pending Approval</option>
+                  <option value="coming_soon">Coming Soon</option>
+                  <option value="active">Active</option>
+                  <option value="rejected">Rejected</option>
                 </select>
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
               <div>
-                <label htmlFor="campus" style={{
-                  display: "block",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  marginBottom: "6px",
-                  color: "var(--ink)",
-                }}>
-                  Campus *
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                  Denomination
                 </label>
                 <select
-                  id="campus"
-                  value={createForm.campus}
-                  onChange={(e) => setCreateForm({ ...createForm, campus: e.target.value })}
-                  required
+                  value={formData.denomination_id}
+                  onChange={(e) => setFormData({ ...formData, denomination_id: e.target.value })}
                 >
-                  {campuses.map((campus) => (
-                    <option key={campus} value={campus}>
-                      {campus}
-                    </option>
+                  <option value="">Select Denomination (Optional)</option>
+                  {denominations.map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label htmlFor="initial-status" style={{
-                  display: "block",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  marginBottom: "6px",
-                  color: "var(--ink)",
-                }}>
-                  Initial status
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                  Campus
                 </label>
                 <select
-                  id="initial-status"
-                  value={createForm.status}
-                  onChange={(e) => setCreateForm({ ...createForm, status: e.target.value as "draft" | "coming soon" })}
+                  value={formData.campus_id}
+                  onChange={(e) => setFormData({ ...formData, campus_id: e.target.value })}
                 >
-                  <option value="draft">Draft (not visible)</option>
-                  <option value="coming soon">Coming soon (placeholder visible)</option>
+                  <option value="">Select Campus (Optional)</option>
+                  {campuses.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
                 </select>
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button
-                type="submit"
-                className="button button-primary"
-                disabled={!createForm.name.trim() || !createForm.denominationId}
-              >
-                Create chapter
-              </button>
-              <button
-                type="button"
-                className="button button-outline"
-                onClick={resetForm}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+            {/* Picture Upload / URL Input section */}
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                Chapter Logo (Picture File Upload or Image URL)
+              </label>
 
-      {/* Invite Chapter Head Form */}
-      {formState === "invite" && (
-        <div style={{
-          background: "var(--sage)",
-          border: "1px solid var(--border)",
-          borderRadius: "10px",
-          padding: "24px",
-          marginBottom: "32px",
-          animation: "fadeIn 0.2s ease",
-        }}>
-          <h3 style={{ fontSize: "18px", marginBottom: "16px", color: "var(--ink)" }}>
-            Invite chapter head
-          </h3>
-          <form onSubmit={handleInviteHead}>
+              <div style={{ display: "flex", gap: "16px", alignItems: "center", marginTop: "8px" }}>
+                {formData.logo_url ? (
+                  <img
+                    src={formData.logo_url}
+                    alt="Logo preview"
+                    style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", border: "1px solid var(--border)" }}
+                  />
+                ) : (
+                  <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--sage)", color: "var(--moss)", display: "grid", placeItems: "center", fontWeight: "bold", fontSize: "24px" }}>
+                    {formData.name ? formData.name[0] : "C"}
+                  </div>
+                )}
+
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div>
+                    <span style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "4px" }}>
+                      Upload Logo Picture File:
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      disabled={isUploading}
+                      style={{ fontSize: "13px" }}
+                    />
+                    {isUploading && <small style={{ color: "var(--moss)", display: "block" }}>Uploading logo...</small>}
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "4px" }}>
+                      Or Image URL:
+                    </span>
+                    <input
+                      type="url"
+                      value={formData.logo_url}
+                      onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                      placeholder="https://example.com/chapter-logo.png"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                  Meeting Day
+                </label>
+                <input
+                  type="text"
+                  value={formData.meeting_day}
+                  onChange={(e) => setFormData({ ...formData, meeting_day: e.target.value })}
+                  placeholder="e.g. Wednesday"
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                  Meeting Time
+                </label>
+                <input
+                  type="text"
+                  value={formData.meeting_time}
+                  onChange={(e) => setFormData({ ...formData, meeting_time: e.target.value })}
+                  placeholder="e.g. 5:30 PM"
+                />
+              </div>
+            </div>
+
             <div style={{ marginBottom: "16px" }}>
-              <label htmlFor="head-email" style={{
-                display: "block",
-                fontSize: "13px",
-                fontWeight: 500,
-                marginBottom: "6px",
-                color: "var(--ink)",
-              }}>
-                Email address *
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                Location
               </label>
               <input
-                id="head-email"
-                type="email"
-                value={inviteForm.email}
-                onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                placeholder="chapterhead@example.com"
-                required
-                autoFocus
-                style={{ background: "white" }}
+                type="text"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                placeholder="e.g. Old Lecture Theatre (OLT)"
               />
             </div>
 
-            <div style={{ marginBottom: "20px" }}>
-              <label htmlFor="assign-chapter" style={{
-                display: "block",
-                fontSize: "13px",
-                fontWeight: 500,
-                marginBottom: "6px",
-                color: "var(--ink)",
-              }}>
-                Assign to chapter *
-              </label>
-              <select
-                id="assign-chapter"
-                value={inviteForm.chapterId}
-                onChange={(e) => setInviteForm({ ...inviteForm, chapterId: e.target.value })}
-                required
-                style={{ background: "white" }}
-              >
-                <option value="">Select a chapter</option>
-                {chapters
-                  .filter(c => c.status === "draft" || c.status === "coming soon")
-                  .map((chapter) => (
-                    <option key={chapter.name} value={chapter.name}>
-                      {chapter.name} ({chapter.campus})
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
               <button
                 type="submit"
                 className="button button-primary"
-                disabled={!inviteForm.email.trim() || !inviteForm.chapterId}
+                disabled={isSaving || isUploading || !formData.name.trim()}
               >
-                Send invitation
+                {isSaving ? "Saving..." : editingChapter ? "Update Chapter" : "Create Chapter Shell"}
               </button>
               <button
                 type="button"
                 className="button button-outline"
-                onClick={resetForm}
+                onClick={() => {
+                  setShowCreateForm(false)
+                  setEditingChapter(null)
+                }}
               >
                 Cancel
               </button>
@@ -321,373 +415,115 @@ export default function AdminChapterPage() {
         </div>
       )}
 
-      {/* Filters — compact toolbar */}
-      <div className="admin-filters">
-        <input
-          type="search"
-          placeholder="Search chapters..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="admin-filters-search"
-          aria-label="Search chapters"
-        />
-        <select
-          value={filterCampus}
-          onChange={(e) => setFilterCampus(e.target.value as any)}
-          className="admin-filters-select"
-          aria-label="Filter by campus"
-        >
-          <option value="all">All campuses</option>
-          {campuses.map((campus) => (
-            <option key={campus} value={campus}>
-              {campus}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as any)}
-          className="admin-filters-select"
-          aria-label="Filter by status"
-        >
-          <option value="all">All statuses</option>
-          <option value="active">Active</option>
-          <option value="coming soon">Coming soon</option>
-          <option value="draft">Draft</option>
-        </select>
-        <span className="admin-filters-count">
-          {filteredChapters.length} {filteredChapters.length === 1 ? "chapter" : "chapters"}
-        </span>
-      </div>
-
-      {/* Chapters List */}
-      {filteredChapters.length === 0 ? (
-        <div style={{
-          textAlign: "center",
-          padding: "80px 20px",
-          color: "var(--muted-foreground)",
-        }}>
-          <p style={{ fontSize: "15px", marginBottom: "8px" }}>
-            {searchQuery || filterStatus !== "all" || filterCampus !== "all"
-              ? "No chapters found matching your filters"
-              : "No chapters yet"}
-          </p>
-          <p style={{ fontSize: "13px" }}>
-            {searchQuery || filterStatus !== "all" || filterCampus !== "all"
-              ? "Try adjusting your search or filters"
-              : "Create your first chapter to get started"}
-          </p>
+      {/* Chapters list */}
+      {isLoading ? (
+        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
+          Loading chapters...
         </div>
       ) : (
         <div className="simple-list">
-          {filteredChapters.map((chapter) => (
-            <div
-              key={chapter.name}
-              className="simple-list-row"
-              style={{ cursor: "pointer" }}
-              onClick={() => setSelectedChapter(chapter)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault()
-                  setSelectedChapter(chapter)
-                }
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <strong style={{ display: "block", marginBottom: "4px" }}>
-                  {chapter.name}
-                </strong>
-                <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
-                  {chapter.denomination} · {chapter.campus}
-                </span>
-              </div>
-              <span style={{
-                fontSize: "12px",
-                padding: "4px 10px",
-                borderRadius: "6px",
-                background: chapter.status === "active"
-                  ? "var(--sage)"
-                  : chapter.status === "coming soon"
-                  ? "color-mix(in srgb, var(--moss) 15%, var(--cream))"
-                  : "var(--cream)",
-                color: chapter.status === "active"
-                  ? "var(--moss)"
-                  : "var(--muted-foreground)",
-                fontWeight: 500,
-                whiteSpace: "nowrap",
-              }}>
-                {chapter.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Pending Invitations */}
-      {invitations.length > 0 && (
-        <div style={{ marginTop: "48px" }}>
-          <h2 style={{ fontSize: "22px", fontFamily: "Georgia, serif", marginBottom: "16px" }}>
-            Pending invitations
-          </h2>
-          <div className="simple-list">
-            {invitations.map(([email, chapter, status]) => (
-              <div key={email} className="simple-list-row">
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <strong style={{ display: "block", marginBottom: "4px", wordBreak: "break-all" }}>
-                    {email}
-                  </strong>
+          {chapters.map((chap) => (
+            <div key={chap.id} className="simple-list-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "16px", cursor: "pointer", flex: 1 }}
+                onClick={() => setSelectedChapter(chap)}
+              >
+                {chap.logo_url ? (
+                  <img
+                    src={chap.logo_url}
+                    alt={chap.name}
+                    style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", border: "1px solid var(--border)" }}
+                  />
+                ) : (
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--sage)", color: "var(--moss)", display: "grid", placeItems: "center", fontWeight: "bold" }}>
+                    {chap.name[0]}
+                  </div>
+                )}
+                <div>
+                  <strong style={{ display: "block", fontSize: "15px" }}>{chap.name}</strong>
                   <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
-                    {chapter}
+                    {chap.denominations?.name || "Fellowship"} • {chap.campuses?.name || "Main Campus"}
                   </span>
                 </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <span style={{
                   fontSize: "12px",
                   padding: "4px 10px",
                   borderRadius: "6px",
-                  background: status === "Accepted" ? "var(--sage)" : "var(--cream)",
-                  color: status === "Accepted" ? "var(--moss)" : "var(--muted-foreground)",
+                  background: chap.status === "active" ? "var(--sage)" : "var(--cream)",
+                  color: chap.status === "active" ? "var(--moss)" : "var(--muted-foreground)",
                   fontWeight: 500,
-                  whiteSpace: "nowrap",
                 }}>
-                  {status}
+                  {chap.status}
                 </span>
+
+                <button
+                  type="button"
+                  className="button button-outline"
+                  onClick={() => openEditForm(chap)}
+                  style={{ padding: "6px 12px", fontSize: "13px" }}
+                >
+                  Edit Form
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Chapter Detail Modal */}
+      {/* Chapter Details Modal */}
       {selectedChapter && (
         <>
           <div className="modal-overlay" onClick={() => setSelectedChapter(null)} />
-          <div className="modal-card" role="dialog" aria-modal="true">
-            <div className="modal-head">
-              <div className="modal-head-info">
-                <div className="modal-head-text">
-                  <h2>{selectedChapter.name}</h2>
-                  <p>{selectedChapter.denomination}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedChapter(null)}
-                className="modal-close"
-                aria-label="Close"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="modal-grid">
-              <div className="modal-field">
-                <small>Campus</small>
-                <strong>{selectedChapter.campus}</strong>
-              </div>
-              <div className="modal-field">
-                <small>Status</small>
-                <strong style={{
-                  color: selectedChapter.status === "active" ? "var(--moss)" : "inherit",
-                }}>
-                  {selectedChapter.status}
-                </strong>
-              </div>
-              {selectedChapter.day && (
-                <div className="modal-field">
-                  <small>Meeting day</small>
-                  <strong>{selectedChapter.day}</strong>
+          <div className="modal-card">
+            <div className="modal-head" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              {selectedChapter.logo_url ? (
+                <img
+                  src={selectedChapter.logo_url}
+                  alt={selectedChapter.name}
+                  style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover" }}
+                />
+              ) : (
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--sage)", color: "var(--moss)", display: "grid", placeItems: "center", fontWeight: "bold", fontSize: "20px" }}>
+                  {selectedChapter.name[0]}
                 </div>
               )}
-              {selectedChapter.time && (
-                <div className="modal-field">
-                  <small>Meeting time</small>
-                  <strong>{selectedChapter.time}</strong>
-                </div>
-              )}
-              {selectedChapter.location && (
-                <div className="modal-field" style={{ gridColumn: "1 / -1" }}>
-                  <small>Location</small>
-                  <strong>{selectedChapter.location}</strong>
-                </div>
-              )}
-            </div>
-
-            {selectedChapter.description && (
-              <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
-                <small style={{
-                  color: "var(--muted-foreground)",
-                  fontSize: "9px",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  display: "block",
-                  marginBottom: "8px",
-                }}>
-                  Description
-                </small>
-                <p style={{ fontSize: "13px", lineHeight: "1.5", margin: 0 }}>
-                  {selectedChapter.description}
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontSize: "18px", margin: 0 }}>{selectedChapter.name}</h2>
+                <p style={{ margin: 0, color: "var(--muted-foreground)", fontSize: "13px" }}>
+                  {selectedChapter.denominations?.name}
                 </p>
               </div>
-            )}
+              <button type="button" onClick={() => setSelectedChapter(null)} style={{ background: "none", border: "none", fontSize: "24px", cursor: "pointer" }}>×</button>
+            </div>
+
+            <div style={{ padding: "16px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div>
+                <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Campus</small>
+                <strong>{selectedChapter.campuses?.name || "Main Campus"}</strong>
+              </div>
+              <div>
+                <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Status</small>
+                <strong style={{ color: selectedChapter.status === "active" ? "var(--moss)" : "inherit" }}>{selectedChapter.status}</strong>
+              </div>
+              <div>
+                <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Meeting Schedule</small>
+                <strong>{selectedChapter.meeting_day || "N/A"} {selectedChapter.meeting_time || ""}</strong>
+              </div>
+              <div>
+                <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Location</small>
+                <strong>{selectedChapter.location || "N/A"}</strong>
+              </div>
+            </div>
           </div>
         </>
       )}
 
-      <div style={{
-        marginTop: "48px",
-        paddingTop: "32px",
-        borderTop: "1px solid var(--border)",
-      }}>
-        <p style={{ fontSize: "13px", color: "var(--muted-foreground)", lineHeight: "1.65" }}>
-          <strong style={{ color: "var(--ink)", display: "block", marginBottom: "8px" }}>
-            Chapter lifecycle
-          </strong>
-          Chapters start as <strong>draft</strong> (not visible) or <strong>coming soon</strong> (placeholder 
-          visible to students). Once you invite and assign a chapter head, they complete the meeting details 
-          and WhatsApp link to make the chapter <strong>active</strong> and fully joinable. Draft chapters 
-          exist purely for administrative planning.
-        </p>
-      </div>
-
       <style jsx>{`
-        .admin-filters {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          flex-wrap: wrap;
-          margin-bottom: 20px;
-        }
-        .admin-filters-search {
-          flex: 1 1 180px;
-          min-width: 160px;
-          padding: 9px 12px !important;
-          font-size: 13px !important;
-        }
-        .admin-filters-select {
-          flex: 0 0 auto;
-          min-width: 118px;
-          padding: 9px 10px !important;
-          font-size: 13px !important;
-        }
-        .admin-filters-count {
-          margin-left: auto;
-          font-size: 12px;
-          color: var(--muted-foreground);
-          white-space: nowrap;
-          padding-left: 4px;
-        }
-
-        @media (max-width: 760px) {
-          .admin-filters {
-            gap: 8px;
-          }
-          .admin-filters-search {
-            flex: 1 1 100%;
-          }
-          .admin-filters-select {
-            flex: 1 1 calc(50% - 4px);
-          }
-          .admin-filters-count {
-            margin-left: 0;
-            width: 100%;
-            padding-left: 0;
-          }
-        }
-
-        .modal-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(32, 35, 31, 0.5);
-          z-index: 999;
-          animation: fadeIn 0.2s ease;
-        }
-
-        .modal-card {
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: var(--cream);
-          border: 1px solid var(--border);
-          border-radius: 14px;
-          box-shadow: 5px 5px 0 var(--ink);
-          padding: 22px;
-          width: min(500px, calc(100vw - 32px));
-          max-height: calc(100vh - 64px);
-          overflow-y: auto;
-          z-index: 1000;
-          animation: slideUp 0.25s ease;
-        }
-
-        .modal-head {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 10px;
-          margin-bottom: 14px;
-        }
-        .modal-head-info {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          min-width: 0;
-        }
-        .modal-head-text { min-width: 0; }
-        .modal-head-text h2 {
-          font-size: 20px;
-          margin: 0;
-          font-family: Georgia, serif;
-          overflow-wrap: anywhere;
-          line-height: 1.2;
-        }
-        .modal-head-text p {
-          color: var(--muted-foreground);
-          font-size: 13px;
-          margin: 4px 0 0;
-        }
-
-        .modal-close {
-          background: none;
-          border: none;
-          color: var(--muted-foreground);
-          font-size: 20px;
-          cursor: pointer;
-          padding: 0;
-          width: 32px;
-          height: 32px;
-          flex: 0 0 auto;
-          border-radius: 50%;
-          display: grid;
-          place-items: center;
-          transition: background 0.15s ease, color 0.15s ease;
-        }
-        .modal-close:hover {
-          background: var(--sage);
-          color: var(--ink);
-        }
-
-        .modal-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px 16px;
-          padding: 14px 0;
-          border-top: 1px solid var(--border);
-        }
-        .modal-field small {
-          color: var(--muted-foreground);
-          font-size: 9px;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          display: block;
-          margin-bottom: 4px;
-        }
-        .modal-field strong {
-          font-size: 13px;
-          line-height: 1.3;
-          display: block;
-        }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(32, 35, 31, 0.5); z-index: 999; }
+        .modal-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 22px; width: min(480px, calc(100vw - 32px)); z-index: 1000; }
       `}</style>
     </DashboardShell>
   )
