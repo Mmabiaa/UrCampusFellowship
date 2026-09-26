@@ -124,8 +124,11 @@ export default function AdminChapterPage() {
     setMessage("")
 
     try {
-      const res = await fetch('/api/admin/chapters', {
-        method: 'POST',
+      const url = editingChapter ? `/api/admin/chapters/${editingChapter.id}` : '/api/admin/chapters'
+      const method = editingChapter ? 'PATCH' : 'POST'
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })

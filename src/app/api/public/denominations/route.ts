@@ -6,7 +6,7 @@ export async function GET() {
         const supabase = createClient()
         const { data: denominations, error } = await supabase
             .from('denominations')
-            .select('id, name, logo_url')
+            .select('id, name, description, logo_url')
             .order('name')
 
         if (error) return apiError('Failed to fetch denominations', 500)

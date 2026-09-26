@@ -202,12 +202,15 @@ export function AdminOverview() {
           </h2>
         </div>
 
-        <div style={{ display: "flex", gap: "16px" }}>
+        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
           <Link href="/admin/denominations" className="button button-outline">
             Manage Denominations →
           </Link>
           <Link href="/admin/chapter" className="button button-outline">
             Manage All Chapters →
+          </Link>
+          <Link href="/admin/campuses" className="button button-outline">
+            Manage Campuses →
           </Link>
         </div>
       </div>

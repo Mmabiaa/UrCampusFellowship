@@ -157,6 +157,9 @@ C.step(5, 'Admin — POST /api/admin/denominations (with logo_url)')
     assert(s2 === 200, 'GET denominations returns 200')
     S.denominationId = d2.denominations?.find(d => d.name === name)?.id ?? d2.denominations?.[0]?.id
     assert(!!S.denominationId, `Denomination ID: ${S.denominationId ?? 'NOT FOUND'}`)
+
+    const { status: patchStatus } = await api('PATCH', `/api/admin/denominations/${S.denominationId}`, { description: 'Updated test description' }, S.adminCookie)
+    assert(patchStatus === 200, 'PATCH denomination update returns 200')
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -306,7 +309,7 @@ C.step(16, 'Student — POST /api/student/waitlist (anonymous)')
 // ═══════════════════════════════════════════════════════════════════════════
 // 17 — Admin sets Campus logo
 // ═══════════════════════════════════════════════════════════════════════════
-C.step(17, 'Admin — PATCH /api/admin/campuses/{id}/logo')
+C.step(17, 'Admin — POST & PATCH /api/admin/campuses')
 {
     const logo_url = `https://hnfuysbsyaqzntzdihti.supabase.co/storage/v1/object/public/logos/campuses/umat-logo.png`
     const { status, data } = await api(
@@ -315,6 +318,18 @@ C.step(17, 'Admin — PATCH /api/admin/campuses/{id}/logo')
         S.adminCookie
     )
     assert(status === 200, 'Campus logo update returns 200', data)
+
+    const newCampusName = `E2E Test Campus ${Date.now()}`
+    const { status: createStatus, data: createData } = await api('POST', '/api/admin/campuses', { name: newCampusName, logo_url }, S.adminCookie)
+    assert(createStatus === 200, 'Create campus returns 200', createData)
+    const testCampusId = createData.campus?.id
+    assert(!!testCampusId, 'New campus ID present')
+
+    const { status: updateStatus } = await api('PATCH', `/api/admin/campuses/${testCampusId}`, { name: `${newCampusName} (Edited)` }, S.adminCookie)
+    assert(updateStatus === 200, 'Update campus returns 200')
+
+    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+    await sb.from('campuses').delete().eq('id', testCampusId)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

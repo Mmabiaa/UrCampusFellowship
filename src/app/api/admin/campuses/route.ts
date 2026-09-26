@@ -1,6 +1,6 @@
 import { createServiceClient } from '@/lib/supabase/service'
 import { getSession, getUserRole, apiError, apiOk } from '@/lib/api-helpers'
-import { AdminChapterSchema } from '@/lib/validations'
+import { CampusSchema } from '@/lib/validations'
 
 export async function GET() {
     try {
@@ -12,14 +12,14 @@ export async function GET() {
 
         const supabase = createServiceClient() as any
 
-        const { data: chapters, error } = await supabase
-            .from('chapters')
-            .select(`id, name, status, meeting_day, meeting_time, location, description, whatsapp_link, logo_url, created_at, denominations(id, name), campuses(id, name)`)
-            .order('created_at', { ascending: false })
+        const { data: campuses, error } = await supabase
+            .from('campuses')
+            .select('id, name, logo_url')
+            .order('name')
 
-        if (error) return apiError('Failed to fetch chapters', 500)
+        if (error) return apiError('Failed to fetch campuses', 500)
 
-        return apiOk({ chapters })
+        return apiOk({ campuses })
     } catch {
         return apiError('Internal server error', 500)
     }
@@ -34,22 +34,23 @@ export async function POST(request: Request) {
         if (role !== 'admin') return apiError('Forbidden: Admin only', 403)
 
         const json = await request.json()
-        const parsed = AdminChapterSchema.safeParse(json)
+        const parsed = CampusSchema.safeParse(json)
         if (!parsed.success) return apiError(parsed.error.issues[0].message, 422)
 
         const supabase = createServiceClient() as any
 
         const { data, error } = await supabase
-            .from('chapters')
+            .from('campuses')
             .insert(parsed.data)
             .select()
             .single()
 
         if (error) {
-            return apiError('Failed to create chapter shell', 500)
+            if (error.code === '23505') return apiError('A campus with this name already exists', 409)
+            return apiError('Failed to create campus', 500)
         }
 
-        return apiOk({ message: 'Chapter created successfully', chapter: data })
+        return apiOk({ message: 'Campus created successfully', campus: data })
     } catch {
         return apiError('Internal server error', 500)
     }
@@ -66,25 +67,26 @@ export async function PATCH(request: Request) {
         const json = await request.json()
         const { id, ...updateFields } = json
 
-        if (!id) return apiError('Chapter ID is required for updates', 400)
+        if (!id) return apiError('Campus ID is required for updates', 400)
 
-        const parsed = AdminChapterSchema.safeParse(updateFields)
+        const parsed = CampusSchema.partial().safeParse(updateFields)
         if (!parsed.success) return apiError(parsed.error.issues[0].message, 422)
 
         const supabase = createServiceClient() as any
 
         const { data, error } = await supabase
-            .from('chapters')
+            .from('campuses')
             .update(parsed.data)
             .eq('id', id)
             .select()
             .single()
 
         if (error) {
-            return apiError('Failed to update chapter', 500)
+            if (error.code === '23505') return apiError('A campus with this name already exists', 409)
+            return apiError('Failed to update campus', 500)
         }
 
-        return apiOk({ message: 'Chapter updated successfully', chapter: data })
+        return apiOk({ message: 'Campus updated successfully', campus: data })
     } catch {
         return apiError('Internal server error', 500)
     }

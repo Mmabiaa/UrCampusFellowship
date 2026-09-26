@@ -74,8 +74,26 @@ export const MemberActionSchema = z.object({
 
 export const DenominationSchema = z.object({
     name: z.string().min(3, 'Denomination name must be at least 3 characters'),
-    description: z.string().optional(),
-    logo_url: z.string().url('Logo must be a valid URL').optional(),
+    description: z.string().optional().nullable(),
+    logo_url: z.string().url('Logo must be a valid URL').optional().or(z.literal('')).nullable(),
+})
+
+export const AdminChapterSchema = z.object({
+    name: z.string().min(3).optional(),
+    denomination_id: z.string().uuid().optional(),
+    campus_id: z.string().uuid().optional(),
+    status: z.enum(['pending_approval', 'coming_soon', 'active', 'rejected', 'draft'] as const).optional(),
+    meeting_day: z.string().optional().nullable(),
+    meeting_time: z.string().optional().nullable(),
+    location: z.string().optional().nullable(),
+    description: z.string().optional().nullable(),
+    whatsapp_link: z.string().url('Enter a valid WhatsApp link').optional().or(z.literal('')).nullable(),
+    logo_url: z.string().url('Logo must be a valid URL').optional().or(z.literal('')).nullable(),
+})
+
+export const CampusSchema = z.object({
+    name: z.string().min(3, 'Campus name must be at least 3 characters'),
+    logo_url: z.string().url('Logo must be a valid URL').optional().or(z.literal('')).nullable(),
 })
 
 export const CampusLogoSchema = z.object({

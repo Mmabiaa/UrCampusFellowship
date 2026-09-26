@@ -88,8 +88,11 @@ export default function DenominationsPage() {
     setMessage("")
 
     try {
-      const res = await fetch('/api/admin/denominations', {
-        method: 'POST',
+      const url = editingDenom ? `/api/admin/denominations/${editingDenom.id}` : '/api/admin/denominations'
+      const method = editingDenom ? 'PATCH' : 'POST'
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
