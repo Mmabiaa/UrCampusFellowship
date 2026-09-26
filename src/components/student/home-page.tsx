@@ -25,13 +25,9 @@ export function HomePage() {
               and take the next step in your faith journey with UrCampusFellowship.
             </p>
             <div className="landing-actions">
-              <button
-                className="landing-cta"
-              >
-                <Link href="/student">
-                  Explore Fellowships
-                </Link>
-              </button>
+              <Link href="/student" className="landing-cta">
+                Explore Fellowships
+              </Link>
               <Link className="landing-secondary" href="/for-leaders">
                 I lead a chapter
               </Link>
