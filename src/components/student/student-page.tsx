@@ -191,7 +191,16 @@ export function StudentPage() {
                     </span>
                   )}
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginTop: 'auto',
+                      paddingTop: '12px',
+                      width: '100%',
+                    }}
+                  >
                     <span
                       style={{
                         fontSize: '11px',
@@ -205,7 +214,9 @@ export function StudentPage() {
                     >
                       {chapter.status === 'active' ? 'Active' : 'Coming Soon'}
                     </span>
-                    <span className="card-arrow">View details →</span>
+                    <span className="card-arrow" style={{ marginTop: 0 }}>
+                      View details →
+                    </span>
                   </div>
                 </Link>
               )
