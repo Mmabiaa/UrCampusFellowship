@@ -49,7 +49,8 @@ export async function middleware(request: NextRequest) {
     const isPublicApiRoute =
         path.startsWith('/api/auth') ||
         path.startsWith('/api/public') ||
-        path.startsWith('/api/student/waitlist')   // joining a waitlist is anonymous
+        path.startsWith('/api/student/waitlist') ||   // joining a waitlist is anonymous
+        path.startsWith('/api/student/register')      // student registration is public
 
     // Page routes that do not require authentication
     const isPublicPageRoute =
