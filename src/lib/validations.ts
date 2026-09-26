@@ -80,8 +80,8 @@ export const DenominationSchema = z.object({
 
 export const AdminChapterSchema = z.object({
     name: z.string().min(3).optional(),
-    denomination_id: z.string().uuid().optional(),
-    campus_id: z.string().uuid().optional(),
+    denomination_id: z.string().uuid('Select a valid denomination').optional().or(z.literal('')).nullable(),
+    campus_id: z.string().uuid('Select a valid campus').optional().or(z.literal('')).nullable(),
     status: z.enum(['pending_approval', 'coming_soon', 'active', 'rejected', 'draft'] as const).optional(),
     meeting_day: z.string().optional().nullable(),
     meeting_time: z.string().optional().nullable(),

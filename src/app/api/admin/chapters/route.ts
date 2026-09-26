@@ -2,6 +2,16 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { getSession, getUserRole, apiError, apiOk } from '@/lib/api-helpers'
 import { AdminChapterSchema } from '@/lib/validations'
 
+function sanitizeChapterInput(input: any) {
+    const cleaned = { ...input }
+    for (const key of ['denomination_id', 'campus_id', 'meeting_day', 'meeting_time', 'location', 'description', 'whatsapp_link', 'logo_url']) {
+        if (cleaned[key] === '') {
+            delete cleaned[key]
+        }
+    }
+    return cleaned
+}
+
 export async function GET() {
     try {
         const session = await getSession()
@@ -14,7 +24,7 @@ export async function GET() {
 
         const { data: chapters, error } = await supabase
             .from('chapters')
-            .select(`id, name, status, meeting_day, meeting_time, location, description, whatsapp_link, logo_url, created_at, denominations(id, name), campuses(id, name)`)
+            .select(`id, name, status, denomination_id, campus_id, meeting_day, meeting_time, location, description, whatsapp_link, logo_url, created_at, denominations(id, name), campuses(id, name)`)
             .order('created_at', { ascending: false })
 
         if (error) return apiError('Failed to fetch chapters', 500)
@@ -34,7 +44,8 @@ export async function POST(request: Request) {
         if (role !== 'admin') return apiError('Forbidden: Admin only', 403)
 
         const json = await request.json()
-        const parsed = AdminChapterSchema.safeParse(json)
+        const cleaned = sanitizeChapterInput(json)
+        const parsed = AdminChapterSchema.safeParse(cleaned)
         if (!parsed.success) return apiError(parsed.error.issues[0].message, 422)
 
         const supabase = createServiceClient() as any
@@ -68,7 +79,8 @@ export async function PATCH(request: Request) {
 
         if (!id) return apiError('Chapter ID is required for updates', 400)
 
-        const parsed = AdminChapterSchema.safeParse(updateFields)
+        const cleaned = sanitizeChapterInput(updateFields)
+        const parsed = AdminChapterSchema.safeParse(cleaned)
         if (!parsed.success) return apiError(parsed.error.issues[0].message, 422)
 
         const supabase = createServiceClient() as any

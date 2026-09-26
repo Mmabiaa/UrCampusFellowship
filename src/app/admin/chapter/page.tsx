@@ -12,14 +12,16 @@ interface Chapter {
   id: string
   name: string
   status: string
+  denomination_id?: string
+  campus_id?: string
   meeting_day?: string
   meeting_time?: string
   location?: string
   description?: string
   logo_url?: string
   whatsapp_link?: string
-  campuses?: { name: string }
-  denominations?: { name: string }
+  campuses?: { id?: string; name: string }
+  denominations?: { id?: string; name: string }
 }
 
 export default function AdminChapterPage() {
@@ -54,7 +56,7 @@ export default function AdminChapterPage() {
     try {
       setIsLoading(true)
       const [chapRes, denRes, camRes] = await Promise.all([
-        fetch('/api/public/chapters'),
+        fetch('/api/admin/chapters'),
         fetch('/api/public/denominations'),
         fetch('/api/public/campuses')
       ])
@@ -123,6 +125,10 @@ export default function AdminChapterPage() {
     setError("")
     setMessage("")
 
+    const payload: Record<string, any> = { ...formData }
+    if (!payload.denomination_id) delete payload.denomination_id
+    if (!payload.campus_id) delete payload.campus_id
+
     try {
       const url = editingChapter ? `/api/admin/chapters/${editingChapter.id}` : '/api/admin/chapters'
       const method = editingChapter ? 'PATCH' : 'POST'
@@ -130,7 +136,7 @@ export default function AdminChapterPage() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
       const data = await res.json()
@@ -158,8 +164,8 @@ export default function AdminChapterPage() {
     setEditingChapter(chap)
     setFormData({
       name: chap.name,
-      denomination_id: chap.denominations ? "" : "",
-      campus_id: "",
+      denomination_id: chap.denomination_id || chap.denominations?.id || "",
+      campus_id: chap.campus_id || chap.campuses?.id || "",
       status: chap.status,
       meeting_day: chap.meeting_day || "",
       meeting_time: chap.meeting_time || "",
@@ -259,8 +265,42 @@ export default function AdminChapterPage() {
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 >
                   <option value="draft">Draft</option>
+                  <option value="pending_approval">Pending Approval</option>
                   <option value="coming_soon">Coming Soon</option>
                   <option value="active">Active</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                  Denomination
+                </label>
+                <select
+                  value={formData.denomination_id}
+                  onChange={(e) => setFormData({ ...formData, denomination_id: e.target.value })}
+                >
+                  <option value="">Select Denomination (Optional)</option>
+                  {denominations.map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
+                  Campus
+                </label>
+                <select
+                  value={formData.campus_id}
+                  onChange={(e) => setFormData({ ...formData, campus_id: e.target.value })}
+                >
+                  <option value="">Select Campus (Optional)</option>
+                  {campuses.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
                 </select>
               </div>
             </div>
