@@ -42,12 +42,16 @@ export default function RosterPage() {
     loadRoster()
   }, [])
 
-  const filteredMembers = members.filter(
-    (member) =>
-      member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (member.program || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (member.hall || "").toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredMembers = members.filter((member) => {
+    const name = member.name || (member as any).full_name || ""
+    const program = member.program || ""
+    const hall = member.hall || ""
+    return (
+      name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      program.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      hall.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })
 
   const handleRemoveMember = async (member: Member, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -197,10 +201,10 @@ export default function RosterPage() {
                       fontWeight: "bold",
                     }}
                   >
-                    {member.name[0]}
+                    {(member.name || (member as any).full_name || 'M')[0]?.toUpperCase()}
                   </i>
                   <div>
-                    <strong style={{ display: "block", fontSize: "15px" }}>{member.name}</strong>
+                    <strong style={{ display: "block", fontSize: "15px" }}>{member.name || (member as any).full_name}</strong>
                     <small style={{ color: "var(--muted-foreground)", fontSize: "13px" }}>
                       {member.program} • Level {member.level}
                     </small>

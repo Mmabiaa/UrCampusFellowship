@@ -157,19 +157,24 @@ export function HeadOverview() {
           </p>
         ) : (
           <div className="member-list">
-            {recentMembers.map((member) => (
-              <span key={member.id}>
-                <i aria-hidden="true">{member.name[0]}</i>
-                <div>
-                  <strong>{member.name}</strong>
-                  <small>{member.program} • Level {member.level}</small>
-                </div>
-                <small>{new Date(member.created_at).toLocaleDateString()}</small>
-                <Link href="/heads/roster" className="button-text">
-                  View
-                </Link>
-              </span>
-            ))}
+            {recentMembers.map((member, idx) => {
+              const memberName = member.name || (member as any).full_name || "Member"
+              const memberId = member.id || (member as any).membershipId || `mem-${idx}`
+              const memberDate = member.created_at || (member as any).joinedAt
+              return (
+                <span key={memberId}>
+                  <i aria-hidden="true">{memberName[0] ? memberName[0].toUpperCase() : "M"}</i>
+                  <div>
+                    <strong>{memberName}</strong>
+                    <small>{member.program || "Student"} • Level {member.level || "N/A"}</small>
+                  </div>
+                  <small>{memberDate ? new Date(memberDate).toLocaleDateString() : ""}</small>
+                  <Link href="/heads/roster" className="button-text">
+                    View
+                  </Link>
+                </span>
+              )
+            })}
           </div>
         )}
       </div>

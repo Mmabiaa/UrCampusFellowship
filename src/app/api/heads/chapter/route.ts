@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import { getSession, getUserRole, apiError, apiOk } from '@/lib/api-helpers'
 import { ChapterSetupSchema } from '@/lib/validations'
 import type { ChapterStatus } from '@/lib/supabase/types'
@@ -13,10 +14,10 @@ export async function GET() {
             return apiError('Forbidden', 403)
         }
 
-        const supabase = await createServerSupabaseClient()
-        const { data: chapter, error } = await (supabase as any)
+        const supabase = createServiceClient() as any
+        const { data: chapter, error } = await supabase
             .from('chapters')
-            .select('*')
+            .select('*, denominations(id, name), campuses(id, name)')
             .eq('head_user_id', session.user.id)
             .single()
 
