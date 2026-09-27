@@ -20,6 +20,7 @@ const dashboardNavigation = {
     links: [
       { href: "/admin/denominations", label: "Denominations" },
       { href: "/admin/chapter", label: "Chapters" },
+      { href: "/admin/campuses", label: "Campuses" },
     ],
   },
 } as const

@@ -21,16 +21,13 @@ export function HomePage() {
               Grow together.
             </h1>
             <p className="landing-lede">
-              Discover fellowships and denominations on your campus, meet your community, 
+              Discover fellowships and denominations on your campus, meet your community,
               and take the next step in your faith journey with UrCampusFellowship.
             </p>
             <div className="landing-actions">
-              <button 
-                className="landing-cta" 
-                onClick={() => setShowWaitlist(true)}
-              >
-                Get early access
-              </button>
+              <Link href="/student" className="landing-cta">
+                Explore Fellowships
+              </Link>
               <Link className="landing-secondary" href="/for-leaders">
                 I lead a chapter
               </Link>
