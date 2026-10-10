@@ -36,7 +36,7 @@ export function HomePage() {
           </div>
 
           <Image
-            src="https://i.pinimg.com/736x/eb/c7/55/ebc755cc412d9ee54bdc4d2b314fc0c8.jpg"
+            src="https://i.pinimg.com/1200x/9e/a5/4f/9ea54f69c3e4b766bc58366a687a986e.jpg"
             alt="Students gathered together at a campus fellowship"
             width={580}
             height={580}
