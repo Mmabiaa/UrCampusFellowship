@@ -36,14 +36,14 @@ export function HomePage() {
           </div>
 
           <Image
-            src="https://i.pinimg.com/1200x/74/ac/0d/74ac0ddc05768ccb5777e91c7d4ce14c.jpg"
+            src="https://i.pinimg.com/736x/eb/c7/55/ebc755cc412d9ee54bdc4d2b314fc0c8.jpg"
             alt="Students gathered together at a campus fellowship"
             width={580}
             height={580}
             priority
             sizes="(max-width: 760px) 88vw, 580px"
             style={{
-              width: "min(580px, 88vw)",
+              width: "100%",
               height: "auto",
               marginTop: "70px",
               borderRadius: "16px",
