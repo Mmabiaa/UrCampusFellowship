@@ -25,7 +25,17 @@ export function Brand({ href = "/" }: { href?: string }) {
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 10)
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -49,7 +59,10 @@ export function SiteHeader() {
   }, [menuOpen])
 
   return (
-    <header ref={headerRef} className="site-header landing-header">
+    <header
+      ref={headerRef}
+      className={`site-header landing-header ${scrolled ? "header-scrolled" : ""}`}
+    >
       <Brand />
       <button
         className={`hamburger ${menuOpen ? "is-open" : ""}`}
@@ -65,10 +78,7 @@ export function SiteHeader() {
         className={`header-nav ${menuOpen ? "nav-open" : ""}`}
         aria-label="Primary navigation"
       >
-        <Link
-          href="/about" 
-          onClick={() => setMenuOpen(false)} 
-        >
+        <Link href="/about" onClick={() => setMenuOpen(false)}>
           About us
         </Link>
         <Link

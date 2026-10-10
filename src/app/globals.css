@@ -1410,7 +1410,7 @@ textarea {
   html,
   body {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body.nav-open {
@@ -1897,9 +1897,41 @@ textarea {
 }
 
 .landing-header {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 26px 42px;
+  position: sticky;
+  top: 0;
+  z-index: 800;
+  background: var(--paper);
+  transition: background .3s ease, box-shadow .3s ease, padding .3s ease;
+}
+
+
+.landing-header.header-scrolled {
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 14px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+.landing-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .6s cubic-bezier(.22, 1, .36, 1);
+  pointer-events: none;
+}
+
+.landing-header.header-scrolled::after {
+  transform: scaleX(1);
+}
+
+.landing-header nav a {
+  font-weight: 700;
 }
 
 .landing-header .brand-mark {
@@ -2261,7 +2293,7 @@ textarea {
   .landing-header {
     align-items: center;
     flex-wrap: nowrap;
-    position: relative;
+    position: sticky;
   }
 
   .landing-header .brand {
@@ -2472,11 +2504,28 @@ textarea {
     gap: 16px;
   }
 
+  /* Keep the two links on one row, spread to the far edges */
   .footer-links {
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
   }
 
+  .footer-links a {
+    flex: 1 1 0;
+  }
+
+  .footer-links a:first-child {
+    text-align: left;
+  }
+
+  .footer-links a:last-child {
+    text-align: right;
+  }
+
+  /* The dot separator isn't needed once the links are at opposite edges */
   .footer-separator {
     display: none;
   }
