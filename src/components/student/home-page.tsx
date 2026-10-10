@@ -43,7 +43,7 @@ export function HomePage() {
             priority
             sizes="(max-width: 760px) 88vw, 580px"
             style={{
-              width: "100%",
+              width: "min(580px, 88vw)",
               height: "auto",
               marginTop: "70px",
               borderRadius: "16px",
