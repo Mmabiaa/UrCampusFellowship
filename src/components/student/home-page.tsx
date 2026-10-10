@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { SiteHeader } from "@/components/common/site-header"
 import { WaitlistModal } from "@/components/student/waitlist-modal"
 
@@ -33,18 +34,23 @@ export function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="landing-art" aria-label="Illustration of a campus gathering">
-            <div className="landing-sun" />
-            <div className="landing-arch">
-              <div className="landing-arch-inner">
-                <span className="landing-figure landing-figure-one" />
-                <span className="landing-figure landing-figure-two" />
-                <span className="landing-figure landing-figure-three" />
-                <span className="landing-plant" />
-              </div>
-            </div>
-          </div>
+
+          <Image
+            src="https://i.pinimg.com/1200x/74/ac/0d/74ac0ddc05768ccb5777e91c7d4ce14c.jpg"
+            alt="Students gathered together at a campus fellowship"
+            width={580}
+            height={580}
+            priority
+            sizes="(max-width: 760px) 88vw, 580px"
+            style={{
+              width: "min(580px, 88vw)",
+              height: "auto",
+              marginTop: "70px",
+              borderRadius: "16px",
+            }}
+          />
         </section>
+
         <div className="landing-proof" aria-label="What UrCampusFellowship helps you do">
           <span>Discover</span>
           <span>Connect</span>
