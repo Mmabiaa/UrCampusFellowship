@@ -1,5 +1,6 @@
 import { PageShell } from "@/components/common/site-header"
 import { SiteFooter } from "@/components/common/site-footer"
+import Image from "next/image"
 import Link from "next/link"
 
 export default function HowItWorksPage() {
@@ -11,6 +12,18 @@ export default function HowItWorksPage() {
           Whether you&apos;re seeking community or leading one, getting started
           is straightforward.
         </p>
+
+        <figure className="about-photo">
+          <Image
+            src="https://i.pinimg.com/1200x/dc/66/0a/dc660a53b73a13ef062fded1ca242a7d.jpg"
+            alt="Students gathered together outdoors on campus, talking and laughing"
+            width={1200}
+            height={720}
+            className="about-photo-img"
+            priority
+          />
+          <figcaption>Finding your people starts with one search.</figcaption>
+        </figure>
 
         <div style={{ marginTop: "72px" }}>
           <span className="step-number">01</span>
@@ -26,9 +39,8 @@ export default function HowItWorksPage() {
           <h3>Connect</h3>
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.65" }}>
             See the meeting details, location, and leadership of any fellowship that catches your eye.
-            When you are ready, register in just a minute and get instant access to the fellowship’s 
+            When you are ready, register in just a minute and get instant access to the fellowship's
             WhatsApp group without waiting for approval.
-
           </p>
         </div>
 
@@ -38,33 +50,50 @@ export default function HowItWorksPage() {
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.65" }}>
             Join a community, grow in faith, and build lasting friendships.
           </p>
-        </div> <br />
+        </div>
 
-        <div style={{
+        <figure className="about-photo">
+          <Image
+            src="https://i.pinimg.com/736x/fa/e1/87/fae187fa8c896cad253b74927b2b5db6.jpg"
+            alt="Students worshipping and studying together"
+            width={1200}
+            height={720}
+            className="about-photo-img"
+          />
+          <figcaption>Belonging grows out of showing up.</figcaption>
+        </figure>
+
+        <div
+          style={{
             background: "var(--sage)",
             padding: "24px",
             borderRadius: "12px",
+            marginTop: "24spx",
             marginBottom: "32px",
             display: "inline-block",
             maxWidth: "100%",
-        }}>
-            <h1 style={{ fontSize: "30px", marginBottom: "12px" }}>For chapter leaders</h1>
-            <p className="intro" style={{
-                color: "black",
-                fontSize: "15px",
-                lineHeight: "1.65",
-                margin: 0,
-                maxWidth: "360px",
-            }}>
-                Set up your chapter, manage your roster, and help students find
-                your community. Our dashboard makes ministry management simple.
-            </p>
+          }}
+        >
+          <h1 style={{ fontSize: "30px", marginBottom: "12px" }}>For chapter leaders</h1>
+          <p
+            className="intro"
+            style={{
+              color: "black",
+              fontSize: "15px",
+              lineHeight: "1.65",
+              margin: 0,
+              maxWidth: "360px",
+            }}
+          >
+            Set up your chapter, manage your roster, and help students find
+            your community. Our dashboard makes ministry management simple.
+          </p>
         </div>
       </div>
 
       <Link className="button button-primary" href="/for-leaders">
-            Learn more for leaders
-          </Link>
+        Learn more for leaders
+      </Link>
       <SiteFooter />
     </PageShell>
   )

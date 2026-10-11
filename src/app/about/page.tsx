@@ -16,7 +16,7 @@ export default function AboutPage() {
 
         <figure className="about-photo">
           <Image
-            src="https://i.pinimg.com/1200x/77/bb/ea/77bbea41d23660c2c51f4acab0495999.jpg"
+            src="https://i.pinimg.com/736x/76/72/df/7672df959fb82190d37af04c0d31fa44.jpg"
             alt="Students gathered together outdoors on campus, talking and laughing"
             width={1200}
             height={720}
@@ -54,7 +54,7 @@ export default function AboutPage() {
 
         <figure className="about-photo about-photo-wide">
           <Image
-            src="https://i.pinimg.com/736x/82/a2/c8/82a2c8291c1718acbb3964df7c12ac28.jpg"
+            src="https://i.pinimg.com/1200x/dd/72/90/dd7290a239c4cde38459056e7571dc2b.jpg"
             alt="A small group sitting in a circle, deep in conversation"
             width={1200}
             height={640}
