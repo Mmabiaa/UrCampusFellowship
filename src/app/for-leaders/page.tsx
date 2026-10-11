@@ -15,7 +15,7 @@ export default function ForLeadersPage() {
 
                 <figure className="about-photo" style={{ marginTop: "48px" }}>
                     <Image
-                        src="https://i.pinimg.com/736x/31/bf/eb/31bfeb8a589618e10bbdf6a4f80c96b6.jpg"
+                        src="https://i.pinimg.com/1200x/f3/c4/83/f3c48317bdbc2f0d09f41574f64385ca.jpg"
                         alt="Small group leader facilitating discussion"
                         width={1200}
                         height={720}
@@ -65,6 +65,17 @@ export default function ForLeadersPage() {
                         can find you and you can focus on discipleship.
                     </p>
 
+                    <figure className="about-photo">
+                        <Image
+                            src="https://i.pinimg.com/1200x/8c/d2/bf/8cd2bf2f5245943319520176fe5888b5.jpg"
+                            alt="Students worshipping and studying together"
+                            width={1200}
+                            height={720}
+                            className="about-photo-img"
+                        />
+                        <figcaption>Belonging grows out of showing up.</figcaption>
+                    </figure>
+
                     <div style={{
                         background: "var(--sage)",
                         padding: "32px",
@@ -80,12 +91,12 @@ export default function ForLeadersPage() {
                         </p>
                     </div>
 
-                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", gap: "16px" }}>
                         <Link className="button button-primary" href="/auth/login">
                             Chapter head login
                         </Link>
                         <Link className="button button-outline" href="/student">
-                            Explore Fellowships
+                            View Fellowships
                         </Link>
                     </div>
                 </div>
