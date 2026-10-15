@@ -142,14 +142,59 @@ export default function ChapterSetupPage() {
   }
 
   if (isLoading) {
-    return (
-      <DashboardShell role="head">
-        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
-          Loading chapter setup form...
+  return (
+    <DashboardShell role="head">
+      <div className="dash-header">
+        <div style={{ width: "100%", maxWidth: "480px" }}>
+          <div className="skeleton" style={{ height: "11px", width: "110px", marginBottom: "16px" }} />
+          <div className="skeleton" style={{ height: "42px", width: "90%", marginBottom: "14px" }} />
+          <div className="skeleton" style={{ height: "17px", width: "100%", marginBottom: "8px" }} />
+          <div className="skeleton" style={{ height: "17px", width: "70%" }} />
         </div>
-      </DashboardShell>
-    )
-  }
+      </div>
+
+      <div className="setup-form">
+        <div className="form-grid">
+          {/* Chapter name, Denomination, Campus, Meeting day, Meeting time, Location */}
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div className="skeleton" style={{ height: "13px", width: "90px" }} />
+              <div className="skeleton" style={{ height: "46px", width: "100%", borderRadius: "10px" }} />
+            </div>
+          ))}
+
+          {/* Logo upload — wide field */}
+          <div className="wide-field" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div className="skeleton" style={{ height: "13px", width: "120px" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "8px" }}>
+              <div className="skeleton" style={{ width: 64, height: 64, borderRadius: "50%", flexShrink: 0 }} />
+              <div className="skeleton" style={{ height: "36px", flex: 1, borderRadius: "8px" }} />
+            </div>
+          </div>
+
+          {/* Description — wide field */}
+          <div className="wide-field" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div className="skeleton" style={{ height: "13px", width: "100px" }} />
+            <div className="skeleton" style={{ height: "120px", width: "100%", borderRadius: "10px" }} />
+          </div>
+
+          {/* WhatsApp link — wide field */}
+          <div className="wide-field" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div className="skeleton" style={{ height: "13px", width: "140px" }} />
+            <div className="skeleton" style={{ height: "46px", width: "100%", borderRadius: "10px" }} />
+            <div className="skeleton" style={{ height: "11px", width: "60%" }} />
+          </div>
+        </div>
+
+        {/* Submit button */}
+        <div
+          className="skeleton"
+          style={{ height: "48px", width: "100%", marginTop: "24px", borderRadius: "12px" }}
+        />
+      </div>
+    </DashboardShell>
+  )
+}
 
   const isFormComplete =
     formData.meeting_day && formData.meeting_time && formData.location && formData.whatsapp_link

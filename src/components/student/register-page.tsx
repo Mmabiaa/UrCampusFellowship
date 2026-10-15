@@ -142,14 +142,34 @@ function RegisterContent() {
   }
 
   if (isLoading) {
-    return (
-      <PageShell>
-        <div className="narrow">
-          <p>Loading registration form...</p>
+  return (
+    <PageShell>
+      <div className="narrow form-page">
+        <div className="skeleton" style={{ height: "14px", width: "130px", marginBottom: "44px" }} />
+
+        <div className="skeleton" style={{ height: "52px", width: "75%", marginBottom: "20px" }} />
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "40px" }}>
+          <div className="skeleton" style={{ height: "17px", width: "100%" }} />
+          <div className="skeleton" style={{ height: "17px", width: "80%" }} />
         </div>
-      </PageShell>
-    )
-  }
+
+        <div className="form-grid">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div className="skeleton" style={{ height: "13px", width: "90px" }} />
+              <div className="skeleton" style={{ height: "46px", width: "100%", borderRadius: "10px" }} />
+            </div>
+          ))}
+        </div>
+
+        <div className="skeleton" style={{ height: "44px", width: "200px", marginTop: "24px", borderRadius: "12px" }} />
+
+        <div className="skeleton" style={{ height: "12px", width: "60%", margin: "16px auto 0" }} />
+      </div>
+    </PageShell>
+  )
+}
 
   if (!chapter) {
     return (
