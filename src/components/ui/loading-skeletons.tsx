@@ -1,19 +1,20 @@
-import { Skeleton } from "./skeleton"
+import { Skeleton, SkeletonText } from "./skeleton"
 
 export function ChapterCardSkeleton() {
   return (
     <div className="skeleton-card">
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <Skeleton style={{ width: 44, height: 44, borderRadius: "50%" }} />
-        <div style={{ flex: 1 }}>
-          <Skeleton style={{ height: "18px", width: "70%", marginBottom: "6px" }} />
-          <Skeleton style={{ height: "13px", width: "50%" }} />
-        </div>
+      <div className="card-top">
+        <Skeleton as="circle" style={{ width: 40, height: 40 }} />
+        <Skeleton as="serif" style={{ width: 56, height: 20 }} />
       </div>
-      <Skeleton style={{ height: "12px", width: "40%", marginTop: "8px" }} />
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", paddingTop: "12px" }}>
-        <Skeleton style={{ height: "20px", width: "70px", borderRadius: "12px" }} />
-        <Skeleton style={{ height: "12px", width: "80px" }} />
+
+      <Skeleton as="serif" style={{ width: "65%", height: 22, marginTop: 24 }} />
+
+      <SkeletonText lines={2} width="100%" />
+
+      <div className="meeting">
+        <Skeleton as="text" style={{ width: "70%" }} />
+        <Skeleton as="text" style={{ width: "45%" }} />
       </div>
     </div>
   )
@@ -22,9 +23,9 @@ export function ChapterCardSkeleton() {
 export function StatCardSkeleton() {
   return (
     <div className="skeleton-stat">
-      <Skeleton style={{ height: "12px", width: "60%" }} />
-      <Skeleton style={{ height: "36px", width: "40%" }} />
-      <Skeleton style={{ height: "12px", width: "80%" }} />
+      <Skeleton as="text" style={{ width: "55%" }} />
+      <Skeleton as="serif" style={{ width: "40%", height: 36, margin: "12px 0 5px" }} />
+      <Skeleton as="text" style={{ width: "75%" }} />
     </div>
   )
 }
@@ -32,28 +33,28 @@ export function StatCardSkeleton() {
 export function MemberListItemSkeleton() {
   return (
     <div className="skeleton-list-item">
-      <Skeleton style={{ width: 40, height: 40, borderRadius: "50%" }} />
-      <div style={{ flex: 1 }}>
-        <Skeleton style={{ height: "14px", width: "60%", marginBottom: "6px" }} />
-        <Skeleton style={{ height: "12px", width: "40%" }} />
+      <Skeleton as="circle" style={{ width: 40, height: 40 }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <Skeleton as="text" style={{ width: "55%", marginBottom: 8 }} />
+        <Skeleton as="text" style={{ width: "35%" }} />
       </div>
-      <Skeleton style={{ height: "12px", width: "80px" }} />
-      <Skeleton style={{ height: "12px", width: "50px" }} />
+      <Skeleton as="text" style={{ width: 72 }} />
+      <Skeleton as="text" style={{ width: 52 }} />
     </div>
   )
 }
 
 export function PendingApprovalSkeleton() {
   return (
-    <div className="skeleton-list-item" style={{ justifyContent: "space-between" }}>
-      <div style={{ flex: 1 }}>
-        <Skeleton style={{ height: "16px", width: "50%", marginBottom: "6px" }} />
-        <Skeleton style={{ height: "13px", width: "70%", marginBottom: "4px" }} />
-        <Skeleton style={{ height: "12px", width: "60%" }} />
+    <div className="skeleton-list-item skeleton-approval">
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <Skeleton as="serif" style={{ width: "45%", height: 18, marginBottom: 10 }} />
+        <Skeleton as="text" style={{ width: "70%", marginBottom: 6 }} />
+        <Skeleton as="text" style={{ width: "55%" }} />
       </div>
-      <div style={{ display: "flex", gap: "10px" }}>
-        <Skeleton style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
-        <Skeleton style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
+      <div style={{ display: "flex", gap: 10 }}>
+        <Skeleton as="pill" style={{ width: 84, height: 34 }} />
+        <Skeleton as="pill" style={{ width: 84, height: 34 }} />
       </div>
     </div>
   )
@@ -62,12 +63,12 @@ export function PendingApprovalSkeleton() {
 export function DashboardHeaderSkeleton() {
   return (
     <div className="dash-header">
-      <div>
-        <Skeleton style={{ height: "11px", width: "150px", marginBottom: "16px" }} />
-        <Skeleton style={{ height: "42px", width: "300px", marginBottom: "12px" }} />
-        <Skeleton style={{ height: "17px", width: "400px" }} />
+      <div style={{ width: "100%", maxWidth: 480 }}>
+        <Skeleton as="text" style={{ width: 150, marginBottom: 16 }} />
+        <Skeleton as="serif" style={{ width: "80%", height: 42, marginBottom: 14 }} />
+        <Skeleton as="text" style={{ width: "90%" }} />
       </div>
-      <Skeleton style={{ width: 48, height: 48, borderRadius: "50%" }} />
+      <Skeleton as="circle" style={{ width: 48, height: 48 }} />
     </div>
   )
 }
