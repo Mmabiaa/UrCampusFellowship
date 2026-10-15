@@ -121,8 +121,23 @@ export function StudentPage() {
 
       {/* Chapter Grid */}
       {isLoading ? (
-        <div style={{ textAlign: "center", padding: "64px 0", color: "var(--muted-foreground)" }}>
-          Loading campus fellowships...
+        <div className="chapter-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton-card">
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div className="skeleton" style={{ width: 44, height: 44, borderRadius: "50%" }} />
+                <div style={{ flex: 1 }}>
+                  <div className="skeleton" style={{ height: "18px", width: "70%", marginBottom: "6px" }} />
+                  <div className="skeleton" style={{ height: "13px", width: "50%" }} />
+                </div>
+              </div>
+              <div className="skeleton" style={{ height: "12px", width: "40%", marginTop: "8px" }} />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", paddingTop: "12px" }}>
+                <div className="skeleton" style={{ height: "20px", width: "70px", borderRadius: "12px" }} />
+                <div className="skeleton" style={{ height: "12px", width: "80px" }} />
+              </div>
+            </div>
+          ))}
         </div>
       ) : error ? (
         <div style={{ textAlign: "center", padding: "48px", background: "var(--cream)", borderRadius: "12px", border: "1px solid var(--border)" }}>

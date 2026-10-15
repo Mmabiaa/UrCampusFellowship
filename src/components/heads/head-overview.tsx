@@ -60,8 +60,59 @@ export function HeadOverview() {
   if (isLoading) {
     return (
       <DashboardShell role="head">
-        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
-          Loading your chapter overview...
+        <div className="dash-header">
+          <div>
+            <div style={{ height: "11px", width: "150px", background: "var(--muted)", borderRadius: "4px", marginBottom: "16px", opacity: 0.5 }} />
+            <div style={{ height: "42px", width: "320px", background: "var(--muted)", borderRadius: "8px", marginBottom: "12px", opacity: 0.5 }} />
+          </div>
+          <div className="skeleton" style={{ width: 48, height: 48, borderRadius: "50%" }} />
+        </div>
+
+        <div className="stat-grid">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="skeleton-stat">
+              <div className="skeleton" style={{ height: "12px", width: "60%" }} />
+              <div className="skeleton" style={{ height: "36px", width: "40%" }} />
+              <div className="skeleton" style={{ height: "12px", width: "80%" }} />
+            </div>
+          ))}
+        </div>
+
+        <div className="dash-section">
+          <div className="section-heading">
+            <div className="skeleton" style={{ height: "30px", width: "200px" }} />
+            <div className="skeleton" style={{ height: "14px", width: "100px" }} />
+          </div>
+
+          <div className="setup-list">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i}>
+                <div className="skeleton" style={{ height: "13px", width: "120px" }} />
+                <div className="skeleton" style={{ height: "13px", width: "180px" }} />
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="dash-section">
+          <div className="section-heading">
+            <div className="skeleton" style={{ height: "30px", width: "180px" }} />
+            <div className="skeleton" style={{ height: "14px", width: "80px" }} />
+          </div>
+
+          <div className="member-list">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <span key={i}>
+                <div className="skeleton" style={{ width: 34, height: 34, borderRadius: "50%" }} />
+                <div style={{ flex: 1 }}>
+                  <div className="skeleton" style={{ height: "14px", width: "60%", marginBottom: "6px" }} />
+                  <div className="skeleton" style={{ height: "12px", width: "40%" }} />
+                </div>
+                <div className="skeleton" style={{ height: "12px", width: "80px" }} />
+                <div className="skeleton" style={{ height: "12px", width: "50px" }} />
+              </span>
+            ))}
+          </div>
         </div>
       </DashboardShell>
     )
