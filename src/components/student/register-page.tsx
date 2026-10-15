@@ -241,8 +241,8 @@ function RegisterContent() {
               <select
                 name="campusId"
                 value={formData.campusId}
-                onChange={handleChange}
-                required
+                disabled
+                style={{ opacity: 0.6, cursor: "not-allowed" }}
               >
                 {campuses.map((c) => (
                   <option key={c.id} value={c.id}>
