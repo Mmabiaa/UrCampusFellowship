@@ -28,6 +28,7 @@ export async function GET(request: Request) {
         denominations(id, name, logo_url),
         campuses(id, name, logo_url)
       `)
+            .in('status', ['active', 'coming_soon'])
             .order('name')
 
         if (campusId) {

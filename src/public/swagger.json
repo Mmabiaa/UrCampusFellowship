@@ -86,7 +86,7 @@
         },
         "/api/auth/head/signup": {
             "post": {
-                "summary": "Signup as a Chapter Head",
+                "summary": "Signup as a Chapter Head (sends welcome email)",
                 "tags": [
                     "Auth"
                 ],
@@ -236,7 +236,7 @@
         },
         "/api/public/chapters": {
             "get": {
-                "summary": "Get directory of active & coming_soon chapters",
+                "summary": "Get directory of active & coming_soon chapters only",
                 "tags": [
                     "Public"
                 ],
@@ -253,7 +253,33 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Active chapters"
+                        "description": "Active chapters (pending_approval and rejected are excluded)"
+                    }
+                }
+            }
+        },
+        "/api/public/campuses": {
+            "get": {
+                "summary": "Get list of all campuses",
+                "tags": [
+                    "Public"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of campuses with id, name, logo_url"
+                    }
+                }
+            }
+        },
+        "/api/public/denominations": {
+            "get": {
+                "summary": "Get list of all denominations",
+                "tags": [
+                    "Public"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of denominations with id, name, description, logo_url"
                     }
                 }
             }
@@ -399,7 +425,7 @@
                 }
             },
             "patch": {
-                "summary": "Update chapter details (triggers active state when day, time, location, whatsapp_link are provided)",
+                "summary": "Update chapter details (can edit even during pending_approval, triggers active state when all required fields provided)",
                 "tags": [
                     "Head"
                 ],
@@ -452,7 +478,7 @@
         },
         "/api/heads/chapter/resubmit": {
             "post": {
-                "summary": "Resubmit a rejected chapter",
+                "summary": "Resubmit a rejected chapter for approval",
                 "tags": [
                     "Head"
                 ],
@@ -557,7 +583,7 @@
         },
         "/api/admin/chapters": {
             "get": {
-                "summary": "List all global chapters",
+                "summary": "List all chapters (all statuses)",
                 "tags": [
                     "Admin"
                 ],
@@ -566,6 +592,154 @@
                         "cookieAuth": []
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new chapter shell",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "denomination_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "campus_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "pending_approval",
+                                            "coming_soon",
+                                            "active",
+                                            "rejected"
+                                        ]
+                                    },
+                                    "meeting_day": {
+                                        "type": "string"
+                                    },
+                                    "meeting_time": {
+                                        "type": "string"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "whatsapp_link": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update chapter by id (sends approval/rejection email if status changes)",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "denomination_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "campus_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "pending_approval",
+                                            "coming_soon",
+                                            "active",
+                                            "rejected"
+                                        ]
+                                    },
+                                    "meeting_day": {
+                                        "type": "string"
+                                    },
+                                    "meeting_time": {
+                                        "type": "string"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "whatsapp_link": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    },
+                                    "rejection_reason": {
+                                        "type": "string",
+                                        "description": "Reason for rejection (used in rejection email)"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -575,7 +749,7 @@
         },
         "/api/admin/chapters/pending": {
             "get": {
-                "summary": "Get queue of chapters pending approval",
+                "summary": "Get queue of chapters with pending_approval status",
                 "tags": [
                     "Admin"
                 ],
@@ -591,9 +765,93 @@
                 }
             }
         },
+        "/api/admin/chapters/{id}": {
+            "patch": {
+                "summary": "Update specific chapter by id (sends approval/rejection email if status changes)",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "denomination_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "campus_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "pending_approval",
+                                            "coming_soon",
+                                            "active",
+                                            "rejected"
+                                        ]
+                                    },
+                                    "meeting_day": {
+                                        "type": "string"
+                                    },
+                                    "meeting_time": {
+                                        "type": "string"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "whatsapp_link": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    },
+                                    "rejection_reason": {
+                                        "type": "string",
+                                        "description": "Reason for rejection (used in rejection email)"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/api/admin/chapters/{id}/approve": {
             "post": {
-                "summary": "Approve a chapter",
+                "summary": "Approve a pending chapter",
                 "tags": [
                     "Admin"
                 ],
@@ -622,7 +880,7 @@
         },
         "/api/admin/chapters/{id}/reject": {
             "post": {
-                "summary": "Reject a chapter",
+                "summary": "Reject a pending chapter",
                 "tags": [
                     "Admin"
                 ],
@@ -708,6 +966,243 @@
                                         "type": "string"
                                     },
                                     "description": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update denomination by id",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/denominations/{id}": {
+            "patch": {
+                "summary": "Update specific denomination by id",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/campuses": {
+            "get": {
+                "summary": "List all campuses",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new campus",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update campus by id",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "logo_url": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/admin/campuses/{id}": {
+            "patch": {
+                "summary": "Update specific campus by id",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
                                         "type": "string"
                                     },
                                     "logo_url": {
@@ -811,6 +1306,66 @@
                 "responses": {
                     "200": {
                         "description": "Returns { url: string }"
+                    }
+                }
+            }
+        },
+        "/api/admin/email-queue": {
+            "get": {
+                "summary": "Get current email queue status (for debugging)",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns queue status and email configuration"
+                    }
+                }
+            }
+        },
+        "/api/admin/test-email": {
+            "post": {
+                "summary": "Send a test email to verify SMTP configuration",
+                "tags": [
+                    "Admin"
+                ],
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "to"
+                                ],
+                                "properties": {
+                                    "to": {
+                                        "type": "string",
+                                        "example": "test@example.com"
+                                    },
+                                    "useQueue": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "description": "Use queue (true) or send directly (false)"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Test email sent"
                     }
                 }
             }

@@ -27,11 +27,13 @@ export async function GET() {
             supabase.from('student_profiles').select('*', { count: 'exact', head: true }),
         ])
 
+        // Combine pending_approval and coming_soon counts since they both require admin action
+        const totalPendingApprovals = (pendingApprovals ?? 0) + (comingSoonChapters ?? 0)
+
         return apiOk({
             totalChapters: totalChapters ?? 0,
             activeChapters: activeChapters ?? 0,
-            pendingApprovals: pendingApprovals ?? 0,
-            comingSoonChapters: comingSoonChapters ?? 0,
+            pendingApprovals: totalPendingApprovals,
             totalDenominations: totalDenominations ?? 0,
             totalMembers: totalMembers ?? 0,
         })

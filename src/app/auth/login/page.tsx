@@ -158,7 +158,7 @@ export default function LoginPage() {
             >
               {isSubmitting ? "Signing in..." : "Sign in"} <span>→</span>
             </button>
-          </form>
+          </form> <br />
           <div className="form-foot">
             <p>
               Don&apos;t have an account?{" "}

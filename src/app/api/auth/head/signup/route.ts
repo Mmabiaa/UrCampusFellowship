@@ -1,6 +1,8 @@
 import { createServiceClient } from '@/lib/supabase/service'
 import { HeadSignupSchema } from '@/lib/validations'
 import { apiError, apiOk } from '@/lib/api-helpers'
+import { emailQueue } from '@/lib/email/queue'
+import { createWelcomeEmail } from '@/lib/email'
 
 export async function POST(request: Request) {
     try {
@@ -96,6 +98,16 @@ export async function POST(request: Request) {
             // They were created, but couldn't sign in? Edge case, but just return success and let them login manually
             return apiOk({ message: 'Account created successfully. Please log in.' })
         }
+
+        // Send welcome email (non-blocking)
+        emailQueue.addToQueue(
+            email,
+            'Welcome to UrCampus Fellowship!',
+            createWelcomeEmail(name, chapterName)
+        ).catch((error) => {
+            console.error('Failed to queue welcome email:', error)
+            // Don't fail the request if email queueing fails
+        })
 
         return apiOk({ message: 'Account created. Your chapter application is pending admin approval.' })
     } catch (error) {
