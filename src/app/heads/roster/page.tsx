@@ -154,8 +154,35 @@ export default function RosterPage() {
       </p>
 
       {isLoading ? (
-        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
-          Loading chapter roster...
+        <div style={{ marginTop: "20px" }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                background: "var(--cream)",
+                borderRadius: "10px",
+                padding: "16px",
+                margin: "0 0 12px",
+                border: "1px solid var(--border)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px"
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1 }}>
+                <div className="skeleton" style={{ width: 40, height: 40, borderRadius: "50%" }} />
+                <div style={{ flex: 1 }}>
+                  <div className="skeleton" style={{ height: "15px", width: "60%", marginBottom: "6px" }} />
+                  <div className="skeleton" style={{ height: "13px", width: "45%" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <div className="skeleton" style={{ height: "32px", width: "60px", borderRadius: "12px" }} />
+                <div className="skeleton" style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="roster-list">

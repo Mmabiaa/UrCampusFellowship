@@ -288,8 +288,19 @@ export default function DenominationsPage() {
       )}
 
       {isLoading ? (
-        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
-          Loading denominations...
+        <div className="simple-list">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="simple-list-row" style={{ justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: 1 }}>
+                <div className="skeleton" style={{ width: 44, height: 44, borderRadius: "50%" }} />
+                <div style={{ flex: 1 }}>
+                  <div className="skeleton" style={{ height: "15px", width: "55%", marginBottom: "6px" }} />
+                  <div className="skeleton" style={{ height: "13px", width: "70%" }} />
+                </div>
+              </div>
+              <div className="skeleton" style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
+            </div>
+          ))}
         </div>
       ) : denominations.length === 0 ? (
         <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--muted-foreground)" }}>

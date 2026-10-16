@@ -93,7 +93,31 @@ function ChapterDetailContent() {
     return (
       <PageShell>
         <div className="narrow">
-          <p>Loading chapter details...</p>
+          <div className="skeleton" style={{ height: "14px", width: "120px", marginBottom: "44px" }} />
+
+          <div className="chapter-hero">
+            <div style={{ flex: 1 }}>
+              <div className="skeleton" style={{ height: "11px", width: "150px", marginBottom: "16px" }} />
+              <div className="skeleton" style={{ height: "52px", width: "80%", marginBottom: "24px" }} />
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div className="skeleton" style={{ height: "17px", width: "100%" }} />
+                <div className="skeleton" style={{ height: "17px", width: "90%" }} />
+                <div className="skeleton" style={{ height: "17px", width: "70%" }} />
+              </div>
+            </div>
+            <div className="skeleton" style={{ width: 80, height: 80, borderRadius: "50%", flexShrink: 0 }} />
+          </div>
+
+          <div className="details-row" style={{ marginTop: "24px" }}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i}>
+                <div className="skeleton" style={{ height: "11px", width: "80px", marginBottom: "7px" }} />
+                <div className="skeleton" style={{ height: "15px", width: "120px" }} />
+              </div>
+            ))}
+          </div>
+
+          <div className="skeleton" style={{ height: "44px", width: "160px", marginTop: "24px", borderRadius: "12px" }} />
         </div>
       </PageShell>
     )

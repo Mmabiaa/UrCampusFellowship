@@ -97,8 +97,41 @@ export function AdminOverview() {
   if (isLoading) {
     return (
       <DashboardShell role="admin">
-        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
-          Loading admin dashboard...
+        <div className="dash-header">
+          <div>
+            <div style={{ height: "11px", width: "200px", background: "var(--muted)", borderRadius: "4px", marginBottom: "16px", opacity: 0.5 }} />
+            <div style={{ height: "42px", width: "280px", background: "var(--muted)", borderRadius: "8px", marginBottom: "12px", opacity: 0.5 }} />
+            <div style={{ height: "17px", width: "400px", background: "var(--muted)", borderRadius: "4px", opacity: 0.5 }} />
+          </div>
+        </div>
+
+        <div className="stat-grid">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="skeleton-stat">
+              <div className="skeleton" style={{ height: "12px", width: "60%" }} />
+              <div className="skeleton" style={{ height: "36px", width: "40%" }} />
+              <div className="skeleton" style={{ height: "12px", width: "80%" }} />
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: "48px" }}>
+          <div style={{ height: "22px", width: "280px", background: "var(--muted)", borderRadius: "8px", marginBottom: "20px", opacity: 0.5 }} />
+          <div style={{ border: "1px solid var(--border)", borderRadius: "12px", padding: "24px", background: "var(--cream)" }}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="skeleton-list-item" style={{ justifyContent: "space-between" }}>
+                <div style={{ flex: 1 }}>
+                  <div className="skeleton" style={{ height: "16px", width: "50%", marginBottom: "6px" }} />
+                  <div className="skeleton" style={{ height: "13px", width: "70%", marginBottom: "4px" }} />
+                  <div className="skeleton" style={{ height: "12px", width: "60%" }} />
+                </div>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <div className="skeleton" style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
+                  <div className="skeleton" style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </DashboardShell>
     )

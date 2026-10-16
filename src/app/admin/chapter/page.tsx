@@ -417,8 +417,22 @@ export default function AdminChapterPage() {
 
       {/* Chapters list */}
       {isLoading ? (
-        <div style={{ padding: "64px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
-          Loading chapters...
+        <div className="simple-list">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="simple-list-row" style={{ justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: 1 }}>
+                <div className="skeleton" style={{ width: 44, height: 44, borderRadius: "50%" }} />
+                <div style={{ flex: 1 }}>
+                  <div className="skeleton" style={{ height: "15px", width: "60%", marginBottom: "6px" }} />
+                  <div className="skeleton" style={{ height: "13px", width: "45%" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <div className="skeleton" style={{ height: "24px", width: "60px", borderRadius: "6px" }} />
+                <div className="skeleton" style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="simple-list">

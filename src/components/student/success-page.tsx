@@ -50,16 +50,51 @@ function SuccessContent() {
   const whatsappLink = paramWhatsapp || chapter?.whatsapp_link || "https://chat.whatsapp.com"
 
   if (isLoading) {
-    return (
-      <PageShell>
-        <div className="success-screen">
-          <div className="success-card">
-            <p>Loading registration summary...</p>
+  return (
+    <PageShell>
+      <div className="success-screen">
+        <div className="success-card">
+          <div
+            className="skeleton"
+            style={{ width: 70, height: 70, borderRadius: "50%", margin: "0 auto 28px" }}
+          />
+
+          <div
+            className="skeleton"
+            style={{ height: 11, width: 140, margin: "0 auto 16px" }}
+          />
+
+          <div
+            className="skeleton"
+            style={{ height: 52, width: "85%", margin: "0 auto 24px" }}
+          />
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 32 }}>
+            <div className="skeleton" style={{ height: 17, width: "100%" }} />
+            <div className="skeleton" style={{ height: 17, width: "95%" }} />
+            <div className="skeleton" style={{ height: 17, width: "70%", margin: "0 auto" }} />
+          </div>
+
+          <div
+            className="skeleton"
+            style={{ height: 48, width: 220, margin: "0 auto", borderRadius: 12 }}
+          />
+
+          <div style={{ marginTop: 40, paddingTop: 32, borderTop: "1px solid var(--border)" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+              <div className="skeleton" style={{ height: 14, width: "80%", margin: "0 auto" }} />
+              <div className="skeleton" style={{ height: 14, width: "60%", margin: "0 auto" }} />
+            </div>
+            <div
+              className="skeleton"
+              style={{ height: 14, width: 180, margin: "0 auto" }}
+            />
           </div>
         </div>
-      </PageShell>
-    )
-  }
+      </div>
+    </PageShell>
+  )
+}
 
   return (
     <PageShell>
