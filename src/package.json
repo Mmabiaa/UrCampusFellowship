@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "test:api": "node --env-file=.env.local scripts/test-api.mjs",
-    "test:email": "node --env-file=.env.local scripts/test-email.mjs"
+    "test:email": "node --env-file=.env.local scripts/test-email.mjs",
+    "test:emails": "node --env-file=.env.local scripts/test-all-emails.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
