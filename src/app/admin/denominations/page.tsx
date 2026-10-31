@@ -24,6 +24,7 @@ export default function DenominationsPage() {
 
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
 
@@ -116,6 +117,44 @@ export default function DenominationsPage() {
     } catch {
       setError("Network error.")
       setIsSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!editingDenom) return
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${editingDenom.name}"? This action cannot be undone and will fail if any chapters are using this denomination.`
+    )
+
+    if (!confirmDelete) return
+
+    setIsDeleting(true)
+    setError("")
+    setMessage("")
+
+    try {
+      const res = await fetch(`/api/admin/denominations/${editingDenom.id}`, {
+        method: 'DELETE',
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Failed to delete denomination.")
+        setIsDeleting(false)
+        return
+      }
+
+      setMessage("Denomination deleted successfully!")
+      setEditingDenom(null)
+      setIsDeleting(false)
+      loadDenominations()
+
+      setTimeout(() => setMessage(""), 4000)
+    } catch {
+      setError("Network error.")
+      setIsDeleting(false)
     }
   }
 
@@ -271,7 +310,7 @@ export default function DenominationsPage() {
               <button
                 type="submit"
                 className="button button-primary"
-                disabled={isSaving || isUploading || !formData.name.trim()}
+                disabled={isSaving || isUploading || isDeleting || !formData.name.trim()}
               >
                 {isSaving ? "Saving..." : editingDenom ? "Update Denomination" : "Create Denomination"}
               </button>
@@ -279,9 +318,26 @@ export default function DenominationsPage() {
                 type="button"
                 className="button button-outline"
                 onClick={cancelForm}
+                disabled={isSaving || isDeleting}
               >
                 Cancel
               </button>
+              {editingDenom && (
+                <button
+                  type="button"
+                  className="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting || isSaving}
+                  style={{
+                    marginLeft: "auto",
+                    background: "var(--destructive)",
+                    color: "white",
+                    border: "none",
+                  }}
+                >
+                  {isDeleting ? "Deleting..." : "Delete Denomination"}
+                </button>
+              )}
             </div>
           </form>
         </div>

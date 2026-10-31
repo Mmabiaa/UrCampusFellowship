@@ -97,3 +97,44 @@ export async function PATCH(
         return apiError('Internal server error', 500)
     }
 }
+
+export async function DELETE(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params
+        const session = await getSession()
+        if (!session) return apiError('Unauthorized', 401)
+
+        const role = await getUserRole(session.user.id)
+        if (role !== 'admin') return apiError('Forbidden: Admin only', 403)
+
+        const supabase = createServiceClient() as any
+
+        // Check if chapter exists
+        const { data: chapter, error: fetchError } = await supabase
+            .from('chapters')
+            .select('id, name')
+            .eq('id', id)
+            .single()
+
+        if (fetchError || !chapter) {
+            return apiError('Chapter not found', 404)
+        }
+
+        // Delete the chapter
+        const { error } = await supabase
+            .from('chapters')
+            .delete()
+            .eq('id', id)
+
+        if (error) {
+            return apiError('Failed to delete chapter', 500)
+        }
+
+        return apiOk({ message: 'Chapter deleted successfully' })
+    } catch {
+        return apiError('Internal server error', 500)
+    }
+}

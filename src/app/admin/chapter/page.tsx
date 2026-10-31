@@ -50,6 +50,7 @@ export default function AdminChapterPage() {
 
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
 
@@ -158,6 +159,44 @@ export default function AdminChapterPage() {
     } catch {
       setError("Network error.")
       setIsSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!editingChapter) return
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${editingChapter.name}"? This action cannot be undone.`
+    )
+
+    if (!confirmDelete) return
+
+    setIsDeleting(true)
+    setError("")
+    setMessage("")
+
+    try {
+      const res = await fetch(`/api/admin/chapters/${editingChapter.id}`, {
+        method: 'DELETE',
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Failed to delete chapter.")
+        setIsDeleting(false)
+        return
+      }
+
+      setMessage("Chapter deleted successfully!")
+      setEditingChapter(null)
+      setIsDeleting(false)
+      loadData()
+
+      setTimeout(() => setMessage(""), 4000)
+    } catch {
+      setError("Network error.")
+      setIsDeleting(false)
     }
   }
 
@@ -403,7 +442,7 @@ export default function AdminChapterPage() {
               <button
                 type="submit"
                 className="button button-primary"
-                disabled={isSaving || isUploading || !formData.name.trim()}
+                disabled={isSaving || isUploading || isDeleting || !formData.name.trim()}
               >
                 {isSaving ? "Saving..." : editingChapter ? "Update Chapter" : "Create Chapter Shell"}
               </button>
@@ -414,9 +453,26 @@ export default function AdminChapterPage() {
                   setShowCreateForm(false)
                   setEditingChapter(null)
                 }}
+                disabled={isSaving || isDeleting}
               >
                 Cancel
               </button>
+              {editingChapter && (
+                <button
+                  type="button"
+                  className="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting || isSaving}
+                  style={{
+                    marginLeft: "auto",
+                    background: "var(--destructive)",
+                    color: "white",
+                    border: "none",
+                  }}
+                >
+                  {isDeleting ? "Deleting..." : "Delete Chapter"}
+                </button>
+              )}
             </div>
           </form>
         </div>
