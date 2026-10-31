@@ -65,23 +65,17 @@ export async function sendEmail({ to, subject, html }: EmailOptions): Promise<bo
         // Check if email is configured
         if (!isEmailConfigured()) {
             console.warn('⚠️ Email not configured. Missing environment variables.')
-            console.log('Logging to console instead:')
             console.log('📧 Email (Development Mode - No SMTP Config)')
             console.log('To:', to)
             console.log('Subject:', subject)
             console.log('---')
-            return true
+            return true // Return true in dev mode without config
         }
 
         console.log('✓ Email is configured, creating transporter...')
         const emailTransporter = getTransporter()
 
-        // Verify transporter configuration
-        console.log('Verifying SMTP connection...')
-        await emailTransporter.verify()
-        console.log('✓ Email server connection verified')
-
-        // Send email using Google SMTP
+        // Send email using Google SMTP (skip verify to avoid connection issues)
         console.log('Sending email...')
         const info = await emailTransporter.sendMail({
             from: `"UrCampus Fellowship" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
@@ -101,6 +95,14 @@ export async function sendEmail({ to, subject, html }: EmailOptions): Promise<bo
         if (error instanceof Error) {
             console.error('Error details:', error.message)
             console.error('Error stack:', error.stack)
+            
+            // Provide helpful debugging info
+            if (error.message.includes('Connection closed')) {
+                console.error('💡 Tip: Check if Gmail "App Password" is correct and "2-Step Verification" is enabled')
+                console.error('💡 Tip: App Passwords can be generated at: https://myaccount.google.com/apppasswords')
+            } else if (error.message.includes('Invalid login')) {
+                console.error('💡 Tip: Verify SMTP_USER and SMTP_PASS are correct')
+            }
         }
         return false
     }

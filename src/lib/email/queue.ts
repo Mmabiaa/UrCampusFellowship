@@ -23,7 +23,7 @@ class EmailQueue {
 
     async addToQueue(to: string, subject: string, html: string): Promise<void> {
         const job: EmailJob = {
-            id: `email-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: `email-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
             to,
             subject,
             html,

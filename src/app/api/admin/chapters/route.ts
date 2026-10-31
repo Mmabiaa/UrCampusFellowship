@@ -32,8 +32,9 @@ export async function GET() {
         if (error) return apiError('Failed to fetch chapters', 500)
 
         return apiOk({ chapters })
-    } catch {
-        return apiError('Internal server error', 500)
+    } catch (error) {
+        console.error('Unexpected chapters GET error:', error)
+        return apiError('Failed to load chapters. Please try again.', 500)
     }
 }
 
@@ -59,12 +60,20 @@ export async function POST(request: Request) {
             .single()
 
         if (error) {
-            return apiError('Failed to create chapter shell', 500)
+            console.error('Chapter creation error:', error)
+            if (error.code === '23505') {
+                return apiError('A chapter with this name already exists in this denomination and campus.', 409)
+            }
+            if (error.code === '23503') {
+                return apiError('Invalid denomination or campus selected. Please check your selections.', 400)
+            }
+            return apiError('Failed to create chapter. Please try again or contact support.', 500)
         }
 
         return apiOk({ message: 'Chapter created successfully', chapter: data })
-    } catch {
-        return apiError('Internal server error', 500)
+    } catch (error) {
+        console.error('Unexpected chapters POST error:', error)
+        return apiError('Failed to create chapter. Please try again.', 500)
     }
 }
 
@@ -102,7 +111,14 @@ export async function PATCH(request: Request) {
             .single()
 
         if (error) {
-            return apiError('Failed to update chapter', 500)
+            console.error('Chapter update error:', error)
+            if (error.code === '23505') {
+                return apiError('A chapter with this name already exists in this denomination and campus.', 409)
+            }
+            if (error.code === '23503') {
+                return apiError('Invalid denomination or campus selected. Please check your selections.', 400)
+            }
+            return apiError('Failed to update chapter. Please try again or contact support.', 500)
         }
 
         // Send email if status changed to approved or rejected
@@ -145,7 +161,8 @@ export async function PATCH(request: Request) {
         }
 
         return apiOk({ message: 'Chapter updated successfully', chapter: data })
-    } catch {
-        return apiError('Internal server error', 500)
+    } catch (error) {
+        console.error('Unexpected chapters PATCH error:', error)
+        return apiError('Failed to update chapter. Please try again.', 500)
     }
 }

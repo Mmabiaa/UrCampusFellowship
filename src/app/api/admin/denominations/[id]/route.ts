@@ -33,8 +33,9 @@ export async function PATCH(
         }
 
         return apiOk({ message: 'Denomination updated successfully', denomination: data })
-    } catch {
-        return apiError('Internal server error', 500)
+    } catch (error) {
+        console.error('Unexpected denomination PATCH error:', error)
+        return apiError('Failed to update denomination. Please try again.', 500)
     }
 }
 
@@ -89,7 +90,8 @@ export async function DELETE(
         }
 
         return apiOk({ message: 'Denomination deleted successfully' })
-    } catch {
-        return apiError('Internal server error', 500)
+    } catch (error) {
+        console.error('Unexpected denomination DELETE error:', error)
+        return apiError('Failed to delete denomination. Please try again.', 500)
     }
 }
