@@ -51,6 +51,7 @@ export default function AdminChapterPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
 
@@ -165,15 +166,10 @@ export default function AdminChapterPage() {
   const handleDelete = async () => {
     if (!editingChapter) return
 
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete "${editingChapter.name}"? This action cannot be undone.`
-    )
-
-    if (!confirmDelete) return
-
     setIsDeleting(true)
     setError("")
     setMessage("")
+    setShowDeleteModal(false)
 
     try {
       const res = await fetch(`/api/admin/chapters/${editingChapter.id}`, {
@@ -461,7 +457,7 @@ export default function AdminChapterPage() {
                 <button
                   type="button"
                   className="button"
-                  onClick={handleDelete}
+                  onClick={() => setShowDeleteModal(true)}
                   disabled={isDeleting || isSaving}
                   style={{
                     marginLeft: "auto",
@@ -702,6 +698,49 @@ export default function AdminChapterPage() {
                 <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Location</small>
                 <strong>{selectedChapter.location || "N/A"}</strong>
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && editingChapter && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowDeleteModal(false)} />
+          <div className="modal-card" style={{ maxWidth: "420px" }}>
+            <div style={{ marginBottom: "16px" }}>
+              <h2 style={{ fontSize: "20px", margin: "0 0 8px 0", color: "var(--destructive)" }}>
+                Delete Chapter?
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: "var(--muted-foreground)", lineHeight: "1.5" }}>
+                Are you sure you want to delete <strong>{editingChapter.name}</strong>? This action cannot be undone and will permanently remove the chapter and all its data.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="button button-outline"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                style={{ fontSize: "14px" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                style={{
+                  background: "var(--destructive)",
+                  color: "white",
+                  border: "none",
+                  fontSize: "14px",
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete Chapter"}
+              </button>
             </div>
           </div>
         </>
