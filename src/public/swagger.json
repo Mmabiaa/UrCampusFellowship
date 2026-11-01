@@ -1378,53 +1378,6 @@
         },
         "/api/admin/campuses/{id}/logo": {
             "patch": {
-                "summary": "Update specific campus by id",
-                "tags": [
-                    "Admin"
-                ],
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "logo_url": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/api/admin/campuses/{id}/logo": {
-            "patch": {
                 "summary": "Set or update campus logo URL",
                 "tags": [
                     "Admin"
@@ -1509,66 +1462,6 @@
                 "responses": {
                     "200": {
                         "description": "Returns { url: string }"
-                    }
-                }
-            }
-        },
-        "/api/admin/email-queue": {
-            "get": {
-                "summary": "Get current email queue status (for debugging)",
-                "tags": [
-                    "Admin"
-                ],
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Returns queue status and email configuration"
-                    }
-                }
-            }
-        },
-        "/api/admin/test-email": {
-            "post": {
-                "summary": "Send a test email to verify SMTP configuration",
-                "tags": [
-                    "Admin"
-                ],
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "to"
-                                ],
-                                "properties": {
-                                    "to": {
-                                        "type": "string",
-                                        "example": "test@example.com"
-                                    },
-                                    "useQueue": {
-                                        "type": "boolean",
-                                        "example": true,
-                                        "description": "Use queue (true) or send directly (false)"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Test email sent"
                     }
                 }
             }
