@@ -171,6 +171,19 @@
   button {
     cursor: pointer;
   }
+
+  /* Hide scrollbar for all elements */
+  * {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
 }
 
 :root {
@@ -1836,10 +1849,13 @@ textarea {
    ============================================ */
 
 @keyframes skeleton-breathe {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
+
   50% {
     opacity: 0.75;
     transform: translateY(-1px);
@@ -1850,6 +1866,7 @@ textarea {
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }
@@ -1859,12 +1876,10 @@ textarea {
   position: relative;
   border-radius: 8px;
   background:
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       color-mix(in srgb, var(--ink) 6%, var(--paper)) 0%,
       color-mix(in srgb, var(--ink) 3%, var(--cream)) 50%,
-      color-mix(in srgb, var(--ink) 6%, var(--paper)) 100%
-    );
+      color-mix(in srgb, var(--ink) 6%, var(--paper)) 100%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.8s ease-in-out infinite;
   overflow: hidden;
@@ -1891,12 +1906,10 @@ textarea {
 .skeleton-serif {
   border-radius: 6px;
   background:
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       color-mix(in srgb, var(--moss) 8%, var(--paper)) 0%,
       color-mix(in srgb, var(--moss) 4%, var(--cream)) 50%,
-      color-mix(in srgb, var(--moss) 8%, var(--paper)) 100%
-    );
+      color-mix(in srgb, var(--moss) 8%, var(--paper)) 100%);
   background-size: 200% 100%;
 }
 
