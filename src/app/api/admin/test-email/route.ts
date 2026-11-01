@@ -14,8 +14,20 @@ export async function POST(request: Request) {
         const role = await getUserRole(session.user.id)
         if (role !== 'admin') return apiError('Forbidden: Admin only', 403)
 
-        const json = await request.json()
-        const { to, useQueue = true } = json
+        let to = session.user.email
+        let useQueue = true
+
+        // Try to parse JSON body if provided
+        try {
+            const contentType = request.headers.get('content-type')
+            if (contentType?.includes('application/json')) {
+                const json = await request.json()
+                if (json.to) to = json.to
+                if (typeof json.useQueue === 'boolean') useQueue = json.useQueue
+            }
+        } catch {
+            // No body or invalid JSON - use defaults
+        }
 
         if (!to) {
             return apiError('Email address required', 400)

@@ -1258,7 +1258,7 @@
         "/api/admin/test-email": {
             "post": {
                 "summary": "Send test email to verify SMTP configuration",
-                "description": "Sends a test email to the configured SMTP user email address to verify the email system is working correctly.",
+                "description": "Sends a test email to verify the email system is working correctly. If no body is provided, sends to the admin's email address.",
                 "tags": [
                     "Admin",
                     "Email"
@@ -1268,6 +1268,29 @@
                         "cookieAuth": []
                     }
                 ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "to": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@example.com",
+                                        "description": "Email address to send test email to (defaults to admin's email)"
+                                    },
+                                    "useQueue": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "description": "Use queue (true) or send directly (false)"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Test email sent successfully",
