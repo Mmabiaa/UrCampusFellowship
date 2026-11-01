@@ -2,24 +2,34 @@
 
 **Find your fellowship. Join your community. All in one tap.**
 
-UrCampusFellowship is a platform that helps university students in Ghana find and join their campus religious fellowship — and get connected straight into the right WhatsApp group — without ever being stopped on campus by someone taking down names and numbers.
+UrCampusFellowship makes it easier for university students in Ghana to find and connect with their campus religious fellowships. Students can discover their fellowship and join the right WhatsApp group directly, eliminating the traditional hassle of being approached on campus to provide their names and contact details.
 
 ---
 ![](/screenshots/landing-page.png)
 
 ## 📖 About
 
-UrCampusFellowship bridges the gap between students seeking faith communities and campus fellowships looking to reach them. The platform provides a centralized directory where students can discover fellowships by denomination and campus, see real meeting details, and join instantly — with immediate access to WhatsApp groups for staying connected.
+UrCampusFellowship bridges the gap between university students seeking a faith community and campus fellowships seeking to connect with them.
 
-### Why UrCampusFellowship?
+It provides a central platform where students can discover fellowships by campus and denomination, access verified meeting times and locations, and connect directly through the appropriate WhatsApp groups.
 
-Every semester, freshers struggle to find the denomination or fellowship they're looking for on campus. At the same time, fellowships struggle to reach new students — usually by walking around campus collecting names and phone numbers by hand, or relying on flyers and word of mouth. Meeting times, locations, and contact details are rarely written down anywhere a student can actually find them.
+## Why UrCampusFellowship?
 
-UrCampusFellowship solves this by:
+Starting university can make finding a faith community difficult, especially for freshers who may not know which fellowships exist on campus or where to find them.
 
-- **For Students**: Discover fellowships by campus and denomination, view meeting details, and join with one click
-- **For Fellowship Leaders**: Manage chapter information, view registered members, and keep rosters up to date
-- **For Administrators**: Maintain the directory, add new fellowships and campuses, and oversee platform health
+Traditionally, fellowships rely on physical outreach, flyers, and word of mouth to reach new students. This often involves walking around campus to collect names and phone numbers, while essential information such as meeting times, venues, and contact details remains difficult to access.
+
+UrCampusFellowship simplifies this process by bringing fellowship information and student connections into one accessible platform.
+
+## How UrCampusFellowship Helps
+
+UrCampusFellowship addresses these challenges by providing tailored tools for everyone involved in the campus fellowship ecosystem:
+
+- **For Students:** Discover fellowships by campus and denomination, explore meeting details, and connect directly through the appropriate WhatsApp groups.
+
+- **For Fellowship Leaders:** Manage fellowship chapter information, view registered members, and maintain accurate membership records.
+
+- **For Administrators:** Manage the fellowship directory, register new fellowships and campuses, and oversee the overall operation of the platform.
 
 ---
 
@@ -288,12 +298,12 @@ UrCampusFellowship features a custom design system with:
 - ✅ **Frontend Implementation** - Complete
 - ✅ **Component Library** - Complete
 - ✅ **Public Pages** - Complete (About, How It Works, For Leaders, Terms, Privacy)
-- 🚧 **Backend Integration** - In Progress
-- 📋 **Authentication** - Planned
-- 📋 **Database Schema** - Planned
-- 📋 **API Development** - Planned
-- 📋 **Testing** - Planned
-- 📋 **Deployment** - Planned
+- ✅ **Backend Integration** - Complete
+- ✅ **Authentication** - Complete
+- ✅ **Database Schema** - Complete
+- ✅ **API Development** - Complete
+- ✅ **Testing** - Complete
+- ✅ **Deployment** - Complete
 
 ---
 

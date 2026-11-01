@@ -8,7 +8,7 @@ export default function PrivacyPage() {
         <p className="eyebrow">Legal</p>
         <h1>Privacy Policy</h1>
         <p className="intro">
-          Last updated: September 16, 2026
+          Last updated: November 1, 2026
         </p>
 
         <div style={{ marginTop: "48px" }}>
@@ -29,9 +29,9 @@ export default function PrivacyPage() {
             When you register as a student, we collect:
           </p>
           <ul style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "24px", paddingLeft: "24px" }}>
-            <li style={{ marginBottom: "8px" }}>Email address (used to sign in and to identify your account)</li>
+            <li style={{ marginBottom: "8px" }}>Email address</li>
             <li style={{ marginBottom: "8px" }}>Full name</li>
-            <li style={{ marginBottom: "8px" }}>Phone number (contact only, not used to sign in)</li>
+            <li style={{ marginBottom: "8px" }}>Phone number</li>
             <li style={{ marginBottom: "8px" }}>Campus</li>
             <li style={{ marginBottom: "8px" }}>Academic program</li>
             <li style={{ marginBottom: "8px" }}>Hall/hostel</li>
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
           </p>
           <ul style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "24px", paddingLeft: "24px" }}>
             <li style={{ marginBottom: "8px" }}>Name, email address, and a password</li>
-            <li style={{ marginBottom: "8px" }}>Optional contact phone number</li>
+            <li style={{ marginBottom: "8px" }}>Phone number</li>
             <li style={{ marginBottom: "8px" }}>Chapter details (meeting day, time, location, description)</li>
             <li style={{ marginBottom: "8px" }}>A WhatsApp group invite link for their chapter</li>
           </ul>
@@ -121,8 +121,6 @@ export default function PrivacyPage() {
             You have the right to:
           </p>
           <ul style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "32px", paddingLeft: "24px" }}>
-            <li style={{ marginBottom: "8px" }}>Access and update your profile information</li>
-            <li style={{ marginBottom: "8px" }}>Leave your current fellowship at any time, without needing approval</li>
             <li style={{ marginBottom: "8px" }}>Request deletion of your account and data</li>
             <li style={{ marginBottom: "8px" }}>Opt out of non-essential communications</li>
           </ul>
@@ -154,7 +152,7 @@ export default function PrivacyPage() {
           <p style={{ color: "var(--muted-foreground)", lineHeight: "1.7", marginBottom: "32px" }}>
             If you have questions or concerns about this Privacy Policy or our data practices, please
             contact us at{" "}
-            <a href="mailto:privacy@urcampusfellowship.org" style={{ color: "var(--moss)", textDecoration: "underline" }}>
+            <a href="mailto:mmaabiaa@gmail.com" style={{ color: "var(--moss)", textDecoration: "underline" }}>
               privacy@urcampusfellowship.org
             </a>
           </p>
