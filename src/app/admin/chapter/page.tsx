@@ -28,6 +28,7 @@ export default function AdminChapterPage() {
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [denominations, setDenominations] = useState<Option[]>([])
   const [campuses, setCampuses] = useState<Option[]>([])
+  const [statusFilter, setStatusFilter] = useState<string>("all")
 
   const [isLoading, setIsLoading] = useState(true)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -49,6 +50,8 @@ export default function AdminChapterPage() {
 
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
 
@@ -160,6 +163,39 @@ export default function AdminChapterPage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!editingChapter) return
+
+    setIsDeleting(true)
+    setError("")
+    setMessage("")
+    setShowDeleteModal(false)
+
+    try {
+      const res = await fetch(`/api/admin/chapters/${editingChapter.id}`, {
+        method: 'DELETE',
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Failed to delete chapter.")
+        setIsDeleting(false)
+        return
+      }
+
+      setMessage("Chapter deleted successfully!")
+      setEditingChapter(null)
+      setIsDeleting(false)
+      loadData()
+
+      setTimeout(() => setMessage(""), 4000)
+    } catch {
+      setError("Network error.")
+      setIsDeleting(false)
+    }
+  }
+
   const openEditForm = (chap: Chapter) => {
     setEditingChapter(chap)
     setFormData({
@@ -178,6 +214,12 @@ export default function AdminChapterPage() {
     setError("")
     setMessage("")
   }
+
+  const filteredChapters = statusFilter === "all" 
+    ? chapters 
+    : chapters.filter(c => c.status === statusFilter)
+
+  const pendingCount = chapters.filter(c => c.status === "pending_approval").length
 
   return (
     <DashboardShell role="admin">
@@ -396,7 +438,7 @@ export default function AdminChapterPage() {
               <button
                 type="submit"
                 className="button button-primary"
-                disabled={isSaving || isUploading || !formData.name.trim()}
+                disabled={isSaving || isUploading || isDeleting || !formData.name.trim()}
               >
                 {isSaving ? "Saving..." : editingChapter ? "Update Chapter" : "Create Chapter Shell"}
               </button>
@@ -407,13 +449,134 @@ export default function AdminChapterPage() {
                   setShowCreateForm(false)
                   setEditingChapter(null)
                 }}
+                disabled={isSaving || isDeleting}
               >
                 Cancel
               </button>
+              {editingChapter && (
+                <button
+                  type="button"
+                  className="button"
+                  onClick={() => setShowDeleteModal(true)}
+                  disabled={isDeleting || isSaving}
+                  style={{
+                    marginLeft: "auto",
+                    background: "var(--destructive)",
+                    color: "white",
+                    border: "none",
+                  }}
+                >
+                  {isDeleting ? "Deleting..." : "Delete Chapter"}
+                </button>
+              )}
             </div>
           </form>
         </div>
       )}
+
+      {/* Status Filter Tabs */}
+      <div style={{ 
+        display: "flex", 
+        gap: "8px", 
+        marginBottom: "24px", 
+        borderBottom: "1px solid var(--border)",
+        paddingBottom: "8px"
+      }}>
+        <button
+          type="button"
+          onClick={() => setStatusFilter("all")}
+          style={{
+            background: statusFilter === "all" ? "var(--moss)" : "transparent",
+            color: statusFilter === "all" ? "white" : "var(--muted-foreground)",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: 500,
+          }}
+        >
+          All ({chapters.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatusFilter("pending_approval")}
+          style={{
+            background: statusFilter === "pending_approval" ? "var(--moss)" : "transparent",
+            color: statusFilter === "pending_approval" ? "white" : "var(--muted-foreground)",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: 500,
+            position: "relative",
+          }}
+        >
+          Pending Approval 
+          {pendingCount > 0 && (
+            <span style={{
+              background: "var(--destructive)",
+              color: "white",
+              borderRadius: "10px",
+              padding: "2px 6px",
+              fontSize: "11px",
+              marginLeft: "6px",
+              fontWeight: "bold",
+            }}>
+              {pendingCount}
+            </span>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatusFilter("active")}
+          style={{
+            background: statusFilter === "active" ? "var(--moss)" : "transparent",
+            color: statusFilter === "active" ? "white" : "var(--muted-foreground)",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: 500,
+          }}
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatusFilter("coming_soon")}
+          style={{
+            background: statusFilter === "coming_soon" ? "var(--moss)" : "transparent",
+            color: statusFilter === "coming_soon" ? "white" : "var(--muted-foreground)",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: 500,
+          }}
+        >
+          Coming Soon
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatusFilter("draft")}
+          style={{
+            background: statusFilter === "draft" ? "var(--moss)" : "transparent",
+            color: statusFilter === "draft" ? "white" : "var(--muted-foreground)",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: 500,
+          }}
+        >
+          Draft
+        </button>
+      </div>
 
       {/* Chapters list */}
       {isLoading ? (
@@ -436,7 +599,12 @@ export default function AdminChapterPage() {
         </div>
       ) : (
         <div className="simple-list">
-          {chapters.map((chap) => (
+          {filteredChapters.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px", color: "var(--muted-foreground)" }}>
+              No chapters found with status "{statusFilter}"
+            </div>
+          ) : (
+            filteredChapters.map((chap) => (
             <div key={chap.id} className="simple-list-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div
                 style={{ display: "flex", alignItems: "center", gap: "16px", cursor: "pointer", flex: 1 }}
@@ -483,7 +651,7 @@ export default function AdminChapterPage() {
                 </button>
               </div>
             </div>
-          ))}
+          )))}
         </div>
       )}
 
@@ -530,6 +698,49 @@ export default function AdminChapterPage() {
                 <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Location</small>
                 <strong>{selectedChapter.location || "N/A"}</strong>
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && editingChapter && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowDeleteModal(false)} />
+          <div className="modal-card" style={{ maxWidth: "420px" }}>
+            <div style={{ marginBottom: "16px" }}>
+              <h2 style={{ fontSize: "20px", margin: "0 0 8px 0", color: "var(--destructive)" }}>
+                Delete Chapter?
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: "var(--muted-foreground)", lineHeight: "1.5" }}>
+                Are you sure you want to delete <strong>{editingChapter.name}</strong>? This action cannot be undone and will permanently remove the chapter and all its data.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="button button-outline"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                style={{ fontSize: "14px" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                style={{
+                  background: "var(--destructive)",
+                  color: "white",
+                  border: "none",
+                  fontSize: "14px",
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete Chapter"}
+              </button>
             </div>
           </div>
         </>

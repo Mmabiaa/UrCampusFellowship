@@ -24,6 +24,8 @@ export default function DenominationsPage() {
 
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
 
@@ -116,6 +118,39 @@ export default function DenominationsPage() {
     } catch {
       setError("Network error.")
       setIsSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!editingDenom) return
+
+    setIsDeleting(true)
+    setError("")
+    setMessage("")
+    setShowDeleteModal(false)
+
+    try {
+      const res = await fetch(`/api/admin/denominations/${editingDenom.id}`, {
+        method: 'DELETE',
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Failed to delete denomination.")
+        setIsDeleting(false)
+        return
+      }
+
+      setMessage("Denomination deleted successfully!")
+      setEditingDenom(null)
+      setIsDeleting(false)
+      loadDenominations()
+
+      setTimeout(() => setMessage(""), 4000)
+    } catch {
+      setError("Network error.")
+      setIsDeleting(false)
     }
   }
 
@@ -271,7 +306,7 @@ export default function DenominationsPage() {
               <button
                 type="submit"
                 className="button button-primary"
-                disabled={isSaving || isUploading || !formData.name.trim()}
+                disabled={isSaving || isUploading || isDeleting || !formData.name.trim()}
               >
                 {isSaving ? "Saving..." : editingDenom ? "Update Denomination" : "Create Denomination"}
               </button>
@@ -279,9 +314,26 @@ export default function DenominationsPage() {
                 type="button"
                 className="button button-outline"
                 onClick={cancelForm}
+                disabled={isSaving || isDeleting}
               >
                 Cancel
               </button>
+              {editingDenom && (
+                <button
+                  type="button"
+                  className="button"
+                  onClick={() => setShowDeleteModal(true)}
+                  disabled={isDeleting || isSaving}
+                  style={{
+                    marginLeft: "auto",
+                    background: "var(--destructive)",
+                    color: "white",
+                    border: "none",
+                  }}
+                >
+                  {isDeleting ? "Deleting..." : "Delete Denomination"}
+                </button>
+              )}
             </div>
           </form>
         </div>
@@ -344,6 +396,54 @@ export default function DenominationsPage() {
           ))}
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && editingDenom && (
+        <>
+          <div className="modal-overlay" onClick={() => setShowDeleteModal(false)} />
+          <div className="modal-card" style={{ maxWidth: "420px" }}>
+            <div style={{ marginBottom: "16px" }}>
+              <h2 style={{ fontSize: "20px", margin: "0 0 8px 0", color: "var(--destructive)" }}>
+                Delete Denomination?
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: "var(--muted-foreground)", lineHeight: "1.5" }}>
+                Are you sure you want to delete <strong>{editingDenom.name}</strong>? This action cannot be undone and will fail if any chapters are currently using this denomination.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="button button-outline"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                style={{ fontSize: "14px" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                style={{
+                  background: "var(--destructive)",
+                  color: "white",
+                  border: "none",
+                  fontSize: "14px",
+                }}
+              >
+                {isDeleting ? "Deleting..." : "Delete Denomination"}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      <style jsx>{`
+        .modal-overlay { position: fixed; inset: 0; background: rgba(32, 35, 31, 0.5); z-index: 999; }
+        .modal-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 22px; width: min(480px, calc(100vw - 32px)); z-index: 1000; }
+      `}</style>
     </DashboardShell>
   )
 }

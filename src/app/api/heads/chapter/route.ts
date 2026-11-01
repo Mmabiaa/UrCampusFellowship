@@ -68,9 +68,10 @@ export async function PATCH(request: Request) {
             return apiError('Chapter not found', 404)
         }
 
-        // Guard: cannot edit until approved
-        if (['pending_approval', 'rejected', 'draft'].includes(chapter.status)) {
-            return apiError('Chapter is not yet approved. You cannot edit details until approval.', 403)
+        // Guard: cannot edit if rejected or draft
+        // Heads CAN edit during pending_approval
+        if (['rejected', 'draft'].includes(chapter.status)) {
+            return apiError('Chapter cannot be edited in current status.', 403)
         }
 
         // Merge existing and new data to check completion
@@ -86,7 +87,20 @@ export async function PATCH(request: Request) {
             (field) => (merged as any)[field] && (merged as any)[field].trim() !== ''
         )
 
-        const newStatus: ChapterStatus = isComplete ? 'active' : 'coming_soon'
+        // Determine new status based on current status and completion
+        let newStatus: ChapterStatus = chapter.status
+        
+        if (chapter.status === 'active') {
+            // If already active, update based on completion
+            newStatus = isComplete ? 'active' : 'coming_soon'
+        } else if (chapter.status === 'coming_soon' || chapter.status === 'pending_approval') {
+            // If pending approval, submit for review if complete, otherwise keep as coming_soon
+            if (isComplete) {
+                newStatus = 'pending_approval' // Submit for admin approval
+            } else {
+                newStatus = 'coming_soon' // Still incomplete
+            }
+        }
 
         // 2. Perform update and return the updated row
         const { data: updated, error: updateError } = await (supabase as any)

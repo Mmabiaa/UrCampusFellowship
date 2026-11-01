@@ -33,7 +33,65 @@ export async function PATCH(
         }
 
         return apiOk({ message: 'Denomination updated successfully', denomination: data })
-    } catch {
-        return apiError('Internal server error', 500)
+    } catch (error) {
+        console.error('Unexpected denomination PATCH error:', error)
+        return apiError('Failed to update denomination. Please try again.', 500)
+    }
+}
+
+export async function DELETE(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params
+        const session = await getSession()
+        if (!session) return apiError('Unauthorized', 401)
+
+        const role = await getUserRole(session.user.id)
+        if (role !== 'admin') return apiError('Forbidden: Admin only', 403)
+
+        const supabase = createServiceClient() as any
+
+        // Check if denomination exists
+        const { data: denomination, error: fetchError } = await supabase
+            .from('denominations')
+            .select('id, name')
+            .eq('id', id)
+            .single()
+
+        if (fetchError || !denomination) {
+            return apiError('Denomination not found', 404)
+        }
+
+        // Check if denomination is being used by any chapters
+        const { data: chapters, error: chaptersError } = await supabase
+            .from('chapters')
+            .select('id')
+            .eq('denomination_id', id)
+            .limit(1)
+
+        if (chaptersError) {
+            return apiError('Failed to check denomination usage', 500)
+        }
+
+        if (chapters && chapters.length > 0) {
+            return apiError('Cannot delete denomination: it is currently being used by one or more chapters', 409)
+        }
+
+        // Delete the denomination
+        const { error } = await supabase
+            .from('denominations')
+            .delete()
+            .eq('id', id)
+
+        if (error) {
+            return apiError('Failed to delete denomination', 500)
+        }
+
+        return apiOk({ message: 'Denomination deleted successfully' })
+    } catch (error) {
+        console.error('Unexpected denomination DELETE error:', error)
+        return apiError('Failed to delete denomination. Please try again.', 500)
     }
 }

@@ -1,23 +1,30 @@
 {
-  "name": "UrCampus Fellowsihip",
+  "name": "UrCampus Fellowship",
   "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@12.6.0",
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test:api": "node --env-file=.env.local scripts/test-api.mjs"
+    "test:api": "node --env-file=.env.local scripts/test-api.mjs",
+    "test:email": "node --env-file=.env.local scripts/test-email.mjs",
+    "test:emails": "node --env-file=.env.local scripts/test-all-emails.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.109.0",
+    "@types/nodemailer": "^8.0.2",
     "@vercel/analytics": "1.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "next": "16.3.3",
+    "nodemailer": "^10.1.2",
     "react": "^19",
     "react-dom": "^19",
     "shadcn": "^4.11.0",

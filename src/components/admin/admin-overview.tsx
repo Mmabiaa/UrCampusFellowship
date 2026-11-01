@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { DashboardShell } from "@/components/common/dashboard-shell"
+import { RejectChapterModal } from "@/components/admin/reject-chapter-modal"
 
 interface AdminStats {
   totalChapters: number
@@ -25,6 +26,8 @@ export function AdminOverview() {
   const [pendingChapters, setPendingChapters] = useState<PendingChapter[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [actionMessage, setActionMessage] = useState("")
+  const [rejectModalOpen, setRejectModalOpen] = useState(false)
+  const [selectedChapter, setSelectedChapter] = useState<PendingChapter | null>(null)
 
   const loadAdminData = async () => {
     try {
@@ -68,30 +71,17 @@ export function AdminOverview() {
     }
   }
 
-  const handleReject = async (id: string, name: string) => {
-    const reason = prompt(`Enter rejection reason for "${name}":`)
-    if (!reason || reason.trim().length < 5) {
-      alert("Rejection reason must be at least 5 characters.")
-      return
-    }
+  const handleReject = (chapter: PendingChapter) => {
+    setSelectedChapter(chapter)
+    setRejectModalOpen(true)
+  }
 
-    try {
-      const res = await fetch(`/api/admin/chapters/${id}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason }),
-      })
-
-      if (res.ok) {
-        setActionMessage(`Chapter "${name}" rejected.`)
-        loadAdminData()
-        setTimeout(() => setActionMessage(""), 4000)
-      } else {
-        alert("Failed to reject chapter.")
-      }
-    } catch {
-      alert("Network error.")
+  const handleRejectSuccess = () => {
+    if (selectedChapter) {
+      setActionMessage(`Chapter "${selectedChapter.name}" rejected.`)
     }
+    loadAdminData()
+    setTimeout(() => setActionMessage(""), 4000)
   }
 
   if (isLoading) {
@@ -216,7 +206,7 @@ export function AdminOverview() {
                   <button
                     type="button"
                     className="button button-outline"
-                    onClick={() => handleReject(chap.id, chap.name)}
+                    onClick={() => handleReject(chap)}
                     style={{ padding: "6px 14px", fontSize: "13px", borderColor: "var(--destructive)", color: "var(--destructive)" }}
                   >
                     Reject
@@ -247,6 +237,18 @@ export function AdminOverview() {
           </Link>
         </div>
       </div>
+
+      {/* Reject Chapter Modal */}
+      {selectedChapter && (
+        <RejectChapterModal
+          open={rejectModalOpen}
+          onOpenChange={setRejectModalOpen}
+          chapterId={selectedChapter.id}
+          chapterName={selectedChapter.name}
+          headEmail={selectedChapter.heads?.email || ""}
+          onSuccess={handleRejectSuccess}
+        />
+      )}
     </DashboardShell>
   )
 }

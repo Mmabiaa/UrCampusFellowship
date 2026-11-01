@@ -1,6 +1,8 @@
 import { createServiceClient } from '@/lib/supabase/service'
 import { HeadSignupSchema } from '@/lib/validations'
 import { apiError, apiOk } from '@/lib/api-helpers'
+import { emailQueue } from '@/lib/email/queue'
+import { createWelcomeEmail } from '@/lib/email'
 
 export async function POST(request: Request) {
     try {
@@ -47,10 +49,14 @@ export async function POST(request: Request) {
         })
 
         if (authError || !authData.user) {
-            if (authError?.message.includes('already registered')) {
-                return apiError('An account with this email already exists.', 409)
+            console.error('Auth creation error:', authError)
+            if (authError?.message.includes('already registered') || authError?.message.includes('User already registered')) {
+                return apiError('An account with this email already exists. Please use a different email or try logging in.', 409)
             }
-            return apiError('Account creation failed.', 500)
+            if (authError?.message.includes('password')) {
+                return apiError('Password does not meet requirements. Use at least 6 characters.', 400)
+            }
+            return apiError(authError?.message || 'Account creation failed. Please try again.', 500)
         }
 
         const userId = authData.user.id
@@ -78,9 +84,17 @@ export async function POST(request: Request) {
             })
 
         if (chapterError) {
+            console.error('Chapter creation error:', chapterError)
             // Rollback user (cascade will handle user_roles ideally, but to be sure)
             await (supabase as any).auth.admin.deleteUser(userId)
-            return apiError('Failed to create chapter application.', 500)
+            
+            if (chapterError.code === '23505') {
+                return apiError('A chapter with this name already exists for this denomination and campus. Please choose a different name.', 409)
+            }
+            if (chapterError.message?.includes('foreign key')) {
+                return apiError('Invalid campus or denomination selected. Please refresh and try again.', 400)
+            }
+            return apiError('Failed to create chapter application. Please try again or contact support.', 500)
         }
 
         // To properly sign the user in, we need to instruct the client to use standard signInWithPassword,
@@ -93,12 +107,37 @@ export async function POST(request: Request) {
         })
 
         if (signInError) {
+            console.error('Sign-in error after creation:', signInError)
             // They were created, but couldn't sign in? Edge case, but just return success and let them login manually
-            return apiOk({ message: 'Account created successfully. Please log in.' })
+            return apiOk({ 
+                message: 'Account created successfully! Please log in to continue.',
+                requiresLogin: true 
+            })
         }
 
-        return apiOk({ message: 'Account created. Your chapter application is pending admin approval.' })
+        // Send welcome email (non-blocking)
+        let emailSent = false
+        try {
+            await emailQueue.addToQueue(
+                email,
+                'Welcome to UrCampus Fellowship!',
+                createWelcomeEmail(name, chapterName)
+            )
+            emailSent = true
+        } catch (error) {
+            console.error('Failed to queue welcome email:', error)
+            // Don't fail the request if email queueing fails
+        }
+
+        return apiOk({ 
+            message: 'Account created successfully! Your chapter application is pending admin approval.',
+            emailSent,
+            ...(emailSent ? {} : { 
+                notice: 'Welcome email could not be sent, but your account is active.' 
+            })
+        })
     } catch (error) {
-        return apiError('Internal server error', 500)
+        console.error('Unexpected signup error:', error)
+        return apiError('An unexpected error occurred. Please try again or contact support if the problem persists.', 500)
     }
 }
