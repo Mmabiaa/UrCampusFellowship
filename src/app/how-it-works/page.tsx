@@ -15,7 +15,7 @@ export default function HowItWorksPage() {
 
         <figure className="about-photo">
           <Image
-            src="https://i.pinimg.com/1200x/dc/66/0a/dc660a53b73a13ef062fded1ca242a7d.jpg"
+            src="https://i.pinimg.com/1200x/3d/5c/51/3d5c514244d89371dd28607a123bfd00.jpg"
             alt="Students gathered together outdoors on campus, talking and laughing"
             width={1200}
             height={720}
