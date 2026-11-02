@@ -256,10 +256,6 @@ export default function RosterPage() {
 
             <div className="modal-body">
               <div className="info-row">
-                <span className="info-label">Email</span>
-                <span className="info-value">{selectedMember.email || "—"}</span>
-              </div>
-              <div className="info-row">
                 <span className="info-label">Phone</span>
                 <span className="info-value">{selectedMember.phone || "—"}</span>
               </div>
@@ -525,11 +521,11 @@ export default function RosterPage() {
           font-size: 15px;
         }
 
-        .td-email {
-          min-width: 200px;
+        .td-phone {
+          min-width: 150px;
         }
 
-        .email-text {
+        .phone-text {
           color: var(--muted-foreground);
           font-size: 13px;
         }
@@ -610,17 +606,18 @@ export default function RosterPage() {
         }
 
         @media (max-width: 900px) {
-          .td-email,
-          .th-email {
+          .td-phone,
+          .th-phone {
             display: none;
           }
         }
 
-        /* Responsive Design - Mobile List */
+        /* Responsive Design - Mobile Card Layout */
         @media (max-width: 768px) {
           .roster-table-container {
-            border: 1px solid var(--line);
+            border: none;
             box-shadow: none;
+            background: transparent;
           }
 
           .roster-table-wrapper {
@@ -642,83 +639,90 @@ export default function RosterPage() {
           }
 
           .roster-table tbody tr {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 16px;
-            margin-bottom: 0;
-            border: none;
-            border-bottom: 1px solid var(--line);
-            border-radius: 0;
+            margin-bottom: 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
             background: white;
-            box-shadow: none;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
           }
 
           .roster-table tbody tr:hover {
             background: var(--sage);
             transform: none;
+            border-color: var(--moss);
           }
 
           .roster-table tbody tr:last-child {
-            border-bottom: none;
+            margin-bottom: 0;
           }
 
           .roster-table td {
-            padding: 0;
-            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-right: none;
+            border-bottom: 1px solid var(--line);
+          }
+
+          .roster-table td:last-child {
+            border-bottom: none;
           }
 
           .roster-table td:before {
-            display: none;
+            content: attr(data-label);
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--moss);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
           }
 
           .td-name {
-            flex: 1;
-            min-width: 0;
+            background: var(--sage);
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
           }
 
-          .td-name strong {
-            font-size: 15px;
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          .td-email,
-          .td-program,
-          .td-level,
-          .td-hall {
+          .td-name:before {
             display: none;
           }
 
+          .td-name strong {
+            font-size: 16px;
+            display: block;
+          }
+
+          .td-phone {
+            display: flex;
+          }
+
           .td-actions {
-            width: auto;
-            flex-shrink: 0;
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--cream);
+          }
+
+          .td-actions:before {
+            display: none;
           }
 
           .action-buttons {
+            width: 100%;
             flex-direction: row;
-            gap: 6px;
-            margin: 0;
+            margin-top: 4px;
           }
 
           .action-btn {
-            padding: 8px;
-            font-size: 14px;
-            border-width: 1px;
-            min-width: 36px;
+            flex: 1;
+            padding: 9px 12px;
             justify-content: center;
           }
 
           .btn-text {
-            display: none;
-          }
-
-          .btn-icon {
-            font-size: 16px;
+            display: inline;
           }
 
           /* Modal adjustments for mobile */

@@ -13,7 +13,7 @@ interface Denomination {
 export default function DenominationsPage() {
   const [denominations, setDenominations] = useState<Denomination[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [editingDenom, setEditingDenom] = useState<Denomination | null>(null)
 
   const [formData, setFormData] = useState({
@@ -67,7 +67,8 @@ export default function DenominationsPage() {
       const data = await res.json()
       if (res.ok && data.url) {
         setFormData((prev) => ({ ...prev, logo_url: data.url }))
-        setMessage("Logo image uploaded successfully!")
+        setMessage("Logo uploaded successfully!")
+        setTimeout(() => setMessage(""), 3000)
       } else {
         setError(data.error || "Failed to upload image.")
       }
@@ -107,9 +108,9 @@ export default function DenominationsPage() {
         return
       }
 
-      setMessage(editingDenom ? "Denomination updated!" : "Denomination created successfully!")
+      setMessage(editingDenom ? "Denomination updated!" : "Denomination created!")
       setFormData({ name: "", description: "", logo_url: "" })
-      setShowCreateForm(false)
+      setShowModal(false)
       setEditingDenom(null)
       setIsSaving(false)
       loadDenominations()
@@ -142,8 +143,9 @@ export default function DenominationsPage() {
         return
       }
 
-      setMessage("Denomination deleted successfully!")
+      setMessage("Denomination deleted!")
       setEditingDenom(null)
+      setShowModal(false)
       setIsDeleting(false)
       loadDenominations()
 
@@ -154,21 +156,29 @@ export default function DenominationsPage() {
     }
   }
 
-  const openEditForm = (denom: Denomination) => {
+  const openCreateModal = () => {
+    setFormData({ name: "", description: "", logo_url: "" })
+    setEditingDenom(null)
+    setShowModal(true)
+    setError("")
+    setMessage("")
+  }
+
+  const openEditModal = (denom: Denomination) => {
     setFormData({
       name: denom.name,
       description: denom.description || "",
       logo_url: denom.logo_url || "",
     })
     setEditingDenom(denom)
-    setShowCreateForm(false)
+    setShowModal(true)
     setError("")
     setMessage("")
   }
 
-  const cancelForm = () => {
+  const closeModal = () => {
     setFormData({ name: "", description: "", logo_url: "" })
-    setShowCreateForm(false)
+    setShowModal(false)
     setEditingDenom(null)
     setError("")
   }
@@ -178,24 +188,17 @@ export default function DenominationsPage() {
       <div className="dash-header">
         <div>
           <p className="eyebrow">Denominations</p>
-          <h1>Manage Denominations & Logos.</h1>
+          <h1>Manage Denominations</h1>
           <p className="intro">
-            Create and update denominations and their official logo pictures.
+            Create and update denominations and their official logos.
           </p>
         </div>
         <button
           type="button"
           className="button button-primary"
-          onClick={() => {
-            setShowCreateForm(!showCreateForm)
-            setEditingDenom(null)
-            setFormData({ name: "", description: "", logo_url: "" })
-            setError("")
-            setMessage("")
-          }}
-          style={{ whiteSpace: "nowrap" }}
+          onClick={openCreateModal}
         >
-          {showCreateForm ? "Cancel" : "+ New Denomination"}
+          + New Denomination
         </button>
       </div>
 
@@ -209,134 +212,6 @@ export default function DenominationsPage() {
         <p style={{ color: "var(--destructive)", fontSize: "14px", fontWeight: "bold", marginBottom: "20px" }}>
           {error}
         </p>
-      )}
-
-      {(showCreateForm || editingDenom) && (
-        <div style={{
-          background: "var(--cream)",
-          border: "1px solid var(--border)",
-          borderRadius: "10px",
-          padding: "24px",
-          marginBottom: "32px",
-          animation: "fadeIn 0.2s ease",
-        }}>
-          <h3 style={{ fontSize: "18px", marginBottom: "16px" }}>
-            {editingDenom ? `Edit Denomination: ${editingDenom.name}` : "Create New Denomination"}
-          </h3>
-
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: "16px" }}>
-              <label htmlFor="denom-name" style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                Denomination Name *
-              </label>
-              <input
-                id="denom-name"
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g. Assemblies of God Ghana"
-                required
-                autoFocus
-              />
-            </div>
-
-            {/* Picture Upload / URL Input */}
-            <div style={{ marginBottom: "16px" }}>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                Denomination Logo (Picture Upload or URL)
-              </label>
-
-              <div style={{ display: "flex", gap: "16px", alignItems: "center", marginTop: "8px" }}>
-                {formData.logo_url ? (
-                  <img
-                    src={formData.logo_url}
-                    alt="Logo preview"
-                    style={{ width: 54, height: 54, borderRadius: "50%", objectFit: "cover", border: "1px solid var(--border)" }}
-                  />
-                ) : (
-                  <div style={{ width: 54, height: 54, borderRadius: "50%", background: "var(--sage)", color: "var(--moss)", display: "grid", placeItems: "center", fontWeight: "bold", fontSize: "20px" }}>
-                    {formData.name ? formData.name[0] : "D"}
-                  </div>
-                )}
-
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <div>
-                    <span style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "4px" }}>
-                      Upload Picture File:
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      disabled={isUploading}
-                      style={{ fontSize: "13px" }}
-                    />
-                    {isUploading && <small style={{ color: "var(--moss)", display: "block" }}>Uploading picture...</small>}
-                  </div>
-
-                  <div>
-                    <span style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "4px" }}>
-                      Or Image URL:
-                    </span>
-                    <input
-                      type="url"
-                      value={formData.logo_url}
-                      onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                      placeholder="https://example.com/logo.png"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: "20px" }}>
-              <label htmlFor="denom-desc" style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                Description (optional)
-              </label>
-              <textarea
-                id="denom-desc"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Optional notes or description about this denomination"
-                rows={3}
-              />
-            </div>
-
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button
-                type="submit"
-                className="button button-primary"
-                disabled={isSaving || isUploading || isDeleting || !formData.name.trim()}
-              >
-                {isSaving ? "Saving..." : editingDenom ? "Update Denomination" : "Create Denomination"}
-              </button>
-              <button
-                type="button"
-                className="button button-outline"
-                onClick={cancelForm}
-                disabled={isSaving || isDeleting}
-              >
-                Cancel
-              </button>
-              {editingDenom && (
-                <button
-                  type="button"
-                  className="button"
-                  onClick={() => setShowDeleteModal(true)}
-                  disabled={isDeleting || isSaving}
-                  style={{
-                    marginLeft: "auto",
-                    background: "var(--destructive)",
-                    color: "white",
-                    border: "none",
-                  }}
-                >
-                  {isDeleting ? "Deleting..." : "Delete Denomination"}
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
       )}
 
       {isLoading ? (
@@ -356,7 +231,7 @@ export default function DenominationsPage() {
         </div>
       ) : denominations.length === 0 ? (
         <div style={{ textAlign: "center", padding: "80px 20px", color: "var(--muted-foreground)" }}>
-          <p style={{ fontSize: "15px", marginBottom: "8px" }}>No denominations yet</p>
+          <p style={{ fontSize: "15px" }}>No denominations yet. Create your first one!</p>
         </div>
       ) : (
         <div className="simple-list">
@@ -388,52 +263,164 @@ export default function DenominationsPage() {
                 type="button"
                 className="button button-outline"
                 style={{ padding: "6px 14px", fontSize: "13px" }}
-                onClick={() => openEditForm(denom)}
+                onClick={() => openEditModal(denom)}
               >
-                Edit Form
+                Edit
               </button>
             </div>
           ))}
         </div>
       )}
 
+      {/* Create/Edit Modal */}
+      {showModal && (
+        <>
+          <div className="modal-overlay" onClick={closeModal} />
+          <div className="modal-card" role="dialog" aria-modal="true">
+            <div className="modal-header">
+              <h3>{editingDenom ? "Edit Denomination" : "New Denomination"}</h3>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="modal-close"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+              <div className="modal-body">
+                <div className="form-field">
+                  <label htmlFor="denom-name">Denomination Name *</label>
+                  <input
+                    id="denom-name"
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g. Assemblies of God Ghana"
+                    required
+                    autoFocus
+                  />
+                </div>
+
+                <div className="form-field">
+                  <label>Logo</label>
+                  <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                    {formData.logo_url ? (
+                      <img
+                        src={formData.logo_url}
+                        alt="Logo preview"
+                        style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", border: "2px solid var(--line)" }}
+                      />
+                    ) : (
+                      <div style={{ width: 50, height: 50, borderRadius: "50%", background: "var(--sage)", color: "var(--moss)", display: "grid", placeItems: "center", fontWeight: "bold", fontSize: "18px" }}>
+                        {formData.name ? formData.name[0] : "D"}
+                      </div>
+                    )}
+
+                    <div style={{ flex: 1 }}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        disabled={isUploading}
+                        style={{ fontSize: "13px", marginBottom: "6px" }}
+                      />
+                      {isUploading && <small style={{ color: "var(--moss)", fontSize: "12px" }}>Uploading...</small>}
+                      <input
+                        type="url"
+                        value={formData.logo_url}
+                        onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                        placeholder="Or paste image URL"
+                        style={{ fontSize: "13px" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label htmlFor="denom-desc">Description (optional)</label>
+                  <textarea
+                    id="denom-desc"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Optional description"
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="submit"
+                  className="modal-btn btn-primary"
+                  disabled={isSaving || isUploading || !formData.name.trim()}
+                >
+                  {isSaving ? "Saving..." : editingDenom ? "Update" : "Create"}
+                </button>
+                {editingDenom && (
+                  <button
+                    type="button"
+                    className="modal-btn btn-danger"
+                    onClick={() => setShowDeleteModal(true)}
+                    disabled={isDeleting || isSaving}
+                  >
+                    Delete
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="modal-btn btn-secondary"
+                  onClick={closeModal}
+                  disabled={isSaving || isDeleting}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </>
+      )}
+
       {/* Delete Confirmation Modal */}
       {showDeleteModal && editingDenom && (
         <>
           <div className="modal-overlay" onClick={() => setShowDeleteModal(false)} />
-          <div className="modal-card" style={{ maxWidth: "420px" }}>
-            <div style={{ marginBottom: "16px" }}>
-              <h2 style={{ fontSize: "20px", margin: "0 0 8px 0", color: "var(--destructive)" }}>
-                Delete Denomination?
-              </h2>
-              <p style={{ margin: 0, fontSize: "14px", color: "var(--muted-foreground)", lineHeight: "1.5" }}>
-                Are you sure you want to delete <strong>{editingDenom.name}</strong>? This action cannot be undone and will fail if any chapters are currently using this denomination.
+          <div className="modal-card modal-sm">
+            <div className="modal-header">
+              <h3>Delete Denomination?</h3>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                className="modal-close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p style={{ margin: 0, fontSize: "14px", color: "var(--muted-foreground)", lineHeight: "1.6" }}>
+                Are you sure you want to delete <strong>{editingDenom.name}</strong>? This action cannot be undone.
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <div className="modal-footer">
               <button
                 type="button"
-                className="button button-outline"
-                onClick={() => setShowDeleteModal(false)}
+                className="modal-btn btn-danger"
+                onClick={handleDelete}
                 disabled={isDeleting}
-                style={{ fontSize: "14px" }}
               >
-                Cancel
+                {isDeleting ? "Deleting..." : "Delete"}
               </button>
               <button
                 type="button"
-                className="button"
-                onClick={handleDelete}
+                className="modal-btn btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
                 disabled={isDeleting}
-                style={{
-                  background: "var(--destructive)",
-                  color: "white",
-                  border: "none",
-                  fontSize: "14px",
-                }}
               >
-                {isDeleting ? "Deleting..." : "Delete Denomination"}
+                Cancel
               </button>
             </div>
           </div>
@@ -441,8 +428,166 @@ export default function DenominationsPage() {
       )}
 
       <style jsx>{`
-        .modal-overlay { position: fixed; inset: 0; background: rgba(32, 35, 31, 0.5); z-index: 999; }
-        .modal-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 22px; width: min(480px, calc(100vw - 32px)); z-index: 1000; }
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(32, 35, 31, 0.6);
+          z-index: 999;
+          backdrop-filter: blur(2px);
+        }
+
+        .modal-card {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          border: 2px solid var(--ink);
+          border-radius: 10px;
+          box-shadow: 4px 4px 0 var(--ink);
+          width: min(520px, calc(100vw - 32px));
+          max-height: calc(100vh - 60px);
+          overflow-y: auto;
+          z-index: 1000;
+        }
+
+        .modal-sm {
+          width: min(420px, calc(100vw - 32px));
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 18px 20px;
+          border-bottom: 1px solid var(--line);
+          background: var(--sage);
+        }
+
+        .modal-header h3 {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--ink);
+        }
+
+        .modal-close {
+          background: none;
+          border: none;
+          font-size: 20px;
+          cursor: pointer;
+          color: var(--muted-foreground);
+          padding: 4px 8px;
+          line-height: 1;
+          border-radius: 4px;
+          transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+          background: var(--line);
+          color: var(--ink);
+        }
+
+        .modal-body {
+          padding: 20px;
+        }
+
+        .form-field {
+          margin-bottom: 18px;
+        }
+
+        .form-field:last-child {
+          margin-bottom: 0;
+        }
+
+        .form-field label {
+          display: block;
+          font-size: 13px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          color: var(--ink);
+        }
+
+        .modal-footer {
+          display: flex;
+          gap: 10px;
+          padding: 16px 20px;
+          border-top: 1px solid var(--line);
+          background: var(--cream);
+        }
+
+        .modal-btn {
+          flex: 1;
+          padding: 10px 16px;
+          font-size: 14px;
+          font-weight: 600;
+          border-radius: 8px;
+          border: 2px solid;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+          border-color: var(--moss);
+          background: var(--moss);
+          color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+          background: #3a442f;
+          transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .btn-danger {
+          border-color: var(--destructive);
+          color: var(--destructive);
+          background: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+          background: var(--destructive);
+          color: white;
+          transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+          border-color: var(--line);
+          background: white;
+          color: var(--ink);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+          background: var(--line);
+        }
+
+        @media (max-width: 768px) {
+          .modal-card {
+            width: calc(100vw - 24px);
+            max-height: calc(100vh - 40px);
+          }
+
+          .modal-header {
+            padding: 14px 16px;
+          }
+
+          .modal-body {
+            padding: 16px;
+          }
+
+          .modal-footer {
+            flex-direction: column;
+            padding: 12px 16px;
+          }
+
+          .modal-btn {
+            width: 100%;
+          }
+        }
       `}</style>
     </DashboardShell>
   )
