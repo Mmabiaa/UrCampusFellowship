@@ -22,47 +22,29 @@ export function LogoUploadField({
   return (
     <div className="admin-form-field">
       <label>Logo</label>
-      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+      <div className="logo-upload-wrapper">
         {logoUrl ? (
           <img
             src={logoUrl}
             alt="Logo preview"
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: "50%",
-              objectFit: "cover",
-              border: "2px solid var(--line)",
-            }}
+            className="logo-preview"
           />
         ) : (
-          <div
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: "50%",
-              background: "var(--sage)",
-              color: "var(--moss)",
-              display: "grid",
-              placeItems: "center",
-              fontWeight: "bold",
-              fontSize: "18px",
-            }}
-          >
+          <div className="logo-placeholder">
             {initial}
           </div>
         )}
 
-        <div style={{ flex: 1 }}>
+        <div className="logo-upload-inputs">
           <input
             type="file"
             accept="image/*"
             onChange={onFileUpload}
             disabled={isUploading}
-            style={{ fontSize: "13px", marginBottom: "6px" }}
+            className="logo-file-input"
           />
           {isUploading && (
-            <small style={{ color: "var(--moss)", fontSize: "12px", display: "block" }}>
+            <small className="upload-status">
               Uploading...
             </small>
           )}
@@ -71,10 +53,86 @@ export function LogoUploadField({
             value={logoUrl}
             onChange={(e) => onUrlChange(e.target.value)}
             placeholder={placeholder}
-            style={{ fontSize: "13px" }}
+            className="logo-url-input"
           />
         </div>
       </div>
+
+      <style jsx>{`
+        .logo-upload-wrapper {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .logo-preview {
+          width: 50px;
+          height: 50px;
+          min-width: 50px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid var(--line);
+        }
+
+        .logo-placeholder {
+          width: 50px;
+          height: 50px;
+          min-width: 50px;
+          border-radius: 50%;
+          background: var(--sage);
+          color: var(--moss);
+          display: grid;
+          place-items: center;
+          font-weight: bold;
+          font-size: 18px;
+        }
+
+        .logo-upload-inputs {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .logo-file-input {
+          font-size: 13px;
+          margin-bottom: 6px;
+          width: 100%;
+        }
+
+        .upload-status {
+          color: var(--moss);
+          font-size: 12px;
+          display: block;
+          margin-bottom: 6px;
+        }
+
+        .logo-url-input {
+          font-size: 13px;
+          width: 100%;
+        }
+
+        @media (max-width: 480px) {
+          .logo-upload-wrapper {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .logo-preview,
+          .logo-placeholder {
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
+          }
+
+          .logo-upload-inputs {
+            width: 100%;
+          }
+
+          .logo-file-input,
+          .logo-url-input {
+            font-size: 14px;
+          }
+        }
+      `}</style>
     </div>
   )
 }

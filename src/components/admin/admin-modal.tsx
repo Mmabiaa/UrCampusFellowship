@@ -109,6 +109,7 @@ export function AdminModal({
             border: 2px solid;
             cursor: pointer;
             transition: all 0.2s ease;
+            white-space: nowrap;
           }
 
           .admin-btn-primary {
@@ -165,6 +166,28 @@ export function AdminModal({
 
             .admin-modal-btn {
               width: 100%;
+            }
+
+            .admin-form-field label {
+              font-size: 12px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .admin-modal-header {
+              padding: 12px 14px;
+            }
+
+            .admin-modal-body {
+              padding: 14px;
+            }
+
+            .admin-form-field {
+              margin-bottom: 16px;
+            }
+
+            .admin-modal-footer {
+              padding: 10px 14px;
             }
           }
         `}</style>

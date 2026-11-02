@@ -116,7 +116,7 @@ export function ChapterInfoModal({
       description="Update meeting schedule and fellowship details"
     >
       <form onSubmit={handleSubmit}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+        <div className="form-row">
           <div className="admin-form-field">
             <label htmlFor="meeting-day">
               Meeting Day <span style={{ color: "var(--destructive)" }}>*</span>
@@ -234,6 +234,22 @@ export function ChapterInfoModal({
             Cancel
           </button>
         </div>
+
+        <style jsx>{`
+          .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 0;
+          }
+
+          @media (max-width: 640px) {
+            .form-row {
+              grid-template-columns: 1fr;
+              gap: 0;
+            }
+          }
+        `}</style>
       </form>
     </AdminModal>
   )

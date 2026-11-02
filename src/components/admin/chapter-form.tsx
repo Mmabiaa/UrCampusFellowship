@@ -62,7 +62,6 @@ export function ChapterForm({
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [error, setError] = useState("")
 
-  // Update form data when chapter changes
   useEffect(() => {
     if (chapter && open) {
       setFormData({
@@ -205,7 +204,7 @@ export function ChapterForm({
         title={chapter ? "Edit Chapter" : "New Chapter"}
       >
         <form onSubmit={handleSubmit}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div className="form-row">
             <div className="admin-form-field">
               <label htmlFor="chapter-name">Chapter Name *</label>
               <input
@@ -235,7 +234,7 @@ export function ChapterForm({
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div className="form-row">
             <div className="admin-form-field">
               <label htmlFor="chapter-denom">Denomination</label>
               <select
@@ -277,7 +276,7 @@ export function ChapterForm({
             isUploading={isUploading}
           />
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div className="form-row">
             <div className="admin-form-field">
               <label htmlFor="chapter-day">Meeting Day</label>
               <input
@@ -367,6 +366,22 @@ export function ChapterForm({
               Cancel
             </button>
           </div>
+
+          <style jsx>{`
+            .form-row {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 16px;
+              margin-bottom: 0;
+            }
+
+            @media (max-width: 640px) {
+              .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+              }
+            }
+          `}</style>
         </form>
       </AdminModal>
 

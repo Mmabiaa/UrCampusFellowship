@@ -187,145 +187,215 @@ export default function ChapterSetupPage() {
       )}
 
       <div className="simple-list">
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Chapter Name
-          </strong>
-          <span style={{ fontSize: "15px" }}>{chapter.name}</span>
+        <div className="info-row">
+          <strong className="info-label">Chapter Name</strong>
+          <span className="info-value">{chapter.name}</span>
         </div>
 
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Denomination
-          </strong>
-          <span style={{ fontSize: "15px" }}>{chapter.denominations?.name || "—"}</span>
+        <div className="info-row">
+          <strong className="info-label">Denomination</strong>
+          <span className="info-value">{chapter.denominations?.name || "—"}</span>
         </div>
 
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Campus
-          </strong>
-          <span style={{ fontSize: "15px" }}>{chapter.campuses?.name || "Main Campus"}</span>
+        <div className="info-row">
+          <strong className="info-label">Campus</strong>
+          <span className="info-value">{chapter.campuses?.name || "Main Campus"}</span>
         </div>
 
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Status
-          </strong>
+        <div className="info-row">
+          <strong className="info-label">Status</strong>
           <span
+            className="status-badge"
             style={{
-              fontSize: "13px",
-              padding: "4px 10px",
-              borderRadius: "6px",
               background: chapter.status === "active" ? "var(--sage)" : "var(--cream)",
               color: chapter.status === "active" ? "var(--moss)" : "var(--muted-foreground)",
-              fontWeight: 600,
-              display: "inline-block",
             }}
           >
             {chapter.status}
           </span>
         </div>
 
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Meeting Schedule
-          </strong>
-          <span style={{ fontSize: "15px" }}>
+        <div className="info-row">
+          <strong className="info-label">Meeting Schedule</strong>
+          <span className="info-value">
             {chapter.meeting_day || "—"} {chapter.meeting_time ? `at ${chapter.meeting_time}` : ""}
           </span>
         </div>
 
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Location
-          </strong>
-          <span style={{ fontSize: "15px" }}>{chapter.location || "—"}</span>
+        <div className="info-row">
+          <strong className="info-label">Location</strong>
+          <span className="info-value">{chapter.location || "—"}</span>
         </div>
 
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Logo
-          </strong>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div className="info-row">
+          <strong className="info-label">Logo</strong>
+          <div className="logo-display">
             {chapter.logo_url ? (
               <img
                 src={chapter.logo_url}
                 alt="Chapter logo"
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border: "1px solid var(--border)",
-                }}
+                className="logo-image"
               />
             ) : (
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: "50%",
-                  background: "var(--sage)",
-                  color: "var(--moss)",
-                  display: "grid",
-                  placeItems: "center",
-                  fontWeight: "bold",
-                }}
-              >
+              <div className="logo-placeholder">
                 {chapter.name[0]}
               </div>
             )}
-            <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+            <span className="logo-status">
               {chapter.logo_url ? "Logo uploaded" : "No logo"}
             </span>
           </div>
         </div>
 
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "start" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Description
-          </strong>
-          <span style={{ fontSize: "15px", lineHeight: "1.6" }}>
+        <div className="info-row">
+          <strong className="info-label">Description</strong>
+          <span className="info-value description-text">
             {chapter.description || "—"}
           </span>
         </div>
 
-        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
-          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            WhatsApp Link
-          </strong>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div className="info-row">
+          <strong className="info-label">WhatsApp Link</strong>
+          <div className="whatsapp-display">
             {chapter.whatsapp_link ? (
               <>
-                <span
-                  style={{
-                    fontSize: "13px",
-                    color: "var(--moss)",
-                    fontWeight: 600,
-                  }}
-                >
-                  ✓ Configured
-                </span>
+                <span className="whatsapp-status">✓ Configured</span>
                 <a
                   href={chapter.whatsapp_link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{
-                    fontSize: "13px",
-                    color: "var(--moss)",
-                    textDecoration: "underline",
-                  }}
+                  className="whatsapp-link"
                 >
                   View
                 </a>
               </>
             ) : (
-              <span style={{ fontSize: "15px" }}>—</span>
+              <span className="info-value">—</span>
             )}
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .info-row {
+          display: grid;
+          grid-template-columns: 200px 1fr;
+          gap: 24px;
+          align-items: center;
+          padding: 16px 0;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .info-label {
+          font-size: 14px;
+          color: var(--muted-foreground);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 600;
+        }
+
+        .info-value {
+          font-size: 15px;
+          color: var(--ink);
+        }
+
+        .description-text {
+          line-height: 1.6;
+        }
+
+        .status-badge {
+          font-size: 13px;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-weight: 600;
+          display: inline-block;
+        }
+
+        .logo-display {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .logo-image {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 1px solid var(--border);
+        }
+
+        .logo-placeholder {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: var(--sage);
+          color: var(--moss);
+          display: grid;
+          place-items: center;
+          font-weight: bold;
+        }
+
+        .logo-status {
+          font-size: 13px;
+          color: var(--muted-foreground);
+        }
+
+        .whatsapp-display {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .whatsapp-status {
+          font-size: 13px;
+          color: var(--moss);
+          font-weight: 600;
+        }
+
+        .whatsapp-link {
+          font-size: 13px;
+          color: var(--moss);
+          text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+          .info-row {
+            grid-template-columns: 1fr;
+            gap: 8px;
+            padding: 14px 0;
+          }
+
+          .info-label {
+            font-size: 12px;
+          }
+
+          .info-value {
+            font-size: 14px;
+          }
+
+          .status-badge {
+            font-size: 12px;
+            padding: 3px 8px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .info-row {
+            padding: 12px 0;
+          }
+
+          .logo-display {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .whatsapp-display {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+        }
+      `}</style>
 
       <ChapterInfoModal
         open={showModal}
