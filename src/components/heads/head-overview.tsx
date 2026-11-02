@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { DashboardShell } from "@/components/common/dashboard-shell"
 
@@ -25,94 +25,121 @@ interface Member {
   created_at: string
 }
 
+function getInitials(name: string) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?"
+}
+
+function formatDate(iso: string) {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+}
+
 export function HeadOverview() {
   const [chapter, setChapter] = useState<Chapter | null>(null)
   const [members, setMembers] = useState<Member[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  const loadDashboard = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      setError(false)
+      const [chapRes, rosRes] = await Promise.all([
+        fetch('/api/heads/chapter'),
+        fetch('/api/heads/roster')
+      ])
+
+      if (!chapRes.ok || !rosRes.ok) throw new Error("Request failed")
+
+      const cData = await chapRes.json()
+      const rData = await rosRes.json()
+      setChapter(cData.chapter || null)
+      setMembers(rData.members || [])
+    } catch {
+      setError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    async function loadDashboard() {
-      try {
-        setIsLoading(true)
-        const [chapRes, rosRes] = await Promise.all([
-          fetch('/api/heads/chapter'),
-          fetch('/api/heads/roster')
-        ])
-
-        if (chapRes.ok) {
-          const cData = await chapRes.json()
-          setChapter(cData.chapter || null)
-        }
-        if (rosRes.ok) {
-          const rData = await rosRes.json()
-          setMembers(rData.members || [])
-        }
-      } catch {
-        // network error
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
     loadDashboard()
-  }, [])
+  }, [loadDashboard])
 
   if (isLoading) {
     return (
       <DashboardShell role="head">
-        <div className="dash-header">
-          <div>
-            <div style={{ height: "11px", width: "150px", background: "var(--muted)", borderRadius: "4px", marginBottom: "16px", opacity: 0.5 }} />
-            <div style={{ height: "42px", width: "320px", background: "var(--muted)", borderRadius: "8px", marginBottom: "12px", opacity: 0.5 }} />
-          </div>
-          <div className="skeleton" style={{ width: 48, height: 48, borderRadius: "50%" }} />
-        </div>
-
-        <div className="stat-grid">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="skeleton-stat">
-              <div className="skeleton" style={{ height: "12px", width: "60%" }} />
-              <div className="skeleton" style={{ height: "36px", width: "40%" }} />
-              <div className="skeleton" style={{ height: "12px", width: "80%" }} />
+        <div aria-busy="true" aria-live="polite">
+          <div className="dash-header">
+            <div>
+              <div style={{ height: "11px", width: "150px", background: "var(--muted)", borderRadius: "4px", marginBottom: "16px", opacity: 0.5 }} />
+              <div style={{ height: "42px", width: "320px", background: "var(--muted)", borderRadius: "8px", marginBottom: "12px", opacity: 0.5 }} />
             </div>
-          ))}
-        </div>
-
-        <div className="dash-section">
-          <div className="section-heading">
-            <div className="skeleton" style={{ height: "30px", width: "200px" }} />
-            <div className="skeleton" style={{ height: "14px", width: "100px" }} />
+            <div className="skeleton" style={{ width: 48, height: 48, borderRadius: "50%" }} />
           </div>
 
-          <div className="setup-list">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i}>
-                <div className="skeleton" style={{ height: "13px", width: "120px" }} />
-                <div className="skeleton" style={{ height: "13px", width: "180px" }} />
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="dash-section">
-          <div className="section-heading">
-            <div className="skeleton" style={{ height: "30px", width: "180px" }} />
-            <div className="skeleton" style={{ height: "14px", width: "80px" }} />
-          </div>
-
-          <div className="member-list">
+          <div className="stat-grid">
             {Array.from({ length: 3 }).map((_, i) => (
-              <span key={i}>
-                <div className="skeleton" style={{ width: 34, height: 34, borderRadius: "50%" }} />
-                <div style={{ flex: 1 }}>
-                  <div className="skeleton" style={{ height: "14px", width: "60%", marginBottom: "6px" }} />
-                  <div className="skeleton" style={{ height: "12px", width: "40%" }} />
-                </div>
-                <div className="skeleton" style={{ height: "12px", width: "80px" }} />
-                <div className="skeleton" style={{ height: "12px", width: "50px" }} />
-              </span>
+              <div key={i} className="skeleton-stat">
+                <div className="skeleton" style={{ height: "12px", width: "60%" }} />
+                <div className="skeleton" style={{ height: "36px", width: "40%" }} />
+                <div className="skeleton" style={{ height: "12px", width: "80%" }} />
+              </div>
             ))}
           </div>
+
+          <div className="dash-section">
+            <div className="section-heading">
+              <div className="skeleton" style={{ height: "30px", width: "200px" }} />
+              <div className="skeleton" style={{ height: "14px", width: "100px" }} />
+            </div>
+
+            <div className="setup-list">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span key={i}>
+                  <div className="skeleton" style={{ height: "13px", width: "120px" }} />
+                  <div className="skeleton" style={{ height: "13px", width: "180px" }} />
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="dash-section">
+            <div className="section-heading">
+              <div className="skeleton" style={{ height: "30px", width: "180px" }} />
+              <div className="skeleton" style={{ height: "14px", width: "80px" }} />
+            </div>
+
+            <div className="member-list">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <span key={i}>
+                  <div className="skeleton" style={{ width: 34, height: 34, borderRadius: "50%" }} />
+                  <div style={{ flex: 1 }}>
+                    <div className="skeleton" style={{ height: "14px", width: "60%", marginBottom: "6px" }} />
+                    <div className="skeleton" style={{ height: "12px", width: "40%" }} />
+                  </div>
+                  <div className="skeleton" style={{ height: "12px", width: "80px" }} />
+                  <div className="skeleton" style={{ height: "12px", width: "50px" }} />
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DashboardShell>
+    )
+  }
+
+  if (error) {
+    return (
+      <DashboardShell role="head">
+        <div className="notify-box" role="alert">
+          <h2>Couldn&apos;t load your dashboard</h2>
+          <p>Check your connection and try again.</p>
+          <button type="button" className="button button-primary" style={{ marginTop: "20px" }} onClick={loadDashboard}>
+            Try again
+          </button>
         </div>
       </DashboardShell>
     )
@@ -120,7 +147,22 @@ export function HeadOverview() {
 
   const isActive = chapter?.status === "active"
   const isPending = chapter?.status === "pending_approval"
+  const isComingSoon = chapter?.status === "coming_soon"
   const recentMembers = members.slice(0, 3)
+
+  const statusLabel = isActive
+    ? "Active"
+    : isPending
+      ? "Pending approval"
+      : isComingSoon
+        ? "Coming soon"
+        : "Setup required"
+
+  const statusHint = isActive
+    ? "Visible in student directory"
+    : isPending
+      ? "Waiting for admin review"
+      : "Action required"
 
   return (
     <DashboardShell role="head">
@@ -132,12 +174,12 @@ export function HeadOverview() {
         {chapter?.logo_url ? (
           <img
             src={chapter.logo_url}
-            alt={chapter.name}
+            alt={`${chapter.name} logo`}
             style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover" }}
           />
         ) : (
           <div className="dash-user" aria-hidden="true">
-            {chapter?.name ? chapter.name[0] : "C"}
+            {chapter?.name ? getInitials(chapter.name) : "C"}
           </div>
         )}
       </div>
@@ -146,19 +188,19 @@ export function HeadOverview() {
         <div>
           <small>Total Members</small>
           <strong>{members.length}</strong>
-          <span>Registered students</span>
+          <span>{members.length === 1 ? "Registered student" : "Registered students"}</span>
         </div>
         <div>
           <small>Status</small>
-          <strong className={isActive ? "green-text" : isPending ? "gold-text" : ""}>
-            {isActive ? "Active" : isPending ? "Pending Admin Approval" : "Setup Required"}
+          <strong className={isActive ? "green-text" : isPending || isComingSoon ? "gold-text" : ""}>
+            {statusLabel}
           </strong>
-          <span>{isActive ? "Visible in student directory" : "Action required"}</span>
+          <span>{statusHint}</span>
         </div>
         <div>
           <small>Next Meeting</small>
           <strong>{chapter?.meeting_day || "Not set"}</strong>
-          <span>{chapter?.meeting_time || "—"}</span>
+          <span>{[chapter?.meeting_time, chapter?.location].filter(Boolean).join(" · ") || "—"}</span>
         </div>
       </div>
 
@@ -173,7 +215,7 @@ export function HeadOverview() {
         <div className="setup-list">
           <span>
             <strong>Chapter name</strong>
-            <em>{chapter?.name}</em>
+            <em>{chapter?.name || "Not set"}</em>
           </span>
           <span>
             <strong>Campus</strong>
@@ -194,44 +236,8 @@ export function HeadOverview() {
         </div>
       </div>
 
-      <div className="dash-section">
-        <div className="section-heading">
-          <h2>Recent members ({members.length})</h2>
-          <Link href="/heads/roster" className="button-text">
-            View all →
-          </Link>
-        </div>
-
-        {recentMembers.length === 0 ? (
-          <p style={{ color: "var(--muted-foreground)", fontSize: "14px", padding: "16px 0" }}>
-            No registered members yet. Once students join, they will appear here.
-          </p>
-        ) : (
-          <div className="member-list">
-            {recentMembers.map((member, idx) => {
-              const memberName = member.name || (member as any).full_name || "Member"
-              const memberId = member.id || (member as any).membershipId || `mem-${idx}`
-              const memberDate = member.created_at || (member as any).joinedAt
-              return (
-                <span key={memberId}>
-                  <i aria-hidden="true">{memberName[0] ? memberName[0].toUpperCase() : "M"}</i>
-                  <div>
-                    <strong>{memberName}</strong>
-                    <small>{member.program || "Student"} • Level {member.level || "N/A"}</small>
-                  </div>
-                  <small>{memberDate ? new Date(memberDate).toLocaleDateString() : ""}</small>
-                  <Link href="/heads/roster" className="button-text">
-                    View
-                  </Link>
-                </span>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
       {isPending && (
-        <div className="notify-box" style={{ marginTop: "40px", background: "var(--butter)", borderColor: "var(--gold)" }}>
+        <div className="notify-box" role="status" style={{ marginTop: "40px", background: "var(--butter)", borderColor: "var(--gold)" }}>
           <h2>Approval Pending</h2>
           <p>
             Your chapter registration has been submitted and is currently being reviewed by the administrator.
@@ -241,10 +247,11 @@ export function HeadOverview() {
       )}
 
       {!isActive && !isPending && (
-        <div className="notify-box" style={{ marginTop: "40px" }}>
+        <div className="notify-box" role="status" style={{ marginTop: "40px" }}>
           <h2>Chapter Setup Incomplete</h2>
           <p>
-            Add your meeting schedule (*Wednesday*, *5:30 PM*, *Old Lecture Theatre*) and official WhatsApp group link to activate your chapter for students.
+            Add your meeting schedule (e.g. Wednesday, 5:30 PM, Old Lecture Theatre) and official WhatsApp group link
+            to activate your chapter for students.
           </p>
           <Link href="/heads/setup" className="button button-primary" style={{ marginTop: "20px" }}>
             Complete Setup Now →
