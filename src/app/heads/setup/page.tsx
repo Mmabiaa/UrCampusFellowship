@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { DashboardShell } from "@/components/common/dashboard-shell"
+import { ChapterInfoModal } from "@/components/heads/chapter-info-modal"
 
 interface ChapterData {
   id: string
@@ -19,387 +20,327 @@ interface ChapterData {
 
 export default function ChapterSetupPage() {
   const [chapter, setChapter] = useState<ChapterData | null>(null)
-  const [formData, setFormData] = useState({
-    meeting_day: "",
-    meeting_time: "",
-    location: "",
-    description: "",
-    whatsapp_link: "",
-    logo_url: "",
-  })
-
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
-  const [saveMessage, setSaveMessage] = useState("")
-  const [errorMessage, setErrorMessage] = useState("")
+  const [showModal, setShowModal] = useState(false)
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
+
+  const fetchChapter = async () => {
+    try {
+      setIsLoading(true)
+      const res = await fetch("/api/heads/chapter")
+      if (res.ok) {
+        const data = await res.json()
+        setChapter(data.chapter || null)
+      }
+    } catch {
+      setError("Failed to load chapter information.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
-    async function fetchChapter() {
-      try {
-        setIsLoading(true)
-        const res = await fetch('/api/heads/chapter')
-        if (res.ok) {
-          const data = await res.json()
-          const c = data.chapter
-          if (c) {
-            setChapter(c)
-            setFormData({
-              meeting_day: c.meeting_day || "",
-              meeting_time: c.meeting_time || "",
-              location: c.location || "",
-              description: c.description || "",
-              whatsapp_link: c.whatsapp_link || "",
-              logo_url: c.logo_url || "",
-            })
-          }
-        }
-      } catch {
-        setErrorMessage("Failed to load chapter information.")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
     fetchChapter()
   }, [])
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-    setSaveMessage("")
-    setErrorMessage("")
+  const handleSuccess = () => {
+    setMessage("Chapter setup updated successfully!")
+    setTimeout(() => setMessage(""), 4000)
+    fetchChapter()
   }
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setIsUploadingLogo(true)
-    setErrorMessage("")
-
-    try {
-      const uploadFormData = new FormData()
-      uploadFormData.append('file', file)
-
-      const res = await fetch('/api/uploads/logo', {
-        method: 'POST',
-        body: uploadFormData,
-      })
-
-      const data = await res.json()
-
-      if (res.ok && data.url) {
-        setFormData((prev) => ({ ...prev, logo_url: data.url }))
-        setSaveMessage("Logo uploaded successfully!")
-      } else {
-        setErrorMessage(data.error || "Logo upload failed.")
-      }
-    } catch {
-      setErrorMessage("Network error during logo upload.")
-    } finally {
-      setIsUploadingLogo(false)
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!formData.meeting_day || !formData.meeting_time || !formData.location || !formData.whatsapp_link) {
-      setErrorMessage("Please fill in all required fields marked with *.")
-      return
-    }
-
-    setIsSaving(true)
-    setSaveMessage("")
-    setErrorMessage("")
-
-    try {
-      const res = await fetch('/api/heads/chapter', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setErrorMessage(data.error || "Failed to update chapter setup.")
-        setIsSaving(false)
-        return
-      }
-
-      setChapter(data.chapter)
-      setSaveMessage("Chapter setup updated successfully! Status is now ACTIVE.")
-      setIsSaving(false)
-
-      setTimeout(() => setSaveMessage(""), 4000)
-    } catch {
-      setErrorMessage("Network error. Please try again.")
-      setIsSaving(false)
-    }
-  }
+  const isSetupComplete =
+    chapter?.meeting_day &&
+    chapter?.meeting_time &&
+    chapter?.location &&
+    chapter?.whatsapp_link
 
   if (isLoading) {
-  return (
-    <DashboardShell role="head">
-      <div className="dash-header">
-        <div style={{ width: "100%", maxWidth: "480px" }}>
-          <div className="skeleton" style={{ height: "11px", width: "110px", marginBottom: "16px" }} />
-          <div className="skeleton" style={{ height: "42px", width: "90%", marginBottom: "14px" }} />
-          <div className="skeleton" style={{ height: "17px", width: "100%", marginBottom: "8px" }} />
-          <div className="skeleton" style={{ height: "17px", width: "70%" }} />
+    return (
+      <DashboardShell role="head">
+        <div className="dash-header">
+          <div style={{ width: "100%", maxWidth: "480px" }}>
+            <div
+              className="skeleton"
+              style={{ height: "11px", width: "110px", marginBottom: "16px" }}
+            />
+            <div
+              className="skeleton"
+              style={{ height: "42px", width: "90%", marginBottom: "14px" }}
+            />
+            <div
+              className="skeleton"
+              style={{ height: "17px", width: "100%", marginBottom: "8px" }}
+            />
+            <div className="skeleton" style={{ height: "17px", width: "70%" }} />
+          </div>
         </div>
-      </div>
 
-      <div className="setup-form">
-        <div className="form-grid">
-          {/* Chapter name, Denomination, Campus, Meeting day, Meeting time, Location */}
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <div className="skeleton" style={{ height: "13px", width: "90px" }} />
-              <div className="skeleton" style={{ height: "46px", width: "100%", borderRadius: "10px" }} />
+        <div style={{ marginTop: "40px" }}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="simple-list-row"
+              style={{ justifyContent: "space-between", alignItems: "center" }}
+            >
+              <div style={{ flex: 1 }}>
+                <div
+                  className="skeleton"
+                  style={{ height: "15px", width: "40%", marginBottom: "6px" }}
+                />
+                <div className="skeleton" style={{ height: "13px", width: "60%" }} />
+              </div>
+              <div className="skeleton" style={{ height: "32px", width: "80px", borderRadius: "8px" }} />
             </div>
           ))}
+        </div>
+      </DashboardShell>
+    )
+  }
 
-          {/* Logo upload — wide field */}
-          <div className="wide-field" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <div className="skeleton" style={{ height: "13px", width: "120px" }} />
-            <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "8px" }}>
-              <div className="skeleton" style={{ width: 64, height: 64, borderRadius: "50%", flexShrink: 0 }} />
-              <div className="skeleton" style={{ height: "36px", flex: 1, borderRadius: "8px" }} />
-            </div>
-          </div>
-
-          {/* Description — wide field */}
-          <div className="wide-field" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <div className="skeleton" style={{ height: "13px", width: "100px" }} />
-            <div className="skeleton" style={{ height: "120px", width: "100%", borderRadius: "10px" }} />
-          </div>
-
-          {/* WhatsApp link — wide field */}
-          <div className="wide-field" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <div className="skeleton" style={{ height: "13px", width: "140px" }} />
-            <div className="skeleton" style={{ height: "46px", width: "100%", borderRadius: "10px" }} />
-            <div className="skeleton" style={{ height: "11px", width: "60%" }} />
+  if (!chapter) {
+    return (
+      <DashboardShell role="head">
+        <div className="dash-header">
+          <div>
+            <p className="eyebrow">Chapter setup</p>
+            <h1>No chapter found</h1>
+            <p className="intro">Unable to load your chapter information.</p>
           </div>
         </div>
-
-        {/* Submit button */}
-        <div
-          className="skeleton"
-          style={{ height: "48px", width: "100%", marginTop: "24px", borderRadius: "12px" }}
-        />
-      </div>
-    </DashboardShell>
-  )
-}
-
-  const isFormComplete =
-    formData.meeting_day && formData.meeting_time && formData.location && formData.whatsapp_link
+      </DashboardShell>
+    )
+  }
 
   return (
     <DashboardShell role="head">
       <div className="dash-header">
         <div>
-          <p className="eyebrow">Chapter setup</p>
+          <p className="eyebrow">Chapter Setup</p>
           <h1>Keep your fellowship details current.</h1>
           <p className="intro">
-            Update the meeting schedule and WhatsApp link that students receive upon joining.
+            Update your meeting schedule and WhatsApp link that students receive upon joining.
           </p>
+        </div>
+        <button
+          type="button"
+          className="button button-primary"
+          onClick={() => setShowModal(true)}
+        >
+          Edit Setup
+        </button>
+      </div>
+
+      {message && (
+        <p
+          style={{
+            padding: "12px 16px",
+            background: "var(--sage)",
+            color: "var(--moss)",
+            borderRadius: "8px",
+            fontSize: "14px",
+            fontWeight: "bold",
+            marginBottom: "20px",
+          }}
+        >
+          ✓ {message}
+        </p>
+      )}
+
+      {error && (
+        <p
+          style={{
+            color: "var(--destructive)",
+            fontSize: "14px",
+            fontWeight: "bold",
+            marginBottom: "20px",
+          }}
+        >
+          {error}
+        </p>
+      )}
+
+      {!isSetupComplete && (
+        <div
+          style={{
+            background: "var(--butter)",
+            border: "1px solid var(--gold)",
+            borderRadius: "10px",
+            padding: "16px 20px",
+            marginBottom: "24px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+          }}
+        >
+          <span style={{ fontSize: "24px" }}>⚠️</span>
+          <div>
+            <strong style={{ display: "block", marginBottom: "4px", color: "var(--ink)" }}>
+              Setup Incomplete
+            </strong>
+            <p style={{ margin: 0, fontSize: "14px", color: "var(--accent-foreground)" }}>
+              Please complete all required fields to activate your chapter.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="simple-list">
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Chapter Name
+          </strong>
+          <span style={{ fontSize: "15px" }}>{chapter.name}</span>
+        </div>
+
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Denomination
+          </strong>
+          <span style={{ fontSize: "15px" }}>{chapter.denominations?.name || "—"}</span>
+        </div>
+
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Campus
+          </strong>
+          <span style={{ fontSize: "15px" }}>{chapter.campuses?.name || "Main Campus"}</span>
+        </div>
+
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Status
+          </strong>
+          <span
+            style={{
+              fontSize: "13px",
+              padding: "4px 10px",
+              borderRadius: "6px",
+              background: chapter.status === "active" ? "var(--sage)" : "var(--cream)",
+              color: chapter.status === "active" ? "var(--moss)" : "var(--muted-foreground)",
+              fontWeight: 600,
+              display: "inline-block",
+            }}
+          >
+            {chapter.status}
+          </span>
+        </div>
+
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Meeting Schedule
+          </strong>
+          <span style={{ fontSize: "15px" }}>
+            {chapter.meeting_day || "—"} {chapter.meeting_time ? `at ${chapter.meeting_time}` : ""}
+          </span>
+        </div>
+
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Location
+          </strong>
+          <span style={{ fontSize: "15px" }}>{chapter.location || "—"}</span>
+        </div>
+
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Logo
+          </strong>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {chapter.logo_url ? (
+              <img
+                src={chapter.logo_url}
+                alt="Chapter logo"
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "1px solid var(--border)",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  background: "var(--sage)",
+                  color: "var(--moss)",
+                  display: "grid",
+                  placeItems: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                {chapter.name[0]}
+              </div>
+            )}
+            <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+              {chapter.logo_url ? "Logo uploaded" : "No logo"}
+            </span>
+          </div>
+        </div>
+
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "start" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            Description
+          </strong>
+          <span style={{ fontSize: "15px", lineHeight: "1.6" }}>
+            {chapter.description || "—"}
+          </span>
+        </div>
+
+        <div className="simple-list-row" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "24px", alignItems: "center" }}>
+          <strong style={{ fontSize: "14px", color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            WhatsApp Link
+          </strong>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {chapter.whatsapp_link ? (
+              <>
+                <span
+                  style={{
+                    fontSize: "13px",
+                    color: "var(--moss)",
+                    fontWeight: 600,
+                  }}
+                >
+                  ✓ Configured
+                </span>
+                <a
+                  href={chapter.whatsapp_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: "13px",
+                    color: "var(--moss)",
+                    textDecoration: "underline",
+                  }}
+                >
+                  View
+                </a>
+              </>
+            ) : (
+              <span style={{ fontSize: "15px" }}>—</span>
+            )}
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="setup-form">
-        <div className="form-grid">
-          <label>
-            Chapter name
-            <input
-              type="text"
-              value={chapter?.name || ""}
-              disabled
-              style={{ opacity: 0.6, cursor: "not-allowed" }}
-            />
-          </label>
-
-          <label>
-            Denomination
-            <input
-              type="text"
-              value={chapter?.denominations?.name || ""}
-              disabled
-              style={{ opacity: 0.6, cursor: "not-allowed" }}
-            />
-          </label>
-
-          <label>
-            Campus
-            <input
-              type="text"
-              value={chapter?.campuses?.name || "Main Campus"}
-              disabled
-              style={{ opacity: 0.6, cursor: "not-allowed" }}
-            />
-          </label>
-
-          <label>
-            Meeting day <span style={{ color: "var(--destructive)" }}>*</span>
-            <select
-              name="meeting_day"
-              value={formData.meeting_day}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select day</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
-            </select>
-          </label>
-
-          <label>
-            Meeting time <span style={{ color: "var(--destructive)" }}>*</span>
-            <input
-              type="text"
-              name="meeting_time"
-              value={formData.meeting_time}
-              onChange={handleChange}
-              placeholder="e.g. 5:30 PM"
-              required
-            />
-          </label>
-
-          <label>
-            Location <span style={{ color: "var(--destructive)" }}>*</span>
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              placeholder="e.g. Old Lecture Theatre (OLT)"
-              required
-            />
-          </label>
-
-          {/* Logo Upload Field */}
-          <label className="wide-field">
-            Fellowship Logo
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
-              {formData.logo_url ? (
-                <img
-                  src={formData.logo_url}
-                  alt="Chapter Logo"
-                  style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--border)' }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: '50%',
-                    background: 'var(--sage)',
-                    color: 'var(--moss)',
-                    display: 'grid',
-                    placeItems: 'center',
-                    fontSize: '24px',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {chapter?.name ? chapter.name[0] : 'L'}
-                </div>
-              )}
-              <div style={{ flex: 1 }}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoUpload}
-                  disabled={isUploadingLogo}
-                  style={{ fontSize: '13px' }}
-                />
-                {isUploadingLogo && (
-                  <span style={{ fontSize: '12px', color: 'var(--muted-foreground)', display: 'block', marginTop: '4px' }}>
-                    Uploading logo...
-                  </span>
-                )}
-              </div>
-            </div>
-          </label>
-
-          <label className="wide-field">
-            Description
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe your fellowship community..."
-              rows={4}
-            />
-          </label>
-
-          <label className="wide-field">
-            WhatsApp group link <span style={{ color: "var(--destructive)" }}>*</span>
-            <input
-              type="url"
-              name="whatsapp_link"
-              value={formData.whatsapp_link}
-              onChange={handleChange}
-              placeholder="https://chat.whatsapp.com/..."
-              required
-            />
-            <span style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "4px" }}>
-              Students automatically receive this link upon registration
-            </span>
-          </label>
-        </div>
-
-        {saveMessage && (
-          <p
-            style={{
-              color: "var(--moss)",
-              fontSize: "14px",
-              marginTop: "16px",
-              padding: "12px 16px",
-              background: "var(--sage)",
-              borderRadius: "8px",
-              fontWeight: "bold",
-            }}
-          >
-            ✓ {saveMessage}
-          </p>
-        )}
-
-        {errorMessage && (
-          <p
-            style={{
-              color: "var(--destructive)",
-              fontSize: "14px",
-              marginTop: "16px",
-              fontWeight: "bold",
-            }}
-          >
-            {errorMessage}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          className="button button-primary full"
-          disabled={isSaving || isUploadingLogo}
-          style={{
-            marginTop: "24px",
-            opacity: isSaving || isUploadingLogo ? 0.6 : 1,
-            cursor: isSaving || isUploadingLogo ? "not-allowed" : "pointer",
-          }}
-        >
-          {isSaving ? "Saving setup..." : "Save and Activate Chapter"}
-          <span aria-hidden="true">→</span>
-        </button>
-      </form>
+      <ChapterInfoModal
+        open={showModal}
+        onOpenChange={setShowModal}
+        chapterName={chapter.name}
+        initialData={{
+          meeting_day: chapter.meeting_day || "",
+          meeting_time: chapter.meeting_time || "",
+          location: chapter.location || "",
+          description: chapter.description || "",
+          whatsapp_link: chapter.whatsapp_link || "",
+          logo_url: chapter.logo_url || "",
+        }}
+        onSuccess={handleSuccess}
+      />
     </DashboardShell>
   )
 }
