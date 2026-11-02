@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { DashboardShell } from "@/components/common/dashboard-shell"
+import { MemberDetailsModal } from "@/components/heads/member-details-modal"
 
 interface Member {
   id: string
@@ -53,8 +54,7 @@ export default function RosterPage() {
     )
   })
 
-  const handleRemoveMember = async (member: Member, e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleRemoveMember = async (member: Member) => {
     if (
       !confirm(
         `Are you sure you want to remove ${member.name} from your roster? They will be free to register with another fellowship.`
@@ -83,8 +83,7 @@ export default function RosterPage() {
     }
   }
 
-  const handleFlagMember = async (member: Member, e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleFlagMember = async (member: Member) => {
     try {
       const res = await fetch(`/api/heads/members/${member.id}`, {
         method: 'PATCH',
@@ -212,7 +211,10 @@ export default function RosterPage() {
                         <button
                           type="button"
                           className="action-btn btn-flag"
-                          onClick={(e) => handleFlagMember(member, e)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleFlagMember(member)
+                          }}
                           title="Flag this member"
                         >
                           <span className="btn-icon">🚩</span>
@@ -221,7 +223,10 @@ export default function RosterPage() {
                         <button
                           type="button"
                           className="action-btn btn-remove"
-                          onClick={(e) => handleRemoveMember(member, e)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemoveMember(member)
+                          }}
                           title="Remove this member"
                         >
                           <span className="btn-icon">✕</span>
@@ -237,208 +242,15 @@ export default function RosterPage() {
         </div>
       )}
 
-      {/* Compact Member Detail Modal */}
-      {selectedMember && (
-        <>
-          <div className="modal-overlay" onClick={() => setSelectedMember(null)} />
-          <div className="modal-card" role="dialog" aria-modal="true">
-            <div className="modal-header">
-              <h3>{selectedMember.name}</h3>
-              <button
-                type="button"
-                onClick={() => setSelectedMember(null)}
-                className="modal-close"
-                aria-label="Close"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="modal-body">
-              <div className="info-row">
-                <span className="info-label">Phone</span>
-                <span className="info-value">{selectedMember.phone || "—"}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Program</span>
-                <span className="info-value">{selectedMember.program || "—"}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Level</span>
-                <span className="info-value">Level {selectedMember.level}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Hall</span>
-                <span className="info-value">{selectedMember.hall || "—"}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Campus</span>
-                <span className="info-value">{selectedMember.campuses?.name || "Main Campus"}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Joined</span>
-                <span className="info-value">{new Date(selectedMember.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-              </div>
-            </div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="modal-btn btn-flag-modal"
-                onClick={(e) => handleFlagMember(selectedMember, e)}
-              >
-                🚩 Flag
-              </button>
-              <button
-                type="button"
-                className="modal-btn btn-remove-modal"
-                onClick={(e) => handleRemoveMember(selectedMember, e)}
-              >
-                ✕ Remove
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      <MemberDetailsModal
+        open={!!selectedMember}
+        onOpenChange={(open) => !open && setSelectedMember(null)}
+        member={selectedMember}
+        onFlag={handleFlagMember}
+        onRemove={handleRemoveMember}
+      />
 
       <style jsx>{`
-        /* Compact Modal Styles */
-        .modal-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(32, 35, 31, 0.6);
-          z-index: 999;
-          backdrop-filter: blur(2px);
-        }
-
-        .modal-card {
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: white;
-          border: 2px solid var(--ink);
-          border-radius: 10px;
-          box-shadow: 4px 4px 0 var(--ink);
-          width: min(460px, calc(100vw - 32px));
-          max-height: calc(100vh - 80px);
-          overflow-y: auto;
-          z-index: 1000;
-        }
-
-        .modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 18px 20px;
-          border-bottom: 1px solid var(--line);
-          background: var(--sage);
-        }
-
-        .modal-header h3 {
-          margin: 0;
-          font-size: 18px;
-          font-weight: 600;
-          color: var(--ink);
-        }
-
-        .modal-close {
-          background: none;
-          border: none;
-          font-size: 20px;
-          cursor: pointer;
-          color: var(--muted-foreground);
-          padding: 4px 8px;
-          line-height: 1;
-          border-radius: 4px;
-          transition: all 0.2s;
-        }
-
-        .modal-close:hover {
-          background: var(--line);
-          color: var(--ink);
-        }
-
-        .modal-body {
-          padding: 8px 20px;
-        }
-
-        .info-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 12px 0;
-          border-bottom: 1px solid var(--line);
-          gap: 16px;
-        }
-
-        .info-row:last-child {
-          border-bottom: none;
-        }
-
-        .info-label {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--muted-foreground);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          flex-shrink: 0;
-        }
-
-        .info-value {
-          font-size: 14px;
-          color: var(--ink);
-          text-align: right;
-          word-break: break-word;
-        }
-
-        .modal-footer {
-          display: flex;
-          gap: 10px;
-          padding: 16px 20px;
-          border-top: 1px solid var(--line);
-          background: var(--cream);
-        }
-
-        .modal-btn {
-          flex: 1;
-          padding: 10px 16px;
-          font-size: 14px;
-          font-weight: 600;
-          border-radius: 8px;
-          border: 2px solid;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-        }
-
-        .btn-flag-modal {
-          border-color: var(--gold);
-          color: var(--accent-foreground);
-          background: var(--butter);
-        }
-
-        .btn-flag-modal:hover {
-          background: var(--gold);
-          transform: translateY(-1px);
-        }
-
-        .btn-remove-modal {
-          border-color: var(--destructive);
-          color: var(--destructive);
-          background: white;
-        }
-
-        .btn-remove-modal:hover {
-          background: var(--destructive);
-          color: white;
-          transform: translateY(-1px);
-        }
-
-        /* Professional Table Styles */
         .roster-table-container {
           margin-top: 20px;
           background: var(--cream);
