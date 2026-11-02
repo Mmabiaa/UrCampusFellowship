@@ -154,183 +154,147 @@ export default function RosterPage() {
       </p>
 
       {isLoading ? (
-        <div style={{ marginTop: "20px" }}>
+        <div className="roster-table-skeleton">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                background: "var(--cream)",
-                borderRadius: "10px",
-                padding: "16px",
-                margin: "0 0 12px",
-                border: "1px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "12px"
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1 }}>
-                <div className="skeleton" style={{ width: 40, height: 40, borderRadius: "50%" }} />
-                <div style={{ flex: 1 }}>
-                  <div className="skeleton" style={{ height: "15px", width: "60%", marginBottom: "6px" }} />
-                  <div className="skeleton" style={{ height: "13px", width: "45%" }} />
-                </div>
-              </div>
+            <div key={i} className="skeleton-row">
+              <div className="skeleton" style={{ width: 40, height: 40, borderRadius: "50%" }} />
+              <div className="skeleton" style={{ height: "14px", width: "120px" }} />
+              <div className="skeleton" style={{ height: "14px", width: "100px" }} />
+              <div className="skeleton" style={{ height: "14px", width: "80px" }} />
+              <div className="skeleton" style={{ height: "14px", width: "90px" }} />
               <div style={{ display: "flex", gap: "8px" }}>
-                <div className="skeleton" style={{ height: "32px", width: "60px", borderRadius: "12px" }} />
-                <div className="skeleton" style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
+                <div className="skeleton" style={{ height: "32px", width: "60px", borderRadius: "6px" }} />
+                <div className="skeleton" style={{ height: "32px", width: "70px", borderRadius: "6px" }} />
               </div>
             </div>
           ))}
         </div>
+      ) : filteredMembers.length === 0 ? (
+        <div className="roster-empty-state">
+          <p>
+            {searchQuery
+              ? `No members found matching "${searchQuery}"`
+              : "No registered members in your fellowship yet."}
+          </p>
+        </div>
       ) : (
-        <div className="roster-list">
-          {filteredMembers.length === 0 ? (
-            <p style={{ padding: "40px 0", textAlign: "center", color: "var(--muted-foreground)" }}>
-              {searchQuery
-                ? `No members found matching "${searchQuery}"`
-                : "No registered members in your fellowship yet."}
-            </p>
-          ) : (
-            filteredMembers.map((member) => (
-              <div
-                key={member.id}
-                onClick={() => setSelectedMember(member)}
-                style={{
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  background: "var(--cream)",
-                  borderRadius: "10px",
-                  padding: "16px",
-                  margin: "0 0 12px",
-                  border: "1px solid var(--border)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "12px",
-                }}
-                className="member-row"
-                role="button"
-                tabIndex={0}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <i
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      background: "var(--sage)",
-                      color: "var(--moss)",
-                      display: "grid",
-                      placeItems: "center",
-                      fontStyle: "normal",
-                      fontWeight: "bold",
-                    }}
+        <div className="roster-table-container">
+          <div className="roster-table-wrapper">
+            <table className="roster-table">
+              <thead>
+                <tr>
+                  <th className="th-name">Name</th>
+                  <th className="th-phone">Phone</th>
+                  <th className="th-program">Program</th>
+                  <th className="th-level">Level</th>
+                  <th className="th-hall">Hall</th>
+                  <th className="th-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredMembers.map((member) => (
+                  <tr 
+                    key={member.id}
+                    onClick={() => setSelectedMember(member)}
+                    className="member-row"
                   >
-                    {(member.name || (member as any).full_name || 'M')[0]?.toUpperCase()}
-                  </i>
-                  <div>
-                    <strong style={{ display: "block", fontSize: "15px" }}>{member.name || (member as any).full_name}</strong>
-                    <small style={{ color: "var(--muted-foreground)", fontSize: "13px" }}>
-                      {member.program} • Level {member.level}
-                    </small>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <button
-                    type="button"
-                    className="button button-outline"
-                    onClick={(e) => handleFlagMember(member, e)}
-                    style={{ padding: "6px 12px", fontSize: "13px" }}
-                  >
-                    Flag
-                  </button>
-                  <button
-                    type="button"
-                    className="button button-outline"
-                    onClick={(e) => handleRemoveMember(member, e)}
-                    style={{
-                      padding: "6px 12px",
-                      fontSize: "13px",
-                      borderColor: "var(--destructive)",
-                      color: "var(--destructive)",
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+                    <td className="td-name" data-label="Name">
+                      <strong>{member.name || (member as any).full_name}</strong>
+                    </td>
+                    <td className="td-phone" data-label="Phone">
+                      <span className="phone-text">{member.phone || "—"}</span>
+                    </td>
+                    <td className="td-program" data-label="Program">{member.program || "—"}</td>
+                    <td className="td-level" data-label="Level">Level {member.level || "—"}</td>
+                    <td className="td-hall" data-label="Hall">{member.hall || "—"}</td>
+                    <td className="td-actions" onClick={(e) => e.stopPropagation()}>
+                      <div className="action-buttons">
+                        <button
+                          type="button"
+                          className="action-btn btn-flag"
+                          onClick={(e) => handleFlagMember(member, e)}
+                          title="Flag this member"
+                        >
+                          <span className="btn-icon">🚩</span>
+                          <span className="btn-text">Flag</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="action-btn btn-remove"
+                          onClick={(e) => handleRemoveMember(member, e)}
+                          title="Remove this member"
+                        >
+                          <span className="btn-icon">✕</span>
+                          <span className="btn-text">Remove</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {/* Member Detail Modal */}
+      {/* Compact Member Detail Modal */}
       {selectedMember && (
         <>
           <div className="modal-overlay" onClick={() => setSelectedMember(null)} />
           <div className="modal-card" role="dialog" aria-modal="true">
-            <div className="modal-head">
-              <div className="modal-head-info">
-                <div className="modal-avatar">{selectedMember.name[0]}</div>
-                <div className="modal-head-text">
-                  <h2>{selectedMember.name}</h2>
-                  <p>Joined {new Date(selectedMember.created_at).toLocaleDateString()}</p>
-                </div>
-              </div>
+            <div className="modal-header">
+              <h3>{selectedMember.name}</h3>
               <button
                 type="button"
                 onClick={() => setSelectedMember(null)}
                 className="modal-close"
                 aria-label="Close"
               >
-                ×
+                ✕
               </button>
             </div>
 
-            <div className="modal-grid">
-              <div className="modal-field">
-                <small>Email</small>
-                <strong className="modal-field-break">{selectedMember.email || "—"}</strong>
+            <div className="modal-body">
+              <div className="info-row">
+                <span className="info-label">Phone</span>
+                <span className="info-value">{selectedMember.phone || "—"}</span>
               </div>
-              <div className="modal-field">
-                <small>Phone</small>
-                <strong>{selectedMember.phone || "—"}</strong>
+              <div className="info-row">
+                <span className="info-label">Program</span>
+                <span className="info-value">{selectedMember.program || "—"}</span>
               </div>
-              <div className="modal-field">
-                <small>Program</small>
-                <strong>{selectedMember.program || "—"}</strong>
+              <div className="info-row">
+                <span className="info-label">Level</span>
+                <span className="info-value">Level {selectedMember.level}</span>
               </div>
-              <div className="modal-field">
-                <small>Level</small>
-                <strong>Level {selectedMember.level}</strong>
+              <div className="info-row">
+                <span className="info-label">Hall</span>
+                <span className="info-value">{selectedMember.hall || "—"}</span>
               </div>
-              <div className="modal-field">
-                <small>Campus</small>
-                <strong>{selectedMember.campuses?.name || "Main Campus"}</strong>
+              <div className="info-row">
+                <span className="info-label">Campus</span>
+                <span className="info-value">{selectedMember.campuses?.name || "Main Campus"}</span>
               </div>
-              <div className="modal-field">
-                <small>Hall/Hostel</small>
-                <strong>{selectedMember.hall || "—"}</strong>
+              <div className="info-row">
+                <span className="info-label">Joined</span>
+                <span className="info-value">{new Date(selectedMember.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
               </div>
             </div>
 
-            <div className="modal-actions">
+            <div className="modal-footer">
               <button
                 type="button"
-                className="button button-outline"
+                className="modal-btn btn-flag-modal"
                 onClick={(e) => handleFlagMember(selectedMember, e)}
               >
-                Flag member
+                🚩 Flag
               </button>
               <button
                 type="button"
-                className="button button-outline modal-remove-btn"
+                className="modal-btn btn-remove-modal"
                 onClick={(e) => handleRemoveMember(selectedMember, e)}
               >
-                Remove member
+                ✕ Remove
               </button>
             </div>
           </div>
@@ -338,78 +302,466 @@ export default function RosterPage() {
       )}
 
       <style jsx>{`
+        /* Compact Modal Styles */
         .modal-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(32, 35, 31, 0.5);
+          background: rgba(32, 35, 31, 0.6);
           z-index: 999;
+          backdrop-filter: blur(2px);
         }
+
         .modal-card {
           position: fixed;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          background: var(--cream);
-          border: 1px solid var(--border);
-          border-radius: 14px;
-          box-shadow: 5px 5px 0 var(--ink);
-          padding: 22px;
-          width: min(400px, calc(100vw - 32px));
+          background: white;
+          border: 2px solid var(--ink);
+          border-radius: 10px;
+          box-shadow: 4px 4px 0 var(--ink);
+          width: min(460px, calc(100vw - 32px));
+          max-height: calc(100vh - 80px);
+          overflow-y: auto;
           z-index: 1000;
         }
-        .modal-head {
+
+        .modal-header {
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
-          gap: 10px;
-          margin-bottom: 14px;
-        }
-        .modal-head-info {
-          display: flex;
           align-items: center;
-          gap: 12px;
-        }
-        .modal-avatar {
-          width: 42px;
-          height: 42px;
-          border-radius: 50%;
+          padding: 18px 20px;
+          border-bottom: 1px solid var(--line);
           background: var(--sage);
-          color: var(--moss);
-          display: grid;
-          place-items: center;
-          font-weight: 700;
-          font-size: 18px;
         }
+
+        .modal-header h3 {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--ink);
+        }
+
         .modal-close {
           background: none;
           border: none;
-          font-size: 24px;
+          font-size: 20px;
           cursor: pointer;
-        }
-        .modal-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-          padding: 14px 0;
-          border-top: 1px solid var(--border);
-          border-bottom: 1px solid var(--border);
-        }
-        .modal-field small {
           color: var(--muted-foreground);
-          font-size: 10px;
-          text-transform: uppercase;
-          display: block;
+          padding: 4px 8px;
+          line-height: 1;
+          border-radius: 4px;
+          transition: all 0.2s;
         }
-        .modal-field strong {
+
+        .modal-close:hover {
+          background: var(--line);
+          color: var(--ink);
+        }
+
+        .modal-body {
+          padding: 8px 20px;
+        }
+
+        .info-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid var(--line);
+          gap: 16px;
+        }
+
+        .info-row:last-child {
+          border-bottom: none;
+        }
+
+        .info-label {
           font-size: 13px;
+          font-weight: 600;
+          color: var(--muted-foreground);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          flex-shrink: 0;
         }
-        .modal-actions {
+
+        .info-value {
+          font-size: 14px;
+          color: var(--ink);
+          text-align: right;
+          word-break: break-word;
+        }
+
+        .modal-footer {
           display: flex;
           gap: 10px;
-          margin-top: 16px;
+          padding: 16px 20px;
+          border-top: 1px solid var(--line);
+          background: var(--cream);
         }
-        .modal-actions .button {
+
+        .modal-btn {
           flex: 1;
+          padding: 10px 16px;
+          font-size: 14px;
+          font-weight: 600;
+          border-radius: 8px;
+          border: 2px solid;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+        }
+
+        .btn-flag-modal {
+          border-color: var(--gold);
+          color: var(--accent-foreground);
+          background: var(--butter);
+        }
+
+        .btn-flag-modal:hover {
+          background: var(--gold);
+          transform: translateY(-1px);
+        }
+
+        .btn-remove-modal {
+          border-color: var(--destructive);
+          color: var(--destructive);
+          background: white;
+        }
+
+        .btn-remove-modal:hover {
+          background: var(--destructive);
+          color: white;
+          transform: translateY(-1px);
+        }
+
+        /* Professional Table Styles */
+        .roster-table-container {
+          margin-top: 20px;
+          background: var(--cream);
+          border: 2px solid var(--ink);
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 4px 4px 0 var(--ink);
+        }
+
+        .roster-table-wrapper {
+          overflow-x: auto;
+          background: white;
+        }
+
+        .roster-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+          background: white;
+        }
+
+        .roster-table thead {
+          background: linear-gradient(135deg, var(--moss) 0%, #4d5744 100%);
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
+        .roster-table th {
+          padding: 16px 20px;
+          text-align: left;
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          color: var(--cream);
+          border-right: 1px solid rgba(255, 253, 247, 0.15);
+          white-space: nowrap;
+        }
+
+        .roster-table th:last-child {
+          border-right: none;
+        }
+
+        .roster-table tbody tr {
+          border-bottom: 1px solid var(--line);
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+
+        .roster-table tbody tr:hover {
+          background: var(--sage);
+          transform: scale(1.002);
+        }
+
+        .roster-table tbody tr:last-child {
+          border-bottom: none;
+        }
+
+        .roster-table td {
+          padding: 16px 20px;
+          font-size: 14px;
+          color: var(--ink);
+          border-right: 1px solid var(--line);
+          vertical-align: middle;
+          transition: all 0.2s ease;
+        }
+
+        .roster-table td:last-child {
+          border-right: none;
+        }
+
+        .td-name {
+          min-width: 180px;
+        }
+
+        .td-name strong {
+          font-weight: 600;
+          color: var(--ink);
+          font-size: 15px;
+        }
+
+        .td-phone {
+          min-width: 150px;
+        }
+
+        .phone-text {
+          color: var(--muted-foreground);
+          font-size: 13px;
+        }
+
+        .td-program {
+          min-width: 160px;
+        }
+
+        .td-level {
+          min-width: 90px;
+          font-weight: 600;
+          color: var(--moss);
+        }
+
+        .td-hall {
+          min-width: 120px;
+        }
+
+        .td-actions {
+          min-width: 190px;
+        }
+
+        .action-buttons {
+          display: flex;
+          gap: 8px;
+          justify-content: flex-end;
+        }
+
+        .action-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 12px;
+          font-size: 13px;
+          font-weight: 600;
+          border-radius: 7px;
+          border: 2px solid;
+          background: white;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .btn-flag {
+          border-color: var(--gold);
+          color: var(--accent-foreground);
+          background: var(--butter);
+        }
+
+        .btn-flag:hover {
+          background: var(--gold);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(232, 200, 120, 0.3);
+        }
+
+        .btn-remove {
+          border-color: var(--destructive);
+          color: var(--destructive);
+        }
+
+        .btn-remove:hover {
+          background: var(--destructive);
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(165, 111, 89, 0.3);
+        }
+
+        .btn-icon {
+          font-size: 13px;
+        }
+
+        /* Responsive Design - Tablet */
+        @media (max-width: 1024px) {
+          .td-hall,
+          .th-hall {
+            display: none;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .td-phone,
+          .th-phone {
+            display: none;
+          }
+        }
+
+        /* Responsive Design - Mobile Card Layout */
+        @media (max-width: 768px) {
+          .roster-table-container {
+            border: none;
+            box-shadow: none;
+            background: transparent;
+          }
+
+          .roster-table-wrapper {
+            border-radius: 0;
+            background: transparent;
+          }
+
+          .roster-table,
+          .roster-table thead,
+          .roster-table tbody,
+          .roster-table th,
+          .roster-table td,
+          .roster-table tr {
+            display: block;
+          }
+
+          .roster-table thead {
+            display: none;
+          }
+
+          .roster-table tbody tr {
+            margin-bottom: 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: white;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+          }
+
+          .roster-table tbody tr:hover {
+            background: var(--sage);
+            transform: none;
+            border-color: var(--moss);
+          }
+
+          .roster-table tbody tr:last-child {
+            margin-bottom: 0;
+          }
+
+          .roster-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-right: none;
+            border-bottom: 1px solid var(--line);
+          }
+
+          .roster-table td:last-child {
+            border-bottom: none;
+          }
+
+          .roster-table td:before {
+            content: attr(data-label);
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--moss);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .td-name {
+            background: var(--sage);
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+          }
+
+          .td-name:before {
+            display: none;
+          }
+
+          .td-name strong {
+            font-size: 16px;
+            display: block;
+          }
+
+          .td-phone {
+            display: flex;
+          }
+
+          .td-actions {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--cream);
+          }
+
+          .td-actions:before {
+            display: none;
+          }
+
+          .action-buttons {
+            width: 100%;
+            flex-direction: row;
+            margin-top: 4px;
+          }
+
+          .action-btn {
+            flex: 1;
+            padding: 9px 12px;
+            justify-content: center;
+          }
+
+          .btn-text {
+            display: inline;
+          }
+
+          /* Modal adjustments for mobile */
+          .modal-card {
+            width: calc(100vw - 24px);
+            max-height: calc(100vh - 40px);
+          }
+
+          .modal-header {
+            padding: 14px 16px;
+          }
+
+          .modal-header h3 {
+            font-size: 16px;
+          }
+
+          .modal-body {
+            padding: 6px 16px;
+          }
+
+          .info-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 10px 0;
+          }
+
+          .info-value {
+            text-align: left;
+          }
+
+          .modal-footer {
+            padding: 12px 16px;
+            flex-direction: column;
+          }
+
+          .modal-btn {
+            width: 100%;
+          }
         }
       `}</style>
     </DashboardShell>

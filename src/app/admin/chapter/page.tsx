@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { DashboardShell } from "@/components/common/dashboard-shell"
+import { ChapterForm } from "@/components/admin/chapter-form"
 
 interface Option {
   id: string
@@ -31,27 +32,10 @@ export default function AdminChapterPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
 
   const [isLoading, setIsLoading] = useState(true)
-  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null)
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null)
 
-  const [formData, setFormData] = useState({
-    name: "",
-    denomination_id: "",
-    campus_id: "",
-    status: "draft",
-    meeting_day: "",
-    meeting_time: "",
-    location: "",
-    description: "",
-    whatsapp_link: "",
-    logo_url: "",
-  })
-
-  const [isUploading, setIsUploading] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
 
@@ -59,9 +43,9 @@ export default function AdminChapterPage() {
     try {
       setIsLoading(true)
       const [chapRes, denRes, camRes] = await Promise.all([
-        fetch('/api/admin/chapters'),
-        fetch('/api/public/denominations'),
-        fetch('/api/public/campuses')
+        fetch("/api/admin/chapters"),
+        fetch("/api/public/denominations"),
+        fetch("/api/public/campuses"),
       ])
 
       if (chapRes.ok) {
@@ -87,179 +71,53 @@ export default function AdminChapterPage() {
     loadData()
   }, [])
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setIsUploading(true)
-    setError("")
-
-    try {
-      const uploadData = new FormData()
-      uploadData.append('file', file)
-
-      const res = await fetch('/api/uploads/logo', {
-        method: 'POST',
-        body: uploadData,
-      })
-
-      const data = await res.json()
-      if (res.ok && data.url) {
-        setFormData((prev) => ({ ...prev, logo_url: data.url }))
-        setMessage("Logo image uploaded successfully!")
-      } else {
-        setError(data.error || "Failed to upload image.")
-      }
-    } catch {
-      setError("Network error uploading image.")
-    } finally {
-      setIsUploading(false)
-    }
+  const handleSuccess = () => {
+    const action = editingChapter ? "updated" : "created"
+    setMessage(`Chapter ${action} successfully!`)
+    setTimeout(() => setMessage(""), 4000)
+    setEditingChapter(null)
+    loadData()
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.name.trim()) {
-      setError("Chapter name is required.")
-      return
-    }
-
-    setIsSaving(true)
-    setError("")
-    setMessage("")
-
-    const payload: Record<string, any> = { ...formData }
-    if (!payload.denomination_id) delete payload.denomination_id
-    if (!payload.campus_id) delete payload.campus_id
-
-    try {
-      const url = editingChapter ? `/api/admin/chapters/${editingChapter.id}` : '/api/admin/chapters'
-      const method = editingChapter ? 'PATCH' : 'POST'
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error || "Failed to save chapter.")
-        setIsSaving(false)
-        return
-      }
-
-      setMessage(editingChapter ? "Chapter updated successfully!" : "Chapter shell created successfully!")
-      setShowCreateForm(false)
-      setEditingChapter(null)
-      setIsSaving(false)
-      loadData()
-
-      setTimeout(() => setMessage(""), 4000)
-    } catch {
-      setError("Network error.")
-      setIsSaving(false)
-    }
+  const openCreateModal = () => {
+    setEditingChapter(null)
+    setShowModal(true)
   }
 
-  const handleDelete = async () => {
-    if (!editingChapter) return
-
-    setIsDeleting(true)
-    setError("")
-    setMessage("")
-    setShowDeleteModal(false)
-
-    try {
-      const res = await fetch(`/api/admin/chapters/${editingChapter.id}`, {
-        method: 'DELETE',
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error || "Failed to delete chapter.")
-        setIsDeleting(false)
-        return
-      }
-
-      setMessage("Chapter deleted successfully!")
-      setEditingChapter(null)
-      setIsDeleting(false)
-      loadData()
-
-      setTimeout(() => setMessage(""), 4000)
-    } catch {
-      setError("Network error.")
-      setIsDeleting(false)
-    }
-  }
-
-  const openEditForm = (chap: Chapter) => {
+  const openEditModal = (chap: Chapter) => {
     setEditingChapter(chap)
-    setFormData({
-      name: chap.name,
-      denomination_id: chap.denomination_id || chap.denominations?.id || "",
-      campus_id: chap.campus_id || chap.campuses?.id || "",
-      status: chap.status,
-      meeting_day: chap.meeting_day || "",
-      meeting_time: chap.meeting_time || "",
-      location: chap.location || "",
-      description: chap.description || "",
-      whatsapp_link: chap.whatsapp_link || "",
-      logo_url: chap.logo_url || "",
-    })
-    setShowCreateForm(false)
-    setError("")
-    setMessage("")
+    setShowModal(true)
   }
 
-  const filteredChapters = statusFilter === "all" 
-    ? chapters 
-    : chapters.filter(c => c.status === statusFilter)
+  const filteredChapters =
+    statusFilter === "all" ? chapters : chapters.filter((c) => c.status === statusFilter)
 
-  const pendingCount = chapters.filter(c => c.status === "pending_approval").length
+  const pendingCount = chapters.filter((c) => c.status === "pending_approval").length
 
   return (
     <DashboardShell role="admin">
       <div className="dash-header">
         <div>
           <p className="eyebrow">Chapter Management</p>
-          <h1>Chapters & Logo Pictures</h1>
-          <p className="intro">
-            Create and edit chapters with custom picture logos and meeting details.
-          </p>
+          <h1>Manage Chapters</h1>
+          <p className="intro">Create and edit chapters with logos and meeting details.</p>
         </div>
-        <button
-          type="button"
-          className="button button-primary"
-          onClick={() => {
-            setShowCreateForm(!showCreateForm)
-            setEditingChapter(null)
-            setFormData({
-              name: "",
-              denomination_id: denominations[0]?.id || "",
-              campus_id: campuses[0]?.id || "",
-              status: "draft",
-              meeting_day: "",
-              meeting_time: "",
-              location: "",
-              description: "",
-              whatsapp_link: "",
-              logo_url: "",
-            })
-            setError("")
-            setMessage("")
-          }}
-          style={{ whiteSpace: "nowrap" }}
-        >
-          {showCreateForm ? "Cancel" : "+ New Chapter"}
+        <button type="button" className="button button-primary" onClick={openCreateModal}>
+          + New Chapter
         </button>
       </div>
 
       {message && (
-        <p style={{ padding: "12px 16px", background: "var(--sage)", color: "var(--moss)", borderRadius: "8px", fontWeight: "bold", marginBottom: "20px" }}>
+        <p
+          style={{
+            padding: "12px 16px",
+            background: "var(--sage)",
+            color: "var(--moss)",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            marginBottom: "20px",
+          }}
+        >
           ✓ {message}
         </p>
       )}
@@ -270,312 +128,57 @@ export default function AdminChapterPage() {
         </p>
       )}
 
-      {(showCreateForm || editingChapter) && (
-        <div style={{
-          background: "var(--cream)",
-          border: "1px solid var(--border)",
-          borderRadius: "10px",
-          padding: "24px",
-          marginBottom: "32px",
-          animation: "fadeIn 0.2s ease",
-        }}>
-          <h3 style={{ fontSize: "18px", marginBottom: "16px" }}>
-            {editingChapter ? `Update Chapter: ${editingChapter.name}` : "Create Chapter Shell"}
-          </h3>
-
-          <form onSubmit={handleSubmit}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                  Chapter Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. PENSA UMaT Chapter"
-                  required
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                  Status
-                </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                >
-                  <option value="draft">Draft</option>
-                  <option value="pending_approval">Pending Approval</option>
-                  <option value="coming_soon">Coming Soon</option>
-                  <option value="active">Active</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-              </div>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                  Denomination
-                </label>
-                <select
-                  value={formData.denomination_id}
-                  onChange={(e) => setFormData({ ...formData, denomination_id: e.target.value })}
-                >
-                  <option value="">Select Denomination (Optional)</option>
-                  {denominations.map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                  Campus
-                </label>
-                <select
-                  value={formData.campus_id}
-                  onChange={(e) => setFormData({ ...formData, campus_id: e.target.value })}
-                >
-                  <option value="">Select Campus (Optional)</option>
-                  {campuses.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Picture Upload / URL Input section */}
-            <div style={{ marginBottom: "20px" }}>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                Chapter Logo (Picture File Upload or Image URL)
-              </label>
-
-              <div style={{ display: "flex", gap: "16px", alignItems: "center", marginTop: "8px" }}>
-                {formData.logo_url ? (
-                  <img
-                    src={formData.logo_url}
-                    alt="Logo preview"
-                    style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", border: "1px solid var(--border)" }}
-                  />
-                ) : (
-                  <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--sage)", color: "var(--moss)", display: "grid", placeItems: "center", fontWeight: "bold", fontSize: "24px" }}>
-                    {formData.name ? formData.name[0] : "C"}
-                  </div>
-                )}
-
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <div>
-                    <span style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "4px" }}>
-                      Upload Logo Picture File:
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoUpload}
-                      disabled={isUploading}
-                      style={{ fontSize: "13px" }}
-                    />
-                    {isUploading && <small style={{ color: "var(--moss)", display: "block" }}>Uploading logo...</small>}
-                  </div>
-
-                  <div>
-                    <span style={{ fontSize: "12px", color: "var(--muted-foreground)", display: "block", marginBottom: "4px" }}>
-                      Or Image URL:
-                    </span>
-                    <input
-                      type="url"
-                      value={formData.logo_url}
-                      onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                      placeholder="https://example.com/chapter-logo.png"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                  Meeting Day
-                </label>
-                <input
-                  type="text"
-                  value={formData.meeting_day}
-                  onChange={(e) => setFormData({ ...formData, meeting_day: e.target.value })}
-                  placeholder="e.g. Wednesday"
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                  Meeting Time
-                </label>
-                <input
-                  type="text"
-                  value={formData.meeting_time}
-                  onChange={(e) => setFormData({ ...formData, meeting_time: e.target.value })}
-                  placeholder="e.g. 5:30 PM"
-                />
-              </div>
-            </div>
-
-            <div style={{ marginBottom: "16px" }}>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: 500, marginBottom: "6px" }}>
-                Location
-              </label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="e.g. Old Lecture Theatre (OLT)"
-              />
-            </div>
-
-            <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
-              <button
-                type="submit"
-                className="button button-primary"
-                disabled={isSaving || isUploading || isDeleting || !formData.name.trim()}
-              >
-                {isSaving ? "Saving..." : editingChapter ? "Update Chapter" : "Create Chapter Shell"}
-              </button>
-              <button
-                type="button"
-                className="button button-outline"
-                onClick={() => {
-                  setShowCreateForm(false)
-                  setEditingChapter(null)
-                }}
-                disabled={isSaving || isDeleting}
-              >
-                Cancel
-              </button>
-              {editingChapter && (
-                <button
-                  type="button"
-                  className="button"
-                  onClick={() => setShowDeleteModal(true)}
-                  disabled={isDeleting || isSaving}
-                  style={{
-                    marginLeft: "auto",
-                    background: "var(--destructive)",
-                    color: "white",
-                    border: "none",
-                  }}
-                >
-                  {isDeleting ? "Deleting..." : "Delete Chapter"}
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-      )}
-
       {/* Status Filter Tabs */}
-      <div style={{ 
-        display: "flex", 
-        gap: "8px", 
-        marginBottom: "24px", 
-        borderBottom: "1px solid var(--border)",
-        paddingBottom: "8px"
-      }}>
-        <button
-          type="button"
-          onClick={() => setStatusFilter("all")}
-          style={{
-            background: statusFilter === "all" ? "var(--moss)" : "transparent",
-            color: statusFilter === "all" ? "white" : "var(--muted-foreground)",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: 500,
-          }}
-        >
-          All ({chapters.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter("pending_approval")}
-          style={{
-            background: statusFilter === "pending_approval" ? "var(--moss)" : "transparent",
-            color: statusFilter === "pending_approval" ? "white" : "var(--muted-foreground)",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: 500,
-            position: "relative",
-          }}
-        >
-          Pending Approval 
-          {pendingCount > 0 && (
-            <span style={{
-              background: "var(--destructive)",
-              color: "white",
-              borderRadius: "10px",
-              padding: "2px 6px",
-              fontSize: "11px",
-              marginLeft: "6px",
-              fontWeight: "bold",
-            }}>
-              {pendingCount}
-            </span>
-          )}
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter("active")}
-          style={{
-            background: statusFilter === "active" ? "var(--moss)" : "transparent",
-            color: statusFilter === "active" ? "white" : "var(--muted-foreground)",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: 500,
-          }}
-        >
-          Active
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter("coming_soon")}
-          style={{
-            background: statusFilter === "coming_soon" ? "var(--moss)" : "transparent",
-            color: statusFilter === "coming_soon" ? "white" : "var(--muted-foreground)",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: 500,
-          }}
-        >
-          Coming Soon
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter("draft")}
-          style={{
-            background: statusFilter === "draft" ? "var(--moss)" : "transparent",
-            color: statusFilter === "draft" ? "white" : "var(--muted-foreground)",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: 500,
-          }}
-        >
-          Draft
-        </button>
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          marginBottom: "24px",
+          borderBottom: "1px solid var(--border)",
+          paddingBottom: "8px",
+        }}
+      >
+        {[
+          { key: "all", label: "All", count: chapters.length },
+          { key: "pending_approval", label: "Pending Approval", count: pendingCount },
+          { key: "active", label: "Active" },
+          { key: "coming_soon", label: "Coming Soon" },
+          { key: "draft", label: "Draft" },
+        ].map((filter) => (
+          <button
+            key={filter.key}
+            type="button"
+            onClick={() => setStatusFilter(filter.key)}
+            style={{
+              background: statusFilter === filter.key ? "var(--moss)" : "transparent",
+              color: statusFilter === filter.key ? "white" : "var(--muted-foreground)",
+              border: "none",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: 500,
+              position: "relative",
+            }}
+          >
+            {filter.label}{" "}
+            {filter.count !== undefined && filter.count > 0 && filter.key === "pending_approval" && (
+              <span
+                style={{
+                  background: "var(--destructive)",
+                  color: "white",
+                  borderRadius: "10px",
+                  padding: "2px 6px",
+                  fontSize: "11px",
+                  marginLeft: "6px",
+                  fontWeight: "bold",
+                }}
+              >
+                {filter.count}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
       {/* Chapters list */}
@@ -584,15 +187,27 @@ export default function AdminChapterPage() {
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="simple-list-row" style={{ justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: 1 }}>
-                <div className="skeleton" style={{ width: 44, height: 44, borderRadius: "50%" }} />
+                <div
+                  className="skeleton"
+                  style={{ width: 44, height: 44, borderRadius: "50%" }}
+                />
                 <div style={{ flex: 1 }}>
-                  <div className="skeleton" style={{ height: "15px", width: "60%", marginBottom: "6px" }} />
+                  <div
+                    className="skeleton"
+                    style={{ height: "15px", width: "60%", marginBottom: "6px" }}
+                  />
                   <div className="skeleton" style={{ height: "13px", width: "45%" }} />
                 </div>
               </div>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                <div className="skeleton" style={{ height: "24px", width: "60px", borderRadius: "6px" }} />
-                <div className="skeleton" style={{ height: "32px", width: "80px", borderRadius: "12px" }} />
+                <div
+                  className="skeleton"
+                  style={{ height: "24px", width: "60px", borderRadius: "6px" }}
+                />
+                <div
+                  className="skeleton"
+                  style={{ height: "32px", width: "80px", borderRadius: "12px" }}
+                />
               </div>
             </div>
           ))}
@@ -605,62 +220,127 @@ export default function AdminChapterPage() {
             </div>
           ) : (
             filteredChapters.map((chap) => (
-            <div key={chap.id} className="simple-list-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div
-                style={{ display: "flex", alignItems: "center", gap: "16px", cursor: "pointer", flex: 1 }}
-                onClick={() => setSelectedChapter(chap)}
+                key={chap.id}
+                className="simple-list-row"
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
               >
-                {chap.logo_url ? (
-                  <img
-                    src={chap.logo_url}
-                    alt={chap.name}
-                    style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", border: "1px solid var(--border)" }}
-                  />
-                ) : (
-                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--sage)", color: "var(--moss)", display: "grid", placeItems: "center", fontWeight: "bold" }}>
-                    {chap.name[0]}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    cursor: "pointer",
+                    flex: 1,
+                  }}
+                  onClick={() => setSelectedChapter(chap)}
+                >
+                  {chap.logo_url ? (
+                    <img
+                      src={chap.logo_url}
+                      alt={chap.name}
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        border: "1px solid var(--border)",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        background: "var(--sage)",
+                        color: "var(--moss)",
+                        display: "grid",
+                        placeItems: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {chap.name[0]}
+                    </div>
+                  )}
+                  <div>
+                    <strong style={{ display: "block", fontSize: "15px" }}>{chap.name}</strong>
+                    <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+                      {chap.denominations?.name || "Fellowship"} •{" "}
+                      {chap.campuses?.name || "Main Campus"}
+                    </span>
                   </div>
-                )}
-                <div>
-                  <strong style={{ display: "block", fontSize: "15px" }}>{chap.name}</strong>
-                  <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
-                    {chap.denominations?.name || "Fellowship"} • {chap.campuses?.name || "Main Campus"}
+                </div>
+
+                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                      background: chap.status === "active" ? "var(--sage)" : "var(--cream)",
+                      color:
+                        chap.status === "active" ? "var(--moss)" : "var(--muted-foreground)",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {chap.status}
                   </span>
+
+                  <button
+                    type="button"
+                    className="button button-outline"
+                    onClick={() => openEditModal(chap)}
+                    style={{ padding: "6px 12px", fontSize: "13px" }}
+                  >
+                    Edit
+                  </button>
                 </div>
               </div>
-
-              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                <span style={{
-                  fontSize: "12px",
-                  padding: "4px 10px",
-                  borderRadius: "6px",
-                  background: chap.status === "active" ? "var(--sage)" : "var(--cream)",
-                  color: chap.status === "active" ? "var(--moss)" : "var(--muted-foreground)",
-                  fontWeight: 500,
-                }}>
-                  {chap.status}
-                </span>
-
-                <button
-                  type="button"
-                  className="button button-outline"
-                  onClick={() => openEditForm(chap)}
-                  style={{ padding: "6px 12px", fontSize: "13px" }}
-                >
-                  Edit Form
-                </button>
-              </div>
-            </div>
-          )))}
+            ))
+          )}
         </div>
       )}
 
       {/* Chapter Details Modal */}
       {selectedChapter && (
         <>
-          <div className="modal-overlay" onClick={() => setSelectedChapter(null)} />
-          <div className="modal-card">
-            <div className="modal-head" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div
+            className="modal-overlay"
+            onClick={() => setSelectedChapter(null)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(32, 35, 31, 0.6)",
+              zIndex: 999,
+              backdropFilter: "blur(2px)",
+            }}
+          />
+          <div
+            className="modal-card"
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "white",
+              border: "2px solid var(--ink)",
+              borderRadius: "10px",
+              boxShadow: "4px 4px 0 var(--ink)",
+              width: "min(480px, calc(100vw - 32px))",
+              zIndex: 1000,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "16px",
+                padding: "18px 20px",
+                borderBottom: "1px solid var(--line)",
+                background: "var(--sage)",
+              }}
+            >
               {selectedChapter.logo_url ? (
                 <img
                   src={selectedChapter.logo_url}
@@ -668,7 +348,19 @@ export default function AdminChapterPage() {
                   style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover" }}
                 />
               ) : (
-                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--sage)", color: "var(--moss)", display: "grid", placeItems: "center", fontWeight: "bold", fontSize: "20px" }}>
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: "50%",
+                    background: "var(--moss)",
+                    color: "var(--cream)",
+                    display: "grid",
+                    placeItems: "center",
+                    fontWeight: "bold",
+                    fontSize: "20px",
+                  }}
+                >
                   {selectedChapter.name[0]}
                 </div>
               )}
@@ -678,78 +370,113 @@ export default function AdminChapterPage() {
                   {selectedChapter.denominations?.name}
                 </p>
               </div>
-              <button type="button" onClick={() => setSelectedChapter(null)} style={{ background: "none", border: "none", fontSize: "24px", cursor: "pointer" }}>×</button>
-            </div>
-
-            <div style={{ padding: "16px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-              <div>
-                <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Campus</small>
-                <strong>{selectedChapter.campuses?.name || "Main Campus"}</strong>
-              </div>
-              <div>
-                <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Status</small>
-                <strong style={{ color: selectedChapter.status === "active" ? "var(--moss)" : "inherit" }}>{selectedChapter.status}</strong>
-              </div>
-              <div>
-                <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Meeting Schedule</small>
-                <strong>{selectedChapter.meeting_day || "N/A"} {selectedChapter.meeting_time || ""}</strong>
-              </div>
-              <div>
-                <small style={{ color: "var(--muted-foreground)", fontSize: "10px", display: "block" }}>Location</small>
-                <strong>{selectedChapter.location || "N/A"}</strong>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && editingChapter && (
-        <>
-          <div className="modal-overlay" onClick={() => setShowDeleteModal(false)} />
-          <div className="modal-card" style={{ maxWidth: "420px" }}>
-            <div style={{ marginBottom: "16px" }}>
-              <h2 style={{ fontSize: "20px", margin: "0 0 8px 0", color: "var(--destructive)" }}>
-                Delete Chapter?
-              </h2>
-              <p style={{ margin: 0, fontSize: "14px", color: "var(--muted-foreground)", lineHeight: "1.5" }}>
-                Are you sure you want to delete <strong>{editingChapter.name}</strong>? This action cannot be undone and will permanently remove the chapter and all its data.
-              </p>
-            </div>
-
-            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
               <button
                 type="button"
-                className="button button-outline"
-                onClick={() => setShowDeleteModal(false)}
-                disabled={isDeleting}
-                style={{ fontSize: "14px" }}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="button"
-                onClick={handleDelete}
-                disabled={isDeleting}
+                onClick={() => setSelectedChapter(null)}
                 style={{
-                  background: "var(--destructive)",
-                  color: "white",
+                  background: "none",
                   border: "none",
-                  fontSize: "14px",
+                  fontSize: "24px",
+                  cursor: "pointer",
                 }}
               >
-                {isDeleting ? "Deleting..." : "Delete Chapter"}
+                ×
               </button>
+            </div>
+
+            <div
+              style={{
+                padding: "20px",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "16px",
+              }}
+            >
+              <div>
+                <small
+                  style={{
+                    color: "var(--muted-foreground)",
+                    fontSize: "11px",
+                    display: "block",
+                    textTransform: "uppercase",
+                    fontWeight: 600,
+                    marginBottom: "4px",
+                  }}
+                >
+                  Campus
+                </small>
+                <strong style={{ fontSize: "14px" }}>
+                  {selectedChapter.campuses?.name || "Main Campus"}
+                </strong>
+              </div>
+              <div>
+                <small
+                  style={{
+                    color: "var(--muted-foreground)",
+                    fontSize: "11px",
+                    display: "block",
+                    textTransform: "uppercase",
+                    fontWeight: 600,
+                    marginBottom: "4px",
+                  }}
+                >
+                  Status
+                </small>
+                <strong
+                  style={{
+                    fontSize: "14px",
+                    color: selectedChapter.status === "active" ? "var(--moss)" : "inherit",
+                  }}
+                >
+                  {selectedChapter.status}
+                </strong>
+              </div>
+              <div>
+                <small
+                  style={{
+                    color: "var(--muted-foreground)",
+                    fontSize: "11px",
+                    display: "block",
+                    textTransform: "uppercase",
+                    fontWeight: 600,
+                    marginBottom: "4px",
+                  }}
+                >
+                  Meeting Schedule
+                </small>
+                <strong style={{ fontSize: "14px" }}>
+                  {selectedChapter.meeting_day || "N/A"}{" "}
+                  {selectedChapter.meeting_time ? `at ${selectedChapter.meeting_time}` : ""}
+                </strong>
+              </div>
+              <div>
+                <small
+                  style={{
+                    color: "var(--muted-foreground)",
+                    fontSize: "11px",
+                    display: "block",
+                    textTransform: "uppercase",
+                    fontWeight: 600,
+                    marginBottom: "4px",
+                  }}
+                >
+                  Location
+                </small>
+                <strong style={{ fontSize: "14px" }}>{selectedChapter.location || "N/A"}</strong>
+              </div>
             </div>
           </div>
         </>
       )}
 
-      <style jsx>{`
-        .modal-overlay { position: fixed; inset: 0; background: rgba(32, 35, 31, 0.5); z-index: 999; }
-        .modal-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 22px; width: min(480px, calc(100vw - 32px)); z-index: 1000; }
-      `}</style>
+      <ChapterForm
+        open={showModal}
+        onOpenChange={setShowModal}
+        chapter={editingChapter}
+        denominations={denominations}
+        campuses={campuses}
+        onSuccess={handleSuccess}
+      />
     </DashboardShell>
   )
 }
