@@ -3138,3 +3138,34 @@ textarea {
     display: none;
   }
 }
+/* 
+============================================
+   Mobile Input Zoom Prevention
+   ============================================ */
+
+/* Prevent mobile browsers (especially iOS Safari) from zooming in on input focus
+   by ensuring all form inputs have at least 16px font-size */
+@media (max-width: 760px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="search"],
+  input[type="url"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Keep labels and other text at their normal sizes */
+  label {
+    font-size: 13px;
+  }
+
+  /* Adjust button text if needed */
+  .button,
+  button {
+    font-size: max(14px, 1em);
+  }
+}
